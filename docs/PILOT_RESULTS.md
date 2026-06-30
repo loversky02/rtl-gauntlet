@@ -192,6 +192,26 @@ adversarial conditions (tamper-capable agent / weak tests) — which the tamper-
 This is the campaign's headline: across 2 models × 156 tasks, **every flagged "hack" was an oracle
 artifact**, removed by hardening + verification.
 
+## 10. Cost axis (C2) — from the sweep token logs
+
+Per-task tokens for the 156-task agentic sweeps (max 2 iters, routed gateway):
+
+| model | total | mean | median | max | 1-iter | 2-iter | top-10% share |
+|-------|------:|-----:|-------:|----:|-------:|-------:|--------------:|
+| Opus 4.8 | 482k | 3,090 | 2,632 | 9,347 | 139 | 17 | 21% |
+| Haiku 4.5 | 522k | 3,597 | 2,611 | 9,418 | 109 | 36 | 21% |
+
+- VerilogEval tasks are small → **no extreme long tail** (unlike HORIZON's CID 002 = 56M tokens);
+  the 2-iter cap bounds it. Top-10% tasks hold only 21% of tokens.
+- The weaker model is **cheaper per call but needs more repair** (2-iter: 17 vs 36), so total cost
+  is comparable/higher — weakness shifts spend to *iteration*, a clean cost-axis signal.
+- Eliciting HORIZON-style long tails needs higher iter caps + harder tasks; an early-stop policy
+  then becomes measurable. Cached-token discount on the gateway makes billable ≪ total.
+
+## Compute note
+The honesty oracle + all sweeps run on **CPU + routed LLM, $0** (no GPU). Only the C3 PPA surrogate
+needs a GPU (~1 h on a cheap card); the long pole there is CPU data-gen. See `docs/C3_PLAN.md`.
+
 ## Findings
 
 1. **Machinery is validated.** Planted anchors confirm the oracle catches over-fit
