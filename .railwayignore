@@ -1,0 +1,8 @@
+external/
+runs/
+results/
+.venv/
+.git/
+__pycache__/
+*.pyc
+*.log
