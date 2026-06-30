@@ -1,0 +1,14 @@
+{
+  "task_id": "veval_prob156_review2015_fancytimer",
+  "top": "TopModule",
+  "kind": "veval",
+  "source": "verilog-eval",
+  "has_reference": true,
+  "interface": "module TopModule (\n  input wire clk,\n  input wire reset,\n  input wire data,\n  output wire [3:0] count,\n  output reg counting,\n  output reg done,\n  input wire ack\n);",
+  "files": {
+    "spec": "spec.md",
+    "golden": "golden.v",
+    "ref_module": "ref_module.sv",
+    "test": "test.sv"
+  }
+}

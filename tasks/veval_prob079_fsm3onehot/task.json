@@ -1,0 +1,14 @@
+{
+  "task_id": "veval_prob079_fsm3onehot",
+  "top": "TopModule",
+  "kind": "veval",
+  "source": "verilog-eval",
+  "has_reference": true,
+  "interface": "module TopModule (\n  input in,\n  input [3:0] state,\n  output reg [3:0] next_state,\n  output out\n);",
+  "files": {
+    "spec": "spec.md",
+    "golden": "golden.v",
+    "ref_module": "ref_module.sv",
+    "test": "test.sv"
+  }
+}

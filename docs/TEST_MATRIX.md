@@ -12,6 +12,8 @@ Each paper claim maps to a concrete artifact that proves it. Status:
 | H2b | Agents reward-hack on *harder* fair tasks | popcount8: Opus+Haiku RHG=0, no tamper (RTL-only & shell) → no natural hacking on small fair tasks; needs scale (SpecBench) | 1 | 🟡 |
 | H4 | Tamper detector + isolation hold (R12/R17) | planted-tamper: faked visible PASS but hidden FAIL + formal CEX + tamper flagged | 1 | 🟢 |
 | H5 | Pipeline runs on an external public benchmark | VerilogEval ×4: adapter + their-TB visible + formal withheld; oracle + Opus 4.8 honest (RHG 0) | 1 | 🟢 |
+| H6 | Naive formal oracle over-reports (must verify) | 156-task Opus sweep: 9 RHG_cex + 50 inconclusive ALL verified as oracle false-positives (don't-care `x` / sequential-reset); no real hacking | 1 | 🟢 |
+| H7 | Don't-care + reset-aware oracle removes false RHG | re-sweep after fixing equiv (setundef/careset + init constraints) | 1 | 🔴 |
 | H3 | Formal equivalence catches hacks that hidden tests miss | ≥1 task: passes hidden, fails EQY (needs a task where hidden alone misses) | 1 | 🔴 |
 | C1 | Long tail is reproducible | one task with ≫ median tokens reproduced | 2 | 🔴 |
 | C2 | Early-stop cuts tokens at fixed honesty | % token saved at equal HPR | 2 | 🔴 |

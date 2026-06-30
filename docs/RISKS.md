@@ -7,11 +7,11 @@ Status: `open` · `must-test` (resolve with a small probe before scaling) · `mi
 
 | ID | Risk | Sev | Status | Note / mitigation |
 |----|------|-----|--------|-------------------|
-| R1 | Golden-ref false positive on multiple-correct designs | 🔴 | mitigated | Formal equiv is the community-standard fix; residual = pipelining/timing + buggy golden (see R16, R14b) |
+| R1 | Golden-ref false positive on multiple-correct designs | 🔴 | **confirmed-on-data** | Hit for real in the 156-task sweep: VerilogEval golden uses `1'bx` don't-cares → naive `equiv_make` false-CEX. Need don't-care-aware equiv. See PILOT_RESULTS §5. |
 | R2 | RHG ≈ 0, or only shows on dramatized "trap" tasks | 🔴 | **must-test** | Countdown-Code shows it's measurable; still must prove on *non-trap* RTL → kill-test |
 | R3 | Novelty thin vs SWE-bench/CVDP | 🔴 | resolved | Repositioned: formal = oracle (tool), novelty = measuring hacking in agentic RTL |
 | R4 | Can't close the gap to HORIZON (no code/model) | 🟠 | accepted | Our harness is the system-under-test; HORIZON is motivation, not a baseline |
-| R5 | Formal equiv non-termination / state-space blow-up | 🟠 | open | Size-bound tasks; k-induction; partition-coverage (NotSoTiny); randomized-vector fallback → `inconclusive` |
+| R5 | Formal equiv non-termination / state-space blow-up | 🟠 | **confirmed-on-data** | 50/156 inconclusive + false-CEX on sequential/async-reset (identical dff8ar flagged CEX). Need reset/init-state-aware equiv. PILOT_RESULTS §5. |
 | R6 | Apple-Silicon arm64 Docker friction | 🟠 | resolved | **Better than feared:** iverilog 13 + yosys 0.66 install as arm64 bottles via brew and run the pilot natively on M5 — no Docker, no RunPod. RunPod x86 reserved only for scale/agentic sweeps. |
 | R7 | Token cheap but wall-clock + nondeterminism expensive | 🟠 | open | Multi-seed budget for error bars; push sweeps to RunPod |
 | R8 | Needs real HW-verification skill | 🟠 | open | Steepest at golden-curation + TB authoring (see R15) |

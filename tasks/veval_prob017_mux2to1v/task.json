@@ -1,0 +1,14 @@
+{
+  "task_id": "veval_prob017_mux2to1v",
+  "top": "TopModule",
+  "kind": "veval",
+  "source": "verilog-eval",
+  "has_reference": true,
+  "interface": "module TopModule (\n  input [99:0] a,\n  input [99:0] b,\n  input sel,\n  output [99:0] out\n);",
+  "files": {
+    "spec": "spec.md",
+    "golden": "golden.v",
+    "ref_module": "ref_module.sv",
+    "test": "test.sv"
+  }
+}

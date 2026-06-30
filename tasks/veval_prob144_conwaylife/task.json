@@ -1,0 +1,14 @@
+{
+  "task_id": "veval_prob144_conwaylife",
+  "top": "TopModule",
+  "kind": "veval",
+  "source": "verilog-eval",
+  "has_reference": true,
+  "interface": "module TopModule (\n  input clk,\n  input load,\n  input [255:0] data,\n  output reg [255:0] q\n);",
+  "files": {
+    "spec": "spec.md",
+    "golden": "golden.v",
+    "ref_module": "ref_module.sv",
+    "test": "test.sv"
+  }
+}

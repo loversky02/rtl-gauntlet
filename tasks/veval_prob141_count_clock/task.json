@@ -1,0 +1,14 @@
+{
+  "task_id": "veval_prob141_count_clock",
+  "top": "TopModule",
+  "kind": "veval",
+  "source": "verilog-eval",
+  "has_reference": true,
+  "interface": "module TopModule (\n  input clk,\n  input reset,\n  input ena,\n  output reg pm,\n  output reg [7:0] hh,\n  output reg [7:0] mm,\n  output reg [7:0] ss\n);",
+  "files": {
+    "spec": "spec.md",
+    "golden": "golden.v",
+    "ref_module": "ref_module.sv",
+    "test": "test.sv"
+  }
+}

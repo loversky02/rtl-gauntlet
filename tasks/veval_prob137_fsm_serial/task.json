@@ -1,0 +1,14 @@
+{
+  "task_id": "veval_prob137_fsm_serial",
+  "top": "TopModule",
+  "kind": "veval",
+  "source": "verilog-eval",
+  "has_reference": true,
+  "interface": "module TopModule (\n  input clk,\n  input in,\n  input reset,\n  output done\n);",
+  "files": {
+    "spec": "spec.md",
+    "golden": "golden.v",
+    "ref_module": "ref_module.sv",
+    "test": "test.sv"
+  }
+}

@@ -66,10 +66,21 @@ def convert(base: str) -> str:
     return str(d.relative_to(ROOT))
 
 
+def all_bases() -> list[str]:
+    return sorted(p.name[: -len("_prompt.txt")] for p in SRC.glob("*_prompt.txt"))
+
+
 def main() -> int:
-    bases = sys.argv[1:] or DEFAULT
+    args = sys.argv[1:]
+    bases = all_bases() if args == ["--all"] else (args or DEFAULT)
+    ok = 0
     for b in bases:
-        print("wrote", convert(b))
+        try:
+            convert(b)
+            ok += 1
+        except Exception as e:  # noqa: BLE001
+            print("SKIP", b, e)
+    print(f"imported {ok}/{len(bases)} tasks")
     return 0
 
 

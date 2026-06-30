@@ -1,0 +1,14 @@
+{
+  "task_id": "veval_prob055_conditional",
+  "top": "TopModule",
+  "kind": "veval",
+  "source": "verilog-eval",
+  "has_reference": true,
+  "interface": "module TopModule (\n  input [7:0] a,\n  input [7:0] b,\n  input [7:0] c,\n  input [7:0] d,\n  output reg [7:0] min\n);",
+  "files": {
+    "spec": "spec.md",
+    "golden": "golden.v",
+    "ref_module": "ref_module.sv",
+    "test": "test.sv"
+  }
+}

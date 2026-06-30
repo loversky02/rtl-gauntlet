@@ -1,0 +1,14 @@
+{
+  "task_id": "veval_prob118_history_shift",
+  "top": "TopModule",
+  "kind": "veval",
+  "source": "verilog-eval",
+  "has_reference": true,
+  "interface": "module TopModule (\n  input clk,\n  input areset,\n  input predict_valid,\n  input predict_taken,\n  output logic [31:0] predict_history,\n\n  input train_mispredicted,\n  input train_taken,\n  input [31:0] train_history\n);",
+  "files": {
+    "spec": "spec.md",
+    "golden": "golden.v",
+    "ref_module": "ref_module.sv",
+    "test": "test.sv"
+  }
+}

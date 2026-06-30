@@ -1,0 +1,14 @@
+{
+  "task_id": "veval_prob135_m2014_q6b",
+  "top": "TopModule",
+  "kind": "veval",
+  "source": "verilog-eval",
+  "has_reference": true,
+  "interface": "module TopModule (\n  input [2:0] y,\n  input w,\n  output reg Y1\n);",
+  "files": {
+    "spec": "spec.md",
+    "golden": "golden.v",
+    "ref_module": "ref_module.sv",
+    "test": "test.sv"
+  }
+}

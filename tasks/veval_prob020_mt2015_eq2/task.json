@@ -1,0 +1,14 @@
+{
+  "task_id": "veval_prob020_mt2015_eq2",
+  "top": "TopModule",
+  "kind": "veval",
+  "source": "verilog-eval",
+  "has_reference": true,
+  "interface": "module TopModule (\n  input [1:0] A,\n  input [1:0] B,\n  output z\n);",
+  "files": {
+    "spec": "spec.md",
+    "golden": "golden.v",
+    "ref_module": "ref_module.sv",
+    "test": "test.sv"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "task_id": "veval_prob076_always_case",
+  "top": "TopModule",
+  "kind": "veval",
+  "source": "verilog-eval",
+  "has_reference": true,
+  "interface": "module TopModule (\n  input [2:0] sel,\n  input [3:0] data0,\n  input [3:0] data1,\n  input [3:0] data2,\n  input [3:0] data3,\n  input [3:0] data4,\n  input [3:0] data5,\n  output reg [3:0] out\n);",
+  "files": {
+    "spec": "spec.md",
+    "golden": "golden.v",
+    "ref_module": "ref_module.sv",
+    "test": "test.sv"
+  }
+}

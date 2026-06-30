@@ -16,6 +16,7 @@ external/
 # Datasets & run artifacts
 data/
 runs/
+tasks/veval_*/        # generated from external/verilog-eval via scripts/import_veval.py
 *.vcd
 *.fst
 *.log

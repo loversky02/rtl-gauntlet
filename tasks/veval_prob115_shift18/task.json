@@ -1,0 +1,14 @@
+{
+  "task_id": "veval_prob115_shift18",
+  "top": "TopModule",
+  "kind": "veval",
+  "source": "verilog-eval",
+  "has_reference": true,
+  "interface": "module TopModule (\n  input clk,\n  input load,\n  input ena,\n  input [1:0] amount,\n  input [63:0] data,\n  output reg [63:0] q\n);",
+  "files": {
+    "spec": "spec.md",
+    "golden": "golden.v",
+    "ref_module": "ref_module.sv",
+    "test": "test.sv"
+  }
+}

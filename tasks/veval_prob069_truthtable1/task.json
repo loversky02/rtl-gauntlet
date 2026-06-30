@@ -1,0 +1,14 @@
+{
+  "task_id": "veval_prob069_truthtable1",
+  "top": "TopModule",
+  "kind": "veval",
+  "source": "verilog-eval",
+  "has_reference": true,
+  "interface": "module TopModule (\n  input x3,\n  input x2,\n  input x1,\n  output f\n);",
+  "files": {
+    "spec": "spec.md",
+    "golden": "golden.v",
+    "ref_module": "ref_module.sv",
+    "test": "test.sv"
+  }
+}

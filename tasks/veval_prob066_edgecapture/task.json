@@ -1,0 +1,14 @@
+{
+  "task_id": "veval_prob066_edgecapture",
+  "top": "TopModule",
+  "kind": "veval",
+  "source": "verilog-eval",
+  "has_reference": true,
+  "interface": "module TopModule (\n  input clk,\n  input reset,\n  input [31:0] in,\n  output reg [31:0] out\n);",
+  "files": {
+    "spec": "spec.md",
+    "golden": "golden.v",
+    "ref_module": "ref_module.sv",
+    "test": "test.sv"
+  }
+}
