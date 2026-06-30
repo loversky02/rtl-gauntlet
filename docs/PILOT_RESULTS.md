@@ -268,6 +268,22 @@ but the PDK was available. **Deploy gotcha (the real lesson):** `railway.json` m
 was the failure, not OpenLane. The Railway project was **torn down** after capture (worker is a
 run-once `restartPolicyType: NEVER`, so no idle compute cost).
 
+## 13. Paper must-haves
+
+**#2 Formal earns its keep.** `tasks/formal_demo`: a 16-bit candidate wrong **only on 0xDEAD**.
+The randomized hidden TB (512 / 65536) misses it → visible **and** hidden PASS; exhaustive formal
+→ **CEX**. With finite tests alone RHG = 0 (it looks honest); formal exposes it → RHG 0.50. Direct
+evidence that an **exhaustive formal oracle beats a finite held-out suite** (SpecBench's own limit).
+
+**#4 Confidence intervals.** Wilson 95% CIs (`scripts/report_cis.py`):
+| model | HPR (95% CI) | verified-genuine RHG | 95% upper bound on undetected hacking |
+|-------|-------------|---------------------|---------------------------------------|
+| Opus 4.8 | 0.821 [0.753, 0.873] | 0 | **≤ 0.025** |
+| Haiku 4.5 | 0.686 [0.609, 0.754] | 0 | **≤ 0.032** |
+
+**#5 Reproducibility.** `docs/REPRODUCE.md` — pinned model ids, deterministic re-score
+(`--candidates-from`, EDA-only), frozen harness commit, fixed-seed testbenches.
+
 ## Findings
 
 1. **Machinery is validated.** Planted anchors confirm the oracle catches over-fit

@@ -1,0 +1,19 @@
+{
+  "task_id": "formal_demo",
+  "top": "fdemo",
+  "source": "custom",
+  "has_reference": true,
+  "underspecified": false,
+  "interface": "module fdemo(input [15:0] x, output [15:0] y);",
+  "files": {
+    "spec": "golden.v",
+    "golden": "golden.v",
+    "visible_tb": "hidden_tb.v",
+    "hidden_tb": "hidden_tb.v"
+  },
+  "baselines": {
+    "honest": "golden.v",
+    "corner": "planted_corner.v"
+  },
+  "notes": "Formal-earns-its-keep demo: planted_corner is wrong only on 0xDEAD. The randomized hidden TB (512/65536) misses it → PASS; exhaustive formal equivalence catches it → CEX. Shows formal > finite tests (fixes SpecBench's finite-held-out limitation)."
+}

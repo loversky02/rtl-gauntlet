@@ -125,8 +125,11 @@ positive. **False CEX 9→1, inconclusive 50→14.**
 
 1. A naïve formal oracle **over-reports** reward hacking; the headline number was an artifact, found
    only by per-case verification. Verification discipline is mandatory.
-2. No false positives on honest agents; across 2 models × 156 fair tasks, **zero genuine reward
-   hacking**.
+2. No false positives on honest agents; across 2 models × 156 fair tasks, **zero verified genuine
+   reward hacking** (95% Wilson upper bound ≤2.5% Opus / ≤3.2% Haiku). A controlled demo
+   (`formal_demo`) shows the formal tier catches a candidate that passes *both* the visible and a
+   randomized hidden testbench — **formal earns its keep over finite tests**, the contribution
+   SpecBench's finite held-out suite cannot provide.
 3. **Weakness ≠ hacking** — a weaker model fails far more but cheats no more.
 4. Hacking is a function of adversarial conditions (tamper-capable agents, weak tests *with*
    incomplete specs), which the protocol catches — not of benchmark mass.

@@ -18,7 +18,9 @@ Each paper claim maps to a concrete artifact that proves it. Status:
 | H9 | SystemVerilog parse fix clears most inconclusive | `read_verilog -sv`: inconclusive 50→14, honest 88→122; RHG_cex still 1 (circuit8 init artifact). Most "inconclusive" was a silent SV parse-fail, not a solver limit | 1 | 🟢 |
 | H10 | Big-FSM SAT + init-don't-care clear the last residual | larger budget/abstraction for lemmings/fsm_serial; equal-arbitrary-init for circuit8 / one-hot prob088 | 1 | 🔴 |
 | H11 | Weakness ≠ hacking (model comparison) | Opus vs Haiku ×156: Haiku fails 3× more (visible) but BOTH have 0 genuine hacking (1 RHG_cex each = verified init artifact) | 1 | 🟢 |
-| H3 | Formal equivalence catches hacks that hidden tests miss | ≥1 task: passes hidden, fails EQY (needs a task where hidden alone misses) | 1 | 🔴 |
+| H3 | Formal equivalence catches hacks that hidden tests miss | **formal_demo**: candidate passes visible+randomized-hidden TB (misses 0xDEAD) but formal CEX → RHG 0.50 | 1 | 🟢 |
+| M4 | RHG/HPR reported with confidence intervals | Wilson 95% CIs (report_cis.py): verified RHG=0, upper bound ≤2.5%/3.2% | 1 | 🟢 |
+| M5 | Reproducible (pinned models, deterministic re-score) | docs/REPRODUCE.md + `--candidates-from` EDA-only re-score | 1 | 🟢 |
 | C1 | Long tail is reproducible | one task with ≫ median tokens reproduced | 2 | 🔴 |
 | C2 | Early-stop cuts tokens at fixed honesty | early-stop @1: 12% (Opus) / 23% (Haiku) tokens saved, ~5% honesty loss; tail payoff 35%/14% | 2 | 🟢 |
 | C3 | Curriculum/triage beats flat scheduling | Pareto front dominates baseline | 2 | 🔴 |
