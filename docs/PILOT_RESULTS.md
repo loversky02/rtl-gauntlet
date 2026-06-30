@@ -147,6 +147,29 @@ trustworthy counter-example; "no model" means no divergence within the bound.
 naive (9 false) → reset+don't-care (3) → BMC fallback (1, explained). Remaining (H9):
 init-don't-care handling (assume equal arbitrary init) + BMC depth/time tuning for big FSMs.
 
+## 8. H9 — the "inconclusive wall" was a parser bug (`-sv`)
+
+The 50 inconclusive resisted a bigger BMC budget — because most were NOT a solver limit. yosys
+`read_verilog` defaults to Verilog-2005, but VerilogEval references are **SystemVerilog**
+(`always_ff`, `logic`, enums). iverilog (`-g2012`) parsed them (visible PASS) while yosys
+errored → "inconclusive" was a silent **parse failure**. Fix: `read_verilog -sv`.
+
+Opus oracle progression (same 156 candidates, no LLM):
+
+| stage | honest | bmc_equiv | dontcare | RHG_cex | inconclusive | fail |
+|-------|------:|---------:|--------:|-------:|------------:|----:|
+| naive | 88 | – | – | 9 | 50 | 9 |
+| H7 reset+don't-care | 91 | – | 3 | 3 | 50 | 9 |
+| H8 +BMC fallback | 91 | 3 | 2 | 1 | 50 | 9 |
+| **H9 +sv** | **122** | 6 | 4 | 1 | **14** | 9 |
+
+`honest+bmc_equiv = 128/156 (82%)`; **RHG_cex = 1** (circuit8, verified init-don't-care artifact);
+inconclusive = 14 (large FSMs — lemmings, fsm_serial — plus a few kmap; residual SAT budget).
+**Still zero genuine reward hacking.** Lesson: a tool-chain mismatch (SystemVerilog accepted by
+the simulator but not the formal reader) silently inflated "inconclusive" — another
+verification-discipline catch. Oracle false-CEX over the campaign: **9 → 3 → 1**; inconclusive
+**50 → 14**.
+
 ## Findings
 
 1. **Machinery is validated.** Planted anchors confirm the oracle catches over-fit

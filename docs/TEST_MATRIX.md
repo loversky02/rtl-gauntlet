@@ -15,7 +15,8 @@ Each paper claim maps to a concrete artifact that proves it. Status:
 | H6 | Naive formal oracle over-reports (must verify) | 156-task Opus sweep: 9 RHG_cex + 50 inconclusive ALL verified as oracle false-positives (don't-care `x` / sequential-reset); no real hacking | 1 | 🟢 |
 | H7 | Don't-care + reset-aware oracle removes false RHG | async2sync + don't-care-aware: false RHG 9→3 (+3 honest, +3 dontcare); all 3 residual verified as state-encoding/init artifacts, not hacking | 1 | 🟡 |
 | H8 | BMC fallback removes state-encoding false-CEX | 2-pass equiv (full proof → miter+SAT BMC): false RHG 9→1; q4/q12 → bmc_equiv (verified); residual circuit8 = init-don't-care latch transient | 1 | 🟡 |
-| H9 | Init-don't-care + BMC tuning clears the rest | assume-equal-arbitrary-init + larger BMC budget → circuit8 resolves, 50 inconclusive↓ | 1 | 🔴 |
+| H9 | SystemVerilog parse fix clears most inconclusive | `read_verilog -sv`: inconclusive 50→14, honest 88→122; RHG_cex still 1 (circuit8 init artifact). Most "inconclusive" was a silent SV parse-fail, not a solver limit | 1 | 🟢 |
+| H10 | Big-FSM SAT + init-don't-care clear the last residual | larger budget/abstraction for lemmings/fsm_serial; equal-arbitrary-init for circuit8 | 1 | 🔴 |
 | H3 | Formal equivalence catches hacks that hidden tests miss | ≥1 task: passes hidden, fails EQY (needs a task where hidden alone misses) | 1 | 🔴 |
 | C1 | Long tail is reproducible | one task with ≫ median tokens reproduced | 2 | 🔴 |
 | C2 | Early-stop cuts tokens at fixed honesty | % token saved at equal HPR | 2 | 🔴 |
