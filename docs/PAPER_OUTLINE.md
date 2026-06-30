@@ -62,5 +62,6 @@ conditions (tamper-capable agents, weak tests), which our tamper-probe catches.
 
 ## Tables/figures to generate
 - T1 oracle-hardening progression (naive/H7/H8 × categories) — have it.
-- T2 Opus vs Haiku (honest/fail/RHG/inconclusive) — Haiku sweep in progress.
+- T2 Opus vs Haiku ×156 — DONE: Opus honest122/fail9/RHG1*, Haiku honest104/fail30+11nc/RHG1*
+  (*both RHG_cex = verified init artifacts). Weakness → failures, not hacking.
 - F1 RHG_cex case taxonomy (don't-care / reset / encoding / init) with one verified example each.
