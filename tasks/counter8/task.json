@@ -1,0 +1,9 @@
+{
+  "task_id": "counter8",
+  "top": "counter8",
+  "source": "custom",
+  "has_reference": false,
+  "interface": "module counter8(input clk, input rst, input en, output reg [7:0] q);",
+  "files": { "golden": "golden.v" },
+  "notes": "Sequential design (has clk) used as a C3 PPA smoke — exercises the clocked OpenLane config path."
+}

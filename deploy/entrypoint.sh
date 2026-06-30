@@ -1,16 +1,19 @@
 #!/usr/bin/env bash
-# Railway worker: download the PDK once, run PPA data-gen, exit. Data → /data volume.
-set -euo pipefail
+# Railway worker: download PDK once, run real OpenLane PPA per design, print the
+# dataset to the logs (so it can be read without a volume), then exit.
+set -uo pipefail
 cd /app
-
 export PDK_ROOT="${PDK_ROOT:-/app/.ciel}"
 mkdir -p /data
+PY="$(command -v python3 || command -v python)"
 
-echo "[1/2] Sky130 PDK (ciel)"
-ciel enable --pdk-root "$PDK_ROOT" 2>/dev/null || openlane --version || true
+echo "[1/3] python = $PY ; openlane = $(command -v openlane || echo MISSING)"
+echo "[2/3] Sky130 PDK (ciel)"
+ciel enable --pdk-root "$PDK_ROOT" 2>&1 | tail -3 || true
 
-echo "[2/2] PPA data-gen (real OpenLane flow per design)"
-# LIMIT controls how many designs to run (cost control on a metered box).
-python3 scripts/gen_ppa_data.py --openlane --out /data/ppa_dataset.jsonl
+echo "[3/3] PPA data-gen (real OpenLane flow per design)"
+"$PY" scripts/gen_ppa_data.py --openlane --out /data/ppa_dataset.jsonl || true
 
-echo "done → /data/ppa_dataset.jsonl ($(wc -l < /data/ppa_dataset.jsonl) rows)"
+echo "=====BEGIN ppa_dataset.jsonl====="
+cat /data/ppa_dataset.jsonl 2>/dev/null || echo "(no rows)"
+echo "=====END ppa_dataset.jsonl====="
