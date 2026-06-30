@@ -24,5 +24,13 @@ tasks/mut_*/
 *.fst
 *.log
 
+# LaTeX aux
+*.aux
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+
 # OS
 .DS_Store
