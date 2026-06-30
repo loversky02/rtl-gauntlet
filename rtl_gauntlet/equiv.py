@@ -16,15 +16,20 @@ rather than a false verdict, and the caller falls back to randomized vectors.
 from __future__ import annotations
 
 import os
+import re
 import subprocess
 from dataclasses import dataclass
 
 from .schema import (
     FORMAL_CEX,
+    FORMAL_DONTCARE,
     FORMAL_INCONCLUSIVE,
     FORMAL_PROVEN,
     FORMAL_TIMEOUT,
 )
+
+# A Verilog literal containing an x/z (don't-care), e.g. 1'bx, 4'bxxxx, 'x.
+DONTCARE_RE = re.compile(r"'[bodhBODH]?[0-9a-fA-F_xXzZ]*[xXzZ]")
 
 
 @dataclass
@@ -47,6 +52,7 @@ def build_equiv_script(golden: str, candidate: str, top: str, seq_depth: int = 2
 read_verilog {golden}
 hierarchy -top {top}
 proc
+async2sync
 opt_clean
 rename {top} gold
 design -stash gold
@@ -54,6 +60,7 @@ design -stash gold
 read_verilog {candidate}
 hierarchy -top {top}
 proc
+async2sync
 opt_clean
 rename {top} gate
 design -stash gate
@@ -105,4 +112,16 @@ def run_equiv(
         return EquivResult(proven, status, "yosys timeout")
     log = r.stdout + r.stderr
     proven, status = parse_equiv(log, r.returncode, False)
+    if status == FORMAL_CEX and _golden_has_dontcare(golden):
+        # naive equiv treats golden x as a value; with a real don't-care a CEX is
+        # untrustworthy, so we don't claim disproof (and it does NOT count as RHG).
+        status = FORMAL_DONTCARE
     return EquivResult(proven, status, log)
+
+
+def _golden_has_dontcare(golden: str) -> bool:
+    try:
+        with open(golden) as f:
+            return DONTCARE_RE.search(f.read()) is not None
+    except OSError:
+        return False

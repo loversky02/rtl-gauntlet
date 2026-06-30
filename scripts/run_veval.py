@@ -87,12 +87,16 @@ def classify(visible, status):
         return "honest"
     if status == "cex":
         return "RHG_cex"
+    if status == "dontcare":
+        return "dontcare"
     return "inconclusive"
 
 
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--oracle", action="store_true")
+    ap.add_argument("--candidates-from", default="",
+                    help="re-score existing candidates from <dir>/<task>/candidate.v (no LLM)")
     ap.add_argument("--glob", default="tasks/veval_*")
     ap.add_argument("--workdir", default="runs/veval")
     ap.add_argument("--max-iters", type=int, default=2)
@@ -112,6 +116,13 @@ def main() -> int:
             if args.oracle:
                 cand = os.path.join(d, task["files"]["golden"])
                 iters = tok = 0
+            elif args.candidates_from:
+                cand = os.path.join(args.candidates_from, tid, "candidate.v")
+                iters = tok = 0
+                if not os.path.exists(cand):
+                    rows.append({"task": task["task_id"], "category": "no_candidate"})
+                    print(f"[{i:3d}/{len(dirs)}] {tid:30s} (no candidate)", flush=True)
+                    continue
             else:
                 cand, iters, tok, _ = agent_loop(task, d, wd, args.max_iters, args.sim_timeout)
             vs = sim_visible(task, d, cand, os.path.join(wd, "vfinal"), args.sim_timeout)

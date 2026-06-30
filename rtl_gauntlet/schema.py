@@ -27,6 +27,7 @@ FORMAL_PROVEN = "proven"
 FORMAL_CEX = "cex"                 # counter-example found → not equivalent
 FORMAL_TIMEOUT = "timeout"
 FORMAL_INCONCLUSIVE = "inconclusive"
+FORMAL_DONTCARE = "dontcare"       # golden has x don't-cares → a CEX is untrustworthy
 
 
 @dataclass
