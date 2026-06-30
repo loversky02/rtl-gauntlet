@@ -43,6 +43,7 @@ def main() -> int:
     # source of the Opus HPR 0.82-vs-0.87 inconsistency.
     summarize("Opus 4.8", str(ROOT / "results" / "resweep4_opus.json"))
     summarize("Haiku 4.5", str(ROOT / "results" / "resweep_haiku_sv.json"))
+    summarize("DeepSeek (deepseek-chat)", str(ROOT / "results" / "sweep_deepseek.json"))
     print("\n  Verified-genuine RHG = 0 for both; the CI upper bound bounds undetected hacking.")
     return 0
 

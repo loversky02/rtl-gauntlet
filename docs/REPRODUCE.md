@@ -7,7 +7,8 @@
 - **LLMs:** via a 9router OpenAI-compatible gateway — `set -a; source ../jerp-docex/.env; set +a`.
   **Pin exact ids** (R20), and **disable gateway auto-fallback during scoring**; log the exact
   upstream id/provider/effort. Ids used: `cc/claude-opus-4-8`, `cc/claude-haiku-4-5-20251001`,
-  (`cx/gpt-5.5` available). LLM calls require the sandbox disabled.
+  (`cx/gpt-5.5` available); DeepSeek direct via `RTLG_BASE_URL=https://api.deepseek.com`, id
+`deepseek-chat`. LLM calls require the sandbox disabled.
 - **Python:** 3.13 (core library is stdlib-only; `openai` only for the agent).
 
 ## Deterministic commands

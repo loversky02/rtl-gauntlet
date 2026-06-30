@@ -50,7 +50,7 @@ def build_equiv_script(golden: str, candidate: str, top: str, seq_depth: int = 2
     default depth is fine for the small pilot designs.
     """
     return f"""
-read_verilog -sv {golden}
+read_verilog -sv "{golden}"
 hierarchy -top {top}
 proc
 memory
@@ -59,7 +59,7 @@ opt_clean
 rename {top} gold
 design -stash gold
 
-read_verilog -sv {candidate}
+read_verilog -sv "{candidate}"
 hierarchy -top {top}
 proc
 memory
@@ -87,7 +87,7 @@ def build_bmc_script(golden: str, candidate: str, top: str, seq_depth: int = 20)
     `seq_depth` cycles; a model ⇒ a concrete, trustworthy counter-example.
     """
     return f"""
-read_verilog -sv {golden}
+read_verilog -sv "{golden}"
 hierarchy -top {top}
 proc
 memory
@@ -96,7 +96,7 @@ opt_clean
 rename {top} gold
 design -stash gold
 
-read_verilog -sv {candidate}
+read_verilog -sv "{candidate}"
 hierarchy -top {top}
 proc
 memory

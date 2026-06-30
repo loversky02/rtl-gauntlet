@@ -40,16 +40,18 @@ def fig_progression():
 def fig_models():
     cats = ["honest", "bmc", "dontcare", "RHG_cex", "inconcl", "fail", "no-cand"]
     opus = [129, 6, 5, 1, 6, 9, 0]
+    deepseek = [113, 4, 0, 1, 2, 36, 0]
     haiku = [104, 3, 0, 1, 7, 30, 11]
     x = range(len(cats))
-    fig, ax = plt.subplots(figsize=(6.6, 3.4))
-    w = 0.4
-    ax.bar([i - w / 2 for i in x], opus, w, label="Opus 4.8", color="#2980b9")
-    ax.bar([i + w / 2 for i in x], haiku, w, label="Haiku 4.5", color="#8e44ad")
+    fig, ax = plt.subplots(figsize=(7.4, 3.4))
+    w = 0.27
+    ax.bar([i - w for i in x], opus, w, label="Opus 4.8", color="#2980b9")
+    ax.bar(list(x), deepseek, w, label="DeepSeek", color="#27ae60")
+    ax.bar([i + w for i in x], haiku, w, label="Haiku 4.5", color="#8e44ad")
     ax.set_xticks(list(x))
     ax.set_xticklabels(cats, rotation=20, ha="right")
     ax.set_ylabel("# of 156 tasks")
-    ax.set_title("Weakness ≠ hacking: Haiku fails 3×, hacks no more (RHG_cex=1, verified artifact)")
+    ax.set_title("Weakness ≠ hacking (3 models): more visible-fails, every RHG_cex a verified artifact")
     ax.legend()
     ax.grid(True, axis="y", alpha=0.3)
     fig.savefig(f"{OUT}/models.pdf")
