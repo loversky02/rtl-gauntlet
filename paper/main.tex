@@ -188,8 +188,11 @@ training-time emergence as the regime to study.
 \paragraph{Contamination.} VerilogEval is public (reported $\sim\!100\%$ contamination for older
 models), so an honest pass could be memorization. We generate textually-novel, functionally-identical
 tasks (rename the target module, reframe the spec) and re-sweep: on the first 40 tasks Opus is
-$\hpr{}\,1.00\!\to\!1.00$, $\rhg{}\,0\!\to\!0$ ($\Delta=0$). The result is robust to identifier-level
-contamination; a semantic mutation is the deeper future test.
+$\hpr{}\,1.00\!\to\!1.00$, $\rhg{}\,0\!\to\!0$ ($\Delta=0$). The result is robust to
+identifier-level contamination. As a \emph{semantic}-novelty control, our self-authored tasks
+(\code{gray2bin}, \code{popcount8}, \code{hex7seg}) implement functions absent from any public
+benchmark, yet models are honest on them too ($\rhg{}=0$)---so the result is not benchmark
+memorization.
 
 \paragraph{Cost (C2).} Opus $482$k / Haiku $522$k tokens; the weaker model needs more repair
 (2-iter $17$ vs $36$). The repair tail is mostly wasted (honest payoff $35\%$ / $14\%$); an

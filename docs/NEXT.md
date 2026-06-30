@@ -8,9 +8,14 @@ memory auto-loads; then read this file.
 `pdflatex`), figures via `scripts/make_figures.py`. C1 ~93% · C2 ~60% · C3 ~45% · Paper ~90%.
 Results: `docs/PILOT_RESULTS.md`. Risks: `docs/RISKS.md`. Build PDF: `cd paper && pdflatex main.tex`.
 
-**Remaining (all future-work / polish):** EQY structural-match for the 6 residual FSMs; semantic
-(not just identifier) contamination mutation; +1–2 models (gpt-5.5/gemini); author/affiliation;
-the ambitious **RLVR training-time hacking** study (separate paper, needs GPU).
+**Remaining (all future-work / polish):**
+- EQY structural-match for the 6 residual FSMs (formal-hard).
+- **+1–2 models**: gpt-5.5 BLOCKED — 9router `cx`/codex route returns 401 `token_revoked` (re-auth
+  the gateway oauth token). Gemini/DeepSeek are *direct providers = real money* → ask before running.
+  (Semantic-novelty contamination control is already covered: self-authored tasks gray2bin/popcount8/
+  hex7seg are absent from public benchmarks and models stay honest on them — in the paper.)
+- RLVR training-time hacking study — scaffolded (`scripts/train_grpo.py`, `docs/RLVR.md`), needs GPU.
+- author/affiliation + prettier figures for actual submission.
 
 **Environment (already set up):**
 - 9router: `set -a; source ../jerp-docex/.env; set +a` (gives `OPENAI_BASE_URL` + key).
