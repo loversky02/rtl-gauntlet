@@ -21,6 +21,21 @@ python3 scripts/report_cis.py ; python3 scripts/analyze_cost.py  # CIs, cost
 python3 scripts/gen_ppa_data.py && python3 scripts/train_surrogate.py   # C3 offline
 ```
 
+## Oracle stages → result files (Opus campaign)
+Each hardening stage is a re-score of the SAME 156 candidates (no new LLM); the figures/tables and
+`report_cis.py`/`analyze_cost.py` read the **canonical final** stage `resweep4`:
+| stage | flags added | result file | honest+bmc | HPR |
+|-------|-------------|-------------|-----------:|----:|
+| naïve | `equiv_make` only | `results/sweep_opus.json` | 88 | 0.564 |
+| +reset+don't-care | `async2sync`, dontcare-reclassify | `results/resweep_opus.json` | 91 | 0.583 |
+| +BMC | bounded miter+sat fallback | `results/resweep2_opus.json` | 94 | 0.603 |
+| +SV | `read_verilog -sv` | `results/resweep3_opus.json` | 128 | 0.821 |
+| **+memory (canonical)** | `memory` (case→ROM) | **`results/resweep4_opus.json`** | **135** | **0.865** |
+
+`equiv.py` is the *final* oracle (all flags on); intermediate stages reproduce from the frozen
+result files above. (Using `resweep3` instead of `resweep4` was the source of the old Opus
+HPR 0.82-vs-0.87 mismatch — now both scripts pin `resweep4`.)
+
 ## Determinism notes
 - Hidden testbenches use a fixed `$random` seed → a fixed vector set. Yosys formal is
   deterministic; BMC is bounded and seed-free.

@@ -178,9 +178,41 @@ def run_equiv(
     return EquivResult(proven, status, log2)
 
 
+def _output_names(src: str) -> set[str]:
+    """Identifiers declared as module outputs (line-oriented; robust to [ranges] and
+    reg/wire/logic qualifiers)."""
+    names: set[str] = set()
+    for raw in src.splitlines():
+        line = raw.split("//", 1)[0]
+        if not re.search(r"\boutput\b", line):
+            continue
+        line = re.sub(r"\[[^\]]*\]", " ", line)                       # drop [ranges]
+        line = re.sub(r"\b(output|reg|wire|logic|signed)\b", " ", line)
+        names.update(re.findall(r"[A-Za-z_]\w*", line))
+    return names
+
+
 def _golden_has_dontcare(golden: str) -> bool:
+    """True iff the golden assigns an x/z literal to one of its OUTPUT ports — a genuine
+    output don't-care. A whole-file x scan over-triggers: an incidental x in an internal
+    signal must not silence a real counter-example (the false-negative risk that would let
+    a hack hide). We therefore require the x-literal to drive an output, AND every
+    reclassified case is additionally hand-verified (docs/RESEARCH_NOTES.md §B). The fully
+    principled fix is a bit-level X-aware miter (setundef/careset) masking only the
+    don't-care bits — future work; this output-context check fails safe (a missed output
+    name leaves the case a CEX, which verification then catches)."""
     try:
-        with open(golden) as f:
-            return DONTCARE_RE.search(f.read()) is not None
+        src = open(golden).read()
     except OSError:
         return False
+    outs = _output_names(src)
+    if not outs:
+        return False
+    for raw in src.splitlines():
+        line = raw.split("//", 1)[0]
+        if not DONTCARE_RE.search(line):
+            continue
+        lhs = line.split("=", 1)[0] if "=" in line else line
+        if any(re.search(rf"\b{re.escape(o)}\b", lhs) for o in outs):
+            return True
+    return False

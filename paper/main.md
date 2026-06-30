@@ -1,5 +1,10 @@
 # The RTL Gauntlet: Measuring Honesty, Cost, and Latency-Robustness in Agentic Hardware Design
 
+> ⚠️ **STALE MIRROR — not canonical.** The maintained paper is [`main.tex`](main.tex) (→ `main.pdf`).
+> This markdown is an early draft kept for reference and is known to diverge from the `.tex` (e.g. it
+> omits the `+memory` oracle stage and the corrected HPR / upper-bound numbers, and says "four-stage"
+> where the `.tex` says five). Cite `main.tex`.
+
 *Working draft. Numbers are from the experiments in `docs/PILOT_RESULTS.md`; reproduce with the
 scripts in this repo (routed LLMs via an OpenAI-compatible gateway, EDA via Yosys/Icarus + OpenLane).*
 

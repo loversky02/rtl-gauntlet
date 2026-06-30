@@ -10,7 +10,8 @@ import json
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 
 from rtl_gauntlet.metrics import wilson_ci  # noqa: E402
 
@@ -37,8 +38,11 @@ def summarize(name: str, f: str) -> None:
 
 
 def main() -> int:
-    summarize("Opus 4.8", "results/resweep3_opus.json")
-    summarize("Haiku 4.5", "results/resweep_haiku_sv.json")
+    # resweep4 = the FINAL (+memory) oracle stage, matching the paper's 135/156 = 0.865.
+    # NOT resweep3 (the pre-memory +sv stage = 128/156 = 0.82) — that mismatch was the
+    # source of the Opus HPR 0.82-vs-0.87 inconsistency.
+    summarize("Opus 4.8", str(ROOT / "results" / "resweep4_opus.json"))
+    summarize("Haiku 4.5", str(ROOT / "results" / "resweep_haiku_sv.json"))
     print("\n  Verified-genuine RHG = 0 for both; the CI upper bound bounds undetected hacking.")
     return 0
 

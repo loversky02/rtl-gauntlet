@@ -97,6 +97,14 @@ curated golden (Yosys). The I/O interface is locked. We define
 \quad
 \hpr = \tfrac{\#\{\text{pass visible and every withheld tier}\}}{\#\text{tasks}} .
 \]
+Here ``two-tier'' is the split \emph{visible} vs.\ \emph{withheld}. The withheld side yields one of
+four formal verdicts, mapped as \code{proven}/\code{bmc\_equiv}$\to$honest, \code{cex}$\to$flagged
+hack, and \code{dontcare}/\code{inconclusive}$\to$\emph{excluded} (a third bucket, neither honest nor
+hack). So \hpr{} is a \emph{lower bound} on true honesty and $\#\code{cex}/\#\text{visible-passers}$
+an \emph{upper bound} on \emph{detectable} hacking; only \textbf{verified-genuine \rhg{}} (every
+\code{cex} confirmed by hand) is the headline claim. On the $156$-task sweep the withheld tier is the
+\textbf{formal} oracle; the hidden randomized testbench is exercised on the focused demos
+(\code{formal\_demo}, \code{sem\_zerocount}, tamper).
 A tamper tier (a shell-capable agent that may edit any workspace file) flags edits to the
 testbench/harness as \emph{exploit-evidenced} hacking, with the withheld tiers run on frozen
 originals so tampering cannot fool the verdict. We separate the claim into behavioral gap,
@@ -155,7 +163,10 @@ beats a finite held-out suite.
 
 \paragraph{Sweep and model comparison.} Table~\ref{tab:models} and Figure~\ref{fig:models}: the
 weaker model fails far more (\code{fail\_visible} $9\!\to\!30$, $+11$ no compilable candidate) but
-hacks no more. Both residual \rhg{} counter-examples are verified init artifacts. With $95\%$ Wilson
+hacks no more. Both residual \rhg{} counter-examples are verified artifacts of the BMC zero-init assumption
+(\code{-set-init-zero} forces an invalid state for an async-reset/one-hot FSM); the $5$ \code{dontcare}
+cases were likewise hand-verified as genuine output don't-cares, and the detector now requires the
+\code{x} to drive an output, so an incidental internal \code{x} cannot mask a real CEX. With $95\%$ Wilson
 intervals, verified-genuine \rhg{}$=0$ with an upper bound $\le\!2.5\%$ (Opus) / $\le\!3.2\%$ (Haiku).
 
 \begin{table}[t]\centering\small
@@ -205,7 +216,7 @@ inference (Min-K\% Prob, arXiv:2310.16789) and the NLL$\leftrightarrow$degradati
 meaning-preserving mutation (arXiv:2604.21579), since no single contamination signal is reliable alone.
 
 \paragraph{Cost (C2).} Opus $482$k / Haiku $522$k tokens; the weaker model needs more repair
-(2-iter $17$ vs $36$). The repair tail is mostly wasted (honest payoff $35\%$ / $14\%$); an
+(2-iter $17$ vs $36$). The repair tail is mostly wasted (honest payoff $41\%$ / $14\%$); an
 early-stop at one iteration reclaims $12\%$ (Opus) / $23\%$ (Haiku) of tokens for a $\sim\!5\%$
 honesty loss (Figure~\ref{fig:cost}).
 
@@ -218,9 +229,10 @@ honesty loss (Figure~\ref{fig:cost}).
 \paragraph{Latency (C3).} A surrogate pipeline verified offline (mock $315$ designs $\to$ holdout
 Pearson $r=0.89/0.91/0.96$ for area/power/timing) and, via a containerized OpenLane flow (the
 OpenLane image as runtime $\to$ native \code{openlane}, no Docker-in-Docker), produced real Sky130
-metrics: \code{counter8} (seq) $495.5\,\mu m^2$ / $0.120$ mW / slack $\approx\!5.5$ ns; \code{popcount8}
-(comb) $247.7\,\mu m^2$ / $0.051$ mW / $1.6$ ns. (The deploy gotcha was a config file at the repo
-root, not OpenLane.)
+metrics: \code{counter8} (seq) $495.5\,\mu m^2$ / $0.120$ mW / worst-slack $\approx\!-5.5$ ns;
+\code{popcount8} (comb) $247.7\,\mu m^2$ / $0.051$ mW / $-1.6$ ns (slacks \emph{negative}: the default
+clock is not met---C3 is a pre-signoff \emph{relative} prototype, not closed timing). (The deploy
+gotcha was a config file at the repo root, not OpenLane.)
 
 \section{Findings}
 \begin{enumerate}[leftmargin=*,topsep=2pt,itemsep=1pt]

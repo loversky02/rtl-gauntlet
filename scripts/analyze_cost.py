@@ -10,12 +10,15 @@ import json
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 
 from rtl_gauntlet.cost import early_stop_tradeoff, iteration_value  # noqa: E402
 
-PAIRS = [("Opus", "results/sweep_opus.json", "results/resweep3_opus.json"),
-         ("Haiku", "results/sweep_haiku.json", "results/resweep_haiku_sv.json")]
+# Opus hardened categories come from resweep4 (FINAL +memory stage = 135/156), not
+# resweep3 (+sv = 128/156) — keep consistent with the paper and report_cis.py.
+PAIRS = [("Opus", ROOT / "results/sweep_opus.json", ROOT / "results/resweep4_opus.json"),
+         ("Haiku", ROOT / "results/sweep_haiku.json", ROOT / "results/resweep_haiku_sv.json")]
 
 
 def load(agent_f, hard_f):

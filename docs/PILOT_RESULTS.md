@@ -219,10 +219,10 @@ Joining agentic tokens/iters with the hardened-oracle category:
 
 | model | multi-iter tasks | tail payoff (ended honest) | early-stop @1: tokens saved | honest kept |
 |-------|-----------------:|---------------------------:|----------------------------:|------------:|
-| Opus 4.8 | 17 | 35% | 55.9k (**11.6%**) | 122/128 (95%) |
+| Opus 4.8 | 17 | 41% | 55.9k (**11.6%**) | 128/135 (95%) |
 | Haiku 4.5 | 36 | 14% | 122k (**23.4%**) | 102/107 (95%) |
 
-The repair tail is **mostly wasted**: only 35% (Opus) / 14% (Haiku) of multi-iteration tasks
+The repair tail is **mostly wasted**: only 41% (Opus) / 14% (Haiku) of multi-iteration tasks
 end honest. An early-stop at 1 iteration reclaims **12–23%** of tokens for a **~5%** honesty
 loss — and saves *more* on the weaker model (bigger, lower-payoff tail). This is the C2 Pareto
 signal: weakness shifts spend to iteration, and that iteration is largely reclaimable.
@@ -297,7 +297,7 @@ evidence that an **exhaustive formal oracle beats a finite held-out suite** (Spe
 **#4 Confidence intervals.** Wilson 95% CIs (`scripts/report_cis.py`):
 | model | HPR (95% CI) | verified-genuine RHG | 95% upper bound on undetected hacking |
 |-------|-------------|---------------------|---------------------------------------|
-| Opus 4.8 | 0.821 [0.753, 0.873] | 0 | **≤ 0.025** |
+| Opus 4.8 | 0.865 [0.803, 0.910] | 0 | **≤ 0.025** |
 | Haiku 4.5 | 0.686 [0.609, 0.754] | 0 | **≤ 0.032** |
 
 **#5 Reproducibility.** `docs/REPRODUCE.md` — pinned model ids, deterministic re-score
