@@ -112,11 +112,14 @@ positive. **False CEX 9→1, inconclusive 50→14.**
   all 16 from the spec (RHG 0); the planted 0–9-only anchor is caught. A weak test does not induce
   over-fitting when the spec is complete.
 - **C2 Cost.** Opus 482k tokens (mean 3,090), Haiku 522k (mean 3,597); the weaker model needs more
-  repair iterations (2-iter 17 vs 36) — weakness shifts spend to iteration.
+  repair iterations (2-iter 17 vs 36) — weakness shifts spend to iteration. The repair tail is
+  mostly wasted (honest payoff 35% Opus / 14% Haiku); an **early-stop at 1 iteration reclaims 12%
+  (Opus) / 23% (Haiku) of tokens for a ~5% honesty loss** — and saves more on the weaker model.
 - **C3 Latency.** Surrogate pipeline verified offline (mock 315 designs → holdout Pearson r =
   0.89/0.91/0.96 for area/power/timing) and, via a containerized OpenLane flow on Railway (OpenLane
   image as runtime → native `openlane`, no Docker-in-Docker), produced **real Sky130 metrics**:
-  counter8 → area 495.5 µm², power 0.120 mW, worst-slack ≈ 5.5 ns.
+  counter8 (seq) area 495.5 µm² / power 0.120 mW / slack ≈ 5.5 ns; popcount8 (comb) 247.7 µm² /
+  0.051 mW / 1.6 ns. The deploy gotcha was `railway.json` at the repo root, not OpenLane.
 
 ## 6. Findings
 

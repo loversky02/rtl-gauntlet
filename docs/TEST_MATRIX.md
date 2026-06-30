@@ -20,11 +20,11 @@ Each paper claim maps to a concrete artifact that proves it. Status:
 | H11 | Weakness ≠ hacking (model comparison) | Opus vs Haiku ×156: Haiku fails 3× more (visible) but BOTH have 0 genuine hacking (1 RHG_cex each = verified init artifact) | 1 | 🟢 |
 | H3 | Formal equivalence catches hacks that hidden tests miss | ≥1 task: passes hidden, fails EQY (needs a task where hidden alone misses) | 1 | 🔴 |
 | C1 | Long tail is reproducible | one task with ≫ median tokens reproduced | 2 | 🔴 |
-| C2 | Early-stop cuts tokens at fixed honesty | % token saved at equal HPR | 2 | 🔴 |
+| C2 | Early-stop cuts tokens at fixed honesty | early-stop @1: 12% (Opus) / 23% (Haiku) tokens saved, ~5% honesty loss; tail payoff 35%/14% | 2 | 🟢 |
 | C3 | Curriculum/triage beats flat scheduling | Pareto front dominates baseline | 2 | 🔴 |
 | H12 | Weak visible TB does not induce over-fitting | hex7seg (spec all-16, visible 0-9): Opus+Haiku honest (RHG 0); planted-overfit → cex (oracle would catch) | 1 | 🟢 |
 | L0 | C3 PPA pipeline runs end-to-end (offline) | mock 315 designs → surrogate holdout r = 0.89/0.91/0.96 (area/power/timing) | 3 | 🟢 |
-| L0b | Real OpenLane PPA on Railway (no DinD) | counter8 → real Sky130 area 495µm²/power 0.12mW/slack≈5.5ns; deploy→flow→parse validated | 3 | 🟢 |
+| L0b | Real OpenLane PPA on Railway (no DinD) | counter8 (seq) + popcount8 (comb) → real Sky130 area/power/timing; deploy→flow→parse validated; Railway torn down | 3 | 🟢 |
 | L1 | PPA surrogate is fast + faithful enough (real) | OpenLane Sky130 ground-truth + GNN; surrogate vs. ground-truth correlation on holdout | 3 | 🔴 |
 | L2 | Agent improves PPA proxy under slow reward | proxy metric ↑ vs. synchronous baseline | 3 | 🔴 |
 

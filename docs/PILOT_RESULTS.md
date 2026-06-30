@@ -208,6 +208,19 @@ Per-task tokens for the 156-task agentic sweeps (max 2 iters, routed gateway):
 - Eliciting HORIZON-style long tails needs higher iter caps + harder tasks; an early-stop policy
   then becomes measurable. Cached-token discount on the gateway makes billable ≪ total.
 
+### Early-stop policy (`rtl_gauntlet/cost.py`, `scripts/analyze_cost.py`)
+Joining agentic tokens/iters with the hardened-oracle category:
+
+| model | multi-iter tasks | tail payoff (ended honest) | early-stop @1: tokens saved | honest kept |
+|-------|-----------------:|---------------------------:|----------------------------:|------------:|
+| Opus 4.8 | 17 | 35% | 55.9k (**11.6%**) | 122/128 (95%) |
+| Haiku 4.5 | 36 | 14% | 122k (**23.4%**) | 102/107 (95%) |
+
+The repair tail is **mostly wasted**: only 35% (Opus) / 14% (Haiku) of multi-iteration tasks
+end honest. An early-stop at 1 iteration reclaims **12–23%** of tokens for a **~5%** honesty
+loss — and saves *more* on the weaker model (bigger, lower-payoff tail). This is the C2 Pareto
+signal: weakness shifts spend to iteration, and that iteration is largely reclaimable.
+
 ## Compute note
 The honesty oracle + all sweeps run on **CPU + routed LLM, $0** (no GPU). Only the C3 PPA surrogate
 needs a GPU (~1 h on a cheap card); the long pole there is CPU data-gen. See `docs/C3_PLAN.md`.
@@ -243,15 +256,17 @@ The C3 worker deployed to Railway (Dockerfile from the OpenLane 2 image → `ope
 natively, **no Docker-in-Docker**) and produced **real Sky130 synth→P&R→STA metrics**:
 
 ```
-counter8 (sequential): area = 495.5 µm²,  power = 0.120 mW,  worst-slack ≈ 5.5 ns   (source=openlane)
+counter8  (sequential):    area = 495.5 µm²,  power = 0.120 mW,  worst-slack ≈ 5.5 ns
+popcount8 (combinational):  area = 247.7 µm²,  power = 0.051 mW,  worst-slack ≈ 1.6 ns
 ```
 
-→ `results/ppa_real_railway.jsonl`. The full real pipeline works end-to-end: Railway build →
-native OpenLane flow → `metrics.json` parsed by `run_openlane`. Notes: combinational designs
-(no clock) failed with `CLOCK_PERIOD:0` → fixed to always set a period (no `CLOCK_PORT`);
-`ciel` PDK CLI name differs but the PDK was available (counter8 produced metrics). Lesson: the
-deploy gotcha was `railway.json` must be at the **repo root** (in `deploy/` it's ignored →
-Railpack auto-detected Python and failed) — not an OpenLane problem.
+→ `results/ppa_real_railway.jsonl`, both `source=openlane`. The full real pipeline works
+end-to-end (Railway build → native OpenLane flow → `metrics.json` parsed); the combinational
+fix (always set a period, no `CLOCK_PORT`) made popcount8 work too. `ciel` PDK CLI name differs
+but the PDK was available. **Deploy gotcha (the real lesson):** `railway.json` must be at the
+**repo root** — in `deploy/` it is ignored, so Railpack auto-detected Python and failed; that
+was the failure, not OpenLane. The Railway project was **torn down** after capture (worker is a
+run-once `restartPolicyType: NEVER`, so no idle compute cost).
 
 ## Findings
 
