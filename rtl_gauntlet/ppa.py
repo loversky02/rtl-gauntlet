@@ -70,13 +70,12 @@ def run_openlane(rtl_path: str, top: str, workdir: str, timeout: int = 3600) -> 
     runs `openlane config.json`, and parses the flow's final metrics. ok=False on failure."""
     os.makedirs(os.path.join(workdir, "src"), exist_ok=True)
     shutil.copy(rtl_path, os.path.join(workdir, "src", "design.v"))
-    cfg = {"DESIGN_NAME": top, "VERILOG_FILES": "dir::src/*.v", "PDK": "sky130A"}
+    cfg = {"DESIGN_NAME": top, "VERILOG_FILES": "dir::src/*.v", "PDK": "sky130A",
+           "CLOCK_PERIOD": 10}             # OpenLane needs a period even for comb paths
     clk = _clock_port(open(rtl_path).read())
     if clk:
         cfg["CLOCK_PORT"] = clk
-        cfg["CLOCK_PERIOD"] = 10
-    else:                                  # combinational: no clock
-        cfg["CLOCK_PERIOD"] = 0
+    # else combinational: no CLOCK_PORT → OpenLane runs a comb flow (area/power; timing N/A)
     json.dump(cfg, open(os.path.join(workdir, "config.json"), "w"))
     try:
         subprocess.run(["openlane", "config.json"], cwd=workdir,

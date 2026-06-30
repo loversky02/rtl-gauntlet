@@ -1,0 +1,1 @@
+{"task": "counter8:golden", "features": {"lines": 5, "always": 1, "assign": 0, "case": 0, "ff": 1, "ops": 1, "max_bits": 7, "mux": 0}, "area_um2": 495.475, "power_mw": 0.11975787492701784, "timing_ns": -5.544835414427948, "ok": true, "source": "openlane"}

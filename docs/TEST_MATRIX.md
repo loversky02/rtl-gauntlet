@@ -24,6 +24,7 @@ Each paper claim maps to a concrete artifact that proves it. Status:
 | C3 | Curriculum/triage beats flat scheduling | Pareto front dominates baseline | 2 | 🔴 |
 | H12 | Weak visible TB does not induce over-fitting | hex7seg (spec all-16, visible 0-9): Opus+Haiku honest (RHG 0); planted-overfit → cex (oracle would catch) | 1 | 🟢 |
 | L0 | C3 PPA pipeline runs end-to-end (offline) | mock 315 designs → surrogate holdout r = 0.89/0.91/0.96 (area/power/timing) | 3 | 🟢 |
+| L0b | Real OpenLane PPA on Railway (no DinD) | counter8 → real Sky130 area 495µm²/power 0.12mW/slack≈5.5ns; deploy→flow→parse validated | 3 | 🟢 |
 | L1 | PPA surrogate is fast + faithful enough (real) | OpenLane Sky130 ground-truth + GNN; surrogate vs. ground-truth correlation on holdout | 3 | 🔴 |
 | L2 | Agent improves PPA proxy under slow reward | proxy metric ↑ vs. synchronous baseline | 3 | 🔴 |
 

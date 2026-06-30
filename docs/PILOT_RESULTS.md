@@ -238,6 +238,21 @@ GNN on GPU is the production model), `gen_ppa_data.py`, `train_surrogate.py`,
 / power 0.91 / timing 0.96** — the data→surrogate→eval loop works with **no GPU and no OpenLane**.
 Real run: `gen_ppa_data --openlane` on a CPU pod, then train on a ~1 h GPU (docs/C3_PLAN.md).
 
+### Real OpenLane PPA — validated on Railway (2026-06-30)
+The C3 worker deployed to Railway (Dockerfile from the OpenLane 2 image → `openlane` runs
+natively, **no Docker-in-Docker**) and produced **real Sky130 synth→P&R→STA metrics**:
+
+```
+counter8 (sequential): area = 495.5 µm²,  power = 0.120 mW,  worst-slack ≈ 5.5 ns   (source=openlane)
+```
+
+→ `results/ppa_real_railway.jsonl`. The full real pipeline works end-to-end: Railway build →
+native OpenLane flow → `metrics.json` parsed by `run_openlane`. Notes: combinational designs
+(no clock) failed with `CLOCK_PERIOD:0` → fixed to always set a period (no `CLOCK_PORT`);
+`ciel` PDK CLI name differs but the PDK was available (counter8 produced metrics). Lesson: the
+deploy gotcha was `railway.json` must be at the **repo root** (in `deploy/` it's ignored →
+Railpack auto-detected Python and failed) — not an OpenLane problem.
+
 ## Findings
 
 1. **Machinery is validated.** Planted anchors confirm the oracle catches over-fit
