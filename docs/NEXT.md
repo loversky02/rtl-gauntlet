@@ -3,8 +3,14 @@
 **To resume next session:** open Claude in this repo, say *"tiếp tục RTL Gauntlet must-haves"* —
 memory auto-loads; then read this file.
 
-**Status:** C1 ~90% · C2 ~60% (early-stop done) · C3 ~40% (2 real PPA + offline surrogate).
-Paper draft: `paper/main.md`. Results: `docs/PILOT_RESULTS.md`. Risks: `docs/RISKS.md`.
+**Status (updated):** All must-haves #1–#5 addressed + #6 (negative result). Oracle: false-CEX
+9→1, inconclusive 50→6, HPR 87%. **Paper compiled**: `paper/main.tex` → `paper/main.pdf` (6 pp,
+`pdflatex`), figures via `scripts/make_figures.py`. C1 ~93% · C2 ~60% · C3 ~45% · Paper ~90%.
+Results: `docs/PILOT_RESULTS.md`. Risks: `docs/RISKS.md`. Build PDF: `cd paper && pdflatex main.tex`.
+
+**Remaining (all future-work / polish):** EQY structural-match for the 6 residual FSMs; semantic
+(not just identifier) contamination mutation; +1–2 models (gpt-5.5/gemini); author/affiliation;
+the ambitious **RLVR training-time hacking** study (separate paper, needs GPU).
 
 **Environment (already set up):**
 - 9router: `set -a; source ../jerp-docex/.env; set +a` (gives `OPENAI_BASE_URL` + key).
