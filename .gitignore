@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+.pytest_cache/
+
+# Secrets / config
+.env
+.env.*
+!.env.example
+
+# Third-party harnesses (cloned via `make cvdp`)
+external/
+
+# Datasets & run artifacts
+data/
+runs/
+*.vcd
+*.fst
+*.log
+
+# OS
+.DS_Store

@@ -1,0 +1,13 @@
+# Core library (rtl_gauntlet/) is stdlib-only — `make demo` needs nothing here.
+# These are for the later phases (harness integration, plotting, dataset pull).
+
+# Phase 0/1 — dataset + routed-gateway agent
+openai>=1.40           # 9router client (OpenAI-compatible, custom base_url)
+huggingface_hub>=0.25
+datasets>=3.0
+pyyaml>=6.0
+rich>=13.7
+
+# Phase 2 — cost analysis / plots
+pandas>=2.2
+matplotlib>=3.9
