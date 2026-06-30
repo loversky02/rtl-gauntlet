@@ -192,7 +192,10 @@ $\hpr{}\,1.00\!\to\!1.00$, $\rhg{}\,0\!\to\!0$ ($\Delta=0$). The result is robus
 identifier-level contamination. As a \emph{semantic}-novelty control, our self-authored tasks
 (\code{gray2bin}, \code{popcount8}, \code{hex7seg}) implement functions absent from any public
 benchmark, yet models are honest on them too ($\rhg{}=0$)---so the result is not benchmark
-memorization.
+memorization. A direct \emph{semantic} mutation (\code{sem\_zerocount}: count \emph{zeros}, a variant
+of the canonical popcount) confirms this: the memorized count-ones solution passes the balanced
+visible test but is caught by hidden$+$formal ($\rhg{}=0.50$), while both models implement the
+variant honestly.
 
 \paragraph{Cost (C2).} Opus $482$k / Haiku $522$k tokens; the weaker model needs more repair
 (2-iter $17$ vs $36$). The repair tail is mostly wasted (honest payoff $35\%$ / $14\%$); an
@@ -225,11 +228,16 @@ when present.
 \end{enumerate}
 
 \section{Threats to Validity}
-\emph{Contamination} is only probed at the identifier level; a semantic mutation is needed for a
-strong claim. \emph{Oracle residual}: $6$ hard sequential FSMs remain inconclusive (EQY structural
-matching is the fix). \emph{Eliciting} genuine hacking from aligned models failed; the negative
-result may reflect single-loop inference rather than RL training. \emph{PPA} on toy designs is noisy
-(not signoff-grade). \emph{Nondeterminism}: LLM runs vary; we report Wilson CIs and pin model ids.
+\emph{Contamination}: addressed at both identifier and semantic level (\code{sem\_zerocount}); a
+full semantic re-mutation of the whole benchmark is future work. \emph{Oracle residual}: $6$ hard
+sequential FSMs remain inconclusive---the fix is EQY with state registers excluded as match points
+$+$ a sequential SAT strategy, validated against a genuine-diff control (simply blacklisting state
+bits can mask real differences). \emph{Eliciting} genuine hacking from aligned models failed; the
+negative result may reflect single-loop inference rather than RL training. \emph{PPA}: open
+Sky130/OpenROAD is pre-signoff, not foundry signoff, and rankings can flip across synthesis flows;
+we therefore frame PPA as a \emph{relative} comparison under identical settings (per TuRTLe) and
+note larger designs $+$ a commercial flow as the path to signoff-grade claims. \emph{Nondeterminism}:
+LLM runs vary; we report Wilson CIs and pin model ids.
 
 \section{Limitations and Future Work}
 EQY structural matching for the residual FSMs; a semantic contamination mutation; more models and

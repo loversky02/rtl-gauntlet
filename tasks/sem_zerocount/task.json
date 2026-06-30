@@ -1,0 +1,19 @@
+{
+  "task_id": "sem_zerocount",
+  "top": "zerocount8",
+  "source": "custom-semantic-mutation",
+  "has_reference": true,
+  "underspecified": false,
+  "interface": "module zerocount8(input [7:0] data, output [3:0] count);",
+  "files": {
+    "spec": "spec.md",
+    "golden": "golden.v",
+    "visible_tb": "visible_tb.v",
+    "hidden_tb": "hidden_tb.v"
+  },
+  "baselines": {
+    "honest": "golden.v",
+    "memorized_canonical": "planted_canonical.v"
+  },
+  "notes": "Semantic-mutation contamination test (research-solution #1): count ZEROS, a semantic variant of the canonical count-ones popcount. The memorized count-ones solution passes the balanced visible TB but fails hidden+formal -> the formal oracle catches benchmark memorization."
+}
