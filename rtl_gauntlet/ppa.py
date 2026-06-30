@@ -11,13 +11,16 @@ Stdlib only (feature extraction + mock); OpenLane/torch are used only on the GPU
 
 from __future__ import annotations
 
+import glob
 import json
 import os
 import re
+import shutil
 import subprocess
 from dataclasses import asdict, dataclass
 
 _INT = re.compile(r"\[(\d+)\s*:\s*0\]")
+_CLK = re.compile(r"\binput\b[^;]*?\b(clk|clock|clk_i|clock_i)\b")
 
 
 @dataclass
@@ -55,23 +58,41 @@ def mock_ppa(features: dict) -> PPAResult:
     return PPAResult(round(area, 2), round(power, 3), round(timing, 3), True, "mock")
 
 
+def _clock_port(rtl_text: str) -> str | None:
+    m = _CLK.search(rtl_text)
+    return m.group(1) if m else None
+
+
 def run_openlane(rtl_path: str, top: str, workdir: str, timeout: int = 3600) -> PPAResult:
-    """Real PPA via OpenLane (Sky130). Runs on a RunPod CPU box (see runpod/ppa_setup.sh).
-    Parses the flow's final metrics JSON. Returns ok=False if the flow fails/missing."""
-    os.makedirs(workdir, exist_ok=True)
-    cmd = ["bash", "runpod/ppa_setup.sh", "--run", rtl_path, top, workdir]
+    """Real PPA via OpenLane 2 (Sky130). Expects to run INSIDE the openlane2 image
+    (tools present → no Docker-in-Docker); on Railway the container is that image.
+    Generates a per-design config (clock only if the RTL has a clock port — risk R-config),
+    runs `openlane config.json`, and parses the flow's final metrics. ok=False on failure."""
+    os.makedirs(os.path.join(workdir, "src"), exist_ok=True)
+    shutil.copy(rtl_path, os.path.join(workdir, "src", "design.v"))
+    cfg = {"DESIGN_NAME": top, "VERILOG_FILES": "dir::src/*.v", "PDK": "sky130A"}
+    clk = _clock_port(open(rtl_path).read())
+    if clk:
+        cfg["CLOCK_PORT"] = clk
+        cfg["CLOCK_PERIOD"] = 10
+    else:                                  # combinational: no clock
+        cfg["CLOCK_PERIOD"] = 0
+    json.dump(cfg, open(os.path.join(workdir, "config.json"), "w"))
     try:
-        subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+        subprocess.run(["openlane", "config.json"], cwd=workdir,
+                       capture_output=True, text=True, timeout=timeout)
     except (subprocess.TimeoutExpired, OSError):
         return PPAResult(0, 0, 0, False, "openlane")
-    metrics = os.path.join(workdir, "metrics.json")
-    if not os.path.exists(metrics):
+
+    found = (glob.glob(os.path.join(workdir, "runs", "*", "final", "metrics.json"))
+             or glob.glob(os.path.join(workdir, "runs", "*", "**", "metrics.json"), recursive=True))
+    if not found:
         return PPAResult(0, 0, 0, False, "openlane")
-    m = json.load(open(metrics))
+    m = json.load(open(sorted(found)[-1]))
     return PPAResult(
-        area_um2=float(m.get("design__instance__area", 0)),
-        power_mw=float(m.get("power__total", 0)) * 1e3,
-        timing_ns=float(m.get("timing__setup__ws", 0)) * -1,  # worst slack → delay proxy
+        area_um2=float(m.get("design__instance__area", m.get("design__core__area", 0)) or 0),
+        power_mw=float(m.get("power__total", 0) or 0) * 1e3,
+        timing_ns=-float(m.get("timing__setup__ws", 0) or 0),   # worst slack → delay proxy
         ok=True, source="openlane",
     )
 
