@@ -53,6 +53,7 @@ def build_equiv_script(golden: str, candidate: str, top: str, seq_depth: int = 2
 read_verilog -sv {golden}
 hierarchy -top {top}
 proc
+memory
 async2sync
 opt_clean
 rename {top} gold
@@ -61,6 +62,7 @@ design -stash gold
 read_verilog -sv {candidate}
 hierarchy -top {top}
 proc
+memory
 async2sync
 opt_clean
 rename {top} gate
@@ -88,6 +90,7 @@ def build_bmc_script(golden: str, candidate: str, top: str, seq_depth: int = 20)
 read_verilog -sv {golden}
 hierarchy -top {top}
 proc
+memory
 async2sync
 opt_clean
 rename {top} gold
@@ -96,6 +99,7 @@ design -stash gold
 read_verilog -sv {candidate}
 hierarchy -top {top}
 proc
+memory
 async2sync
 opt_clean
 rename {top} gate
