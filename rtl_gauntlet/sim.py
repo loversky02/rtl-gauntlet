@@ -11,11 +11,14 @@ NOT on the host Mac.
 from __future__ import annotations
 
 import os
+import re
 import subprocess
 from dataclasses import dataclass
 
 SENTINEL_PASS = "RTLG_RESULT: PASS"
 SENTINEL_FAIL = "RTLG_RESULT: FAIL"
+# VerilogEval testbenches end with: "Mismatches: K in N samples"
+VEVAL_RE = re.compile(r"Mismatches:\s*(\d+)\s+in\s+(\d+)\s+samples")
 
 
 @dataclass
@@ -27,11 +30,23 @@ class SimResult:
 
 
 def parse_sim(log: str) -> tuple[bool, str]:
-    """(passed, note) from a simulation log using the sentinel convention."""
+    """(passed, note) from a simulation log.
+
+    Supports our own sentinel convention and the VerilogEval "Mismatches: K in N"
+    convention, so external benchmark testbenches work unmodified.
+    """
     if SENTINEL_PASS in log:
         return True, "sentinel:pass"
     if SENTINEL_FAIL in log:
         return False, "sentinel:fail"
+    m = VEVAL_RE.search(log)
+    if m:
+        if "TIMEOUT" in log:
+            return False, "veval:timeout"
+        k = int(m.group(1))
+        return (k == 0), f"veval:mismatches={k}"
+    if "TIMEOUT" in log:
+        return False, "veval:timeout"
     return False, "no-sentinel (crash/timeout/missing $display)"
 
 

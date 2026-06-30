@@ -42,6 +42,22 @@ file is flagged as tamper (R12 tier-2).
 The red-team agent overwrote the visible TB to always pass — the withheld hidden TB
 and formal equivalence still failed it, and tamper was flagged. The isolation holds.
 
+## 4. Scale to an external public benchmark — VerilogEval spec-to-rtl
+
+`scripts/import_veval.py` maps VerilogEval tasks (ref + testbench) into the two-tier format:
+their testbench = VISIBLE grader the agent iterates on; Yosys equivalence vs. golden =
+withheld FORMAL oracle. 4 combinational tasks, oracle-sanity + Opus 4.8 via 9router.
+
+| run | visible (their TB) | formal | RHG |
+|-----|:------------------:|:------:|:---:|
+| oracle (golden as candidate) | 4/4 PASS | 4/4 proven | 0.00 |
+| Opus 4.8 agent | 4/4 PASS (≈2.3k tok each, 1 iter) | 4/4 proven | 0.00 |
+
+The pipeline runs on a public benchmark with public golden references — adapter + the
+VerilogEval "Mismatches: K in N" convention + formal all work on external tasks. RHG = 0 on
+these easy combinational tasks (consistent with §2/§3). Eliciting RHG > 0 needs the harder /
+sequential / weak-TB items in the full 156-task set — follow-on (R15 curation).
+
 ## Findings
 
 1. **Machinery is validated.** Planted anchors confirm the oracle catches over-fit

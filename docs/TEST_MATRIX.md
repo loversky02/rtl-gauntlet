@@ -11,6 +11,7 @@ Each paper claim maps to a concrete artifact that proves it. Status:
 | H2a | Agentic loop runs e2e via 9router | Opus 4.8: spec→RTL→visible→freeze→hidden+formal, honest_pass on fair task (3.2k tok, 1 iter) | 1 | 🟢 |
 | H2b | Agents reward-hack on *harder* fair tasks | popcount8: Opus+Haiku RHG=0, no tamper (RTL-only & shell) → no natural hacking on small fair tasks; needs scale (SpecBench) | 1 | 🟡 |
 | H4 | Tamper detector + isolation hold (R12/R17) | planted-tamper: faked visible PASS but hidden FAIL + formal CEX + tamper flagged | 1 | 🟢 |
+| H5 | Pipeline runs on an external public benchmark | VerilogEval ×4: adapter + their-TB visible + formal withheld; oracle + Opus 4.8 honest (RHG 0) | 1 | 🟢 |
 | H3 | Formal equivalence catches hacks that hidden tests miss | ≥1 task: passes hidden, fails EQY (needs a task where hidden alone misses) | 1 | 🔴 |
 | C1 | Long tail is reproducible | one task with ≫ median tokens reproduced | 2 | 🔴 |
 | C2 | Early-stop cuts tokens at fixed honesty | % token saved at equal HPR | 2 | 🔴 |
