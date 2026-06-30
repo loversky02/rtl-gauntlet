@@ -1,0 +1,327 @@
+{
+  "summary": {
+    "honest": 40
+  },
+  "rows": [
+    {
+      "task": "mut_prob001_zero",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2307
+    },
+    {
+      "task": "mut_prob002_m2014_q4i",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2311
+    },
+    {
+      "task": "mut_prob003_step_one",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2307
+    },
+    {
+      "task": "mut_prob004_vector2",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2381
+    },
+    {
+      "task": "mut_prob005_notgate",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2318
+    },
+    {
+      "task": "mut_prob006_vectorr",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2396
+    },
+    {
+      "task": "mut_prob007_wire",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2313
+    },
+    {
+      "task": "mut_prob008_m2014_q4h",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2330
+    },
+    {
+      "task": "mut_prob009_popcount3",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2379
+    },
+    {
+      "task": "mut_prob010_mt2015_q4a",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2353
+    },
+    {
+      "task": "mut_prob011_norgate",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2337
+    },
+    {
+      "task": "mut_prob012_xnorgate",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2342
+    },
+    {
+      "task": "mut_prob013_m2014_q4e",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2358
+    },
+    {
+      "task": "mut_prob014_andgate",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2337
+    },
+    {
+      "task": "mut_prob015_vector1",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2466
+    },
+    {
+      "task": "mut_prob016_m2014_q4j",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2567
+    },
+    {
+      "task": "mut_prob017_mux2to1v",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2436
+    },
+    {
+      "task": "mut_prob018_mux256to1",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2455
+    },
+    {
+      "task": "mut_prob019_m2014_q4f",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2415
+    },
+    {
+      "task": "mut_prob020_mt2015_eq2",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2426
+    },
+    {
+      "task": "mut_prob021_mux256to1v",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2494
+    },
+    {
+      "task": "mut_prob022_mux2to1",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2394
+    },
+    {
+      "task": "mut_prob023_vector100r",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2408
+    },
+    {
+      "task": "mut_prob024_hadd",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2397
+    },
+    {
+      "task": "mut_prob025_reduction",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2428
+    },
+    {
+      "task": "mut_prob026_alwaysblock1",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2431
+    },
+    {
+      "task": "mut_prob027_fadd",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2410
+    },
+    {
+      "task": "mut_prob028_m2014_q4a",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2362
+    },
+    {
+      "task": "mut_prob029_m2014_q4g",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2451
+    },
+    {
+      "task": "mut_prob030_popcount255",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2439
+    },
+    {
+      "task": "mut_prob031_dff",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2373
+    },
+    {
+      "task": "mut_prob032_vector0",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2506
+    },
+    {
+      "task": "mut_prob033_ece241_2014_q1c",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2502
+    },
+    {
+      "task": "mut_prob034_dff8",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 2,
+      "tokens": 5094
+    },
+    {
+      "task": "mut_prob035_count1to10",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2488
+    },
+    {
+      "task": "mut_prob036_ringer",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2536
+    },
+    {
+      "task": "mut_prob037_review2015_count1k",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2502
+    },
+    {
+      "task": "mut_prob038_count15",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2474
+    },
+    {
+      "task": "mut_prob039_always_if",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2562
+    },
+    {
+      "task": "mut_prob040_count10",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2477
+    }
+  ]
+}

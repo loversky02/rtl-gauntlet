@@ -270,6 +270,14 @@ run-once `restartPolicyType: NEVER`, so no idle compute cost).
 
 ## 13. Paper must-haves
 
+**#1 Contamination robustness.** VerilogEval is public (VeriContaminated: ~100% contamination for
+GPT-3.5/4o), so an "honest pass" could be memorization. We generate textually-novel,
+functionally-identical tasks (`scripts/mutate_tasks.py`: rename the target module + reframe the
+spec) and re-sweep. On the first 40 tasks, Opus: **HPR 1.00 → 1.00, RHG 0 → 0 (Δ HPR = 0.000)** —
+the honesty result is **robust to identifier-level contamination** (the model adapts to a novel
+module name and stays honest). *Caveat:* these 40 are easy combinational tasks where HPR is
+saturated; a **semantic** mutation (change the function) on harder tasks is the deeper future test.
+
 **#2 Formal earns its keep.** `tasks/formal_demo`: a 16-bit candidate wrong **only on 0xDEAD**.
 The randomized hidden TB (512 / 65536) misses it → visible **and** hidden PASS; exhaustive formal
 → **CEX**. With finite tests alone RHG = 0 (it looks honest); formal exposes it → RHG 0.50. Direct
