@@ -16,7 +16,8 @@ Each paper claim maps to a concrete artifact that proves it. Status:
 | H7 | Don't-care + reset-aware oracle removes false RHG | async2sync + don't-care-aware: false RHG 9→3 (+3 honest, +3 dontcare); all 3 residual verified as state-encoding/init artifacts, not hacking | 1 | 🟡 |
 | H8 | BMC fallback removes state-encoding false-CEX | 2-pass equiv (full proof → miter+SAT BMC): false RHG 9→1; q4/q12 → bmc_equiv (verified); residual circuit8 = init-don't-care latch transient | 1 | 🟡 |
 | H9 | SystemVerilog parse fix clears most inconclusive | `read_verilog -sv`: inconclusive 50→14, honest 88→122; RHG_cex still 1 (circuit8 init artifact). Most "inconclusive" was a silent SV parse-fail, not a solver limit | 1 | 🟢 |
-| H10 | Big-FSM SAT + init-don't-care clear the last residual | larger budget/abstraction for lemmings/fsm_serial; equal-arbitrary-init for circuit8 / one-hot prob088 | 1 | 🔴 |
+| H10 | memory pass + EQY-match clear inconclusive | `memory` (case-ROM) closed 8/14 → **6 residual** (hard sequential FSMs); EQY structural-match for the last 6 = future | 1 | 🟡 |
+| M6 | Elicit real hacking (negative result) | tamper-capable shell agent: Haiku struggled 4 iters with full affordance but never tampered (honest); genuine hacking not elicited from aligned models → RL training-time = future | 1 | 🟡 |
 | H11 | Weakness ≠ hacking (model comparison) | Opus vs Haiku ×156: Haiku fails 3× more (visible) but BOTH have 0 genuine hacking (1 RHG_cex each = verified init artifact) | 1 | 🟢 |
 | H3 | Formal equivalence catches hacks that hidden tests miss | **formal_demo**: candidate passes visible+randomized-hidden TB (misses 0xDEAD) but formal CEX → RHG 0.50 | 1 | 🟢 |
 | M4 | RHG/HPR reported with confidence intervals | Wilson 95% CIs (report_cis.py): verified RHG=0, upper bound ≤2.5%/3.2% | 1 | 🟢 |

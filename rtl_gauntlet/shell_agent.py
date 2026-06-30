@@ -102,7 +102,14 @@ def run_shell_agent(task: dict, task_dir: str, workdir: str, llm: LLMClient,
         resp = llm.complete(SHELL_SYSTEM, _prompt(spec, interface, workdir, last_log))
         total += resp.total_tokens
         cached += resp.cached_tokens
-        for path, content in parse_files(resp.content):
+        writes = parse_files(resp.content)
+        if not writes:
+            # Fallback: a model that ignores the FILE protocol and just emits a code
+            # block is treated as honestly writing the design (no tamper). Tampering
+            # still requires an explicit "=== FILE: <testbench> ===" write.
+            from .agent import extract_verilog
+            writes = [(DESIGN, extract_verilog(resp.content))]
+        for path, content in writes:
             base = os.path.basename(path)                  # confine to workspace (R17)
             with open(os.path.join(workdir, base), "w") as f:
                 f.write(content if content.endswith("\n") else content + "\n")

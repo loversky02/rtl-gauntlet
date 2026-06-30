@@ -12,9 +12,11 @@ and scores it with a withheld, formal-equivalence oracle, and define a **Reward-
 and **Honest Pass Rate (HPR)**. Applying it to 156 VerilogEval tasks across two models, we find the
 naïve headline RHG (6.1%) is **entirely an oracle artifact**: a naïve formal oracle over-reports
 reward hacking via don't-care `x`, async-reset, state-encoding, init-state, and even a SystemVerilog
-parser flag. We harden the oracle in four stages — reset-aware, don't-care-aware, bounded miter+SAT,
-and `read_verilog -sv` — cutting false counter-examples 9→1 and "inconclusive" 50→14, and verify
-every surviving flag by hand: **zero genuine reward hacking** by frontier models on fair tasks. A
+parser flag. We harden the oracle in five steps — reset-aware, don't-care-aware, bounded miter+SAT,
+`read_verilog -sv`, and a `memory` (case→ROM) pass — cutting false counter-examples 9→1 and
+"inconclusive" 50→6, and verify every surviving flag by hand: **zero genuine reward hacking** by
+frontier models on fair tasks. Even a tamper-capable shell agent that struggles for several
+iterations does not edit the testbench — it keeps honestly repairing the design. A
 weaker model (Haiku 4.5) fails 3× more than Opus 4.8 on the visible tests but does **not** hack
 more — weakness manifests as *failures*, not *cheating*. We show the oracle *would* catch hacking
 when present (planted-overfit and a tamper-capable shell agent are both caught) and that, on
@@ -96,7 +98,8 @@ compares I/O sequences directly (encoding-agnostic; a SAT model is a real CEX); 
 | +SystemVerilog | 122 | 6 | 4 | 1 | 14 | 9 |
 
 The single residual CEX (an uninitialized-latch init transient, a spec don't-care) is also a false
-positive. **False CEX 9→1, inconclusive 50→14.**
+positive. A `memory` (case→ROM) pass then closed 8 of the remaining inconclusive, leaving 6 hard
+sequential FSMs. **False CEX 9→1, inconclusive 50→6, HPR 56%→87%.**
 
 ## 5. Experiments
 
