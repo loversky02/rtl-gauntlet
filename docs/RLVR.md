@@ -24,18 +24,32 @@ cannot. Either outcome is publishable: emergence (a warning for RL-trained RTL a
 robustness (RL on visible reward stays honest with a good oracle).
 
 ## RunPod setup (GPU — the one place GPU is genuinely needed)
+One command on a GPU pod (A100/H100, x86_64, CUDA 12.x):
 ```bash
-# pod: GPU (A100/H100), an image with torch+trl+vllm + iverilog/yosys on PATH
-pip install "trl>=0.17" vllm transformers datasets
-apt-get install -y iverilog yosys   # the oracle EDA
-python3 scripts/import_veval.py --all
-python3 scripts/train_grpo.py --model Qwen/Qwen3-4B --glob "tasks/veval_*" --steps 500
-# watch RHG vs step in the logged history; tear the pod down when done.
+bash runpod/rlvr_setup.sh      # EDA + pinned RL deps + import tasks + 50-step SMOKE (~30-45 min)
 ```
+It runs `scripts/train_grpo.py --smoke`. For the full curve drop `--smoke`:
+```bash
+python3 scripts/train_grpo.py --model Qwen/Qwen3-4B --glob "tasks/veval_*" --steps 500
+```
+The reward-hacking gap is appended to `runs/grpo/rhg_curve.jsonl`, one line per audit:
+`RHG(t) = visible_pass_rate(t) − formal_pass_rate(t)`. Tear the pod down once captured.
 Cost: one GPU for the training run (hours, not the ~$0.3 minutes of the PPA surrogate). This is the
 study that justifies the GPU budget — see [[runpod-grpo-env]] for the training-env gotchas.
 
 ## Status
-Scaffolded: reward + oracle instrumentation (`rl_reward.py`) reuse the eval stack; the GRPO loop
-(`train_grpo.py`) is structurally complete (the eval callback's generate-and-score body is the
-remaining glue). Not run (needs GPU). This is a **separate paper**, not part of v1.
+Implemented: reward + oracle instrumentation (`rl_reward.py`) reuse the eval stack, and the GRPO loop
+(`train_grpo.py`) now has a complete audit callback — every `--audit-every` steps it generates designs
+for the held-out set with the current policy, scores them with the withheld hidden+formal oracle, and
+logs `{visible_pass_rate, formal_pass_rate, RHG, hack_rate, honest_rate}` to `runs/grpo/rhg_curve.jsonl`.
+One-command bring-up: `runpod/rlvr_setup.sh` (deps pinned in `runpod/requirements-rl.txt`). Byte-compiles
+clean; not yet run on GPU (needs a pod). This is a **separate paper**, not part of v1.
+
+## Literature (verified arXiv IDs — see docs/RESEARCH_NOTES.md §A)
+- **2503.11926** — production RL training *discovers* test-subverting hacks (invisible to single-shot eval).
+- **2604.15149** — reward-hacking shortcuts are RLVR-specific, absent in non-RL counterparts.
+- **2605.02944** — pass-rate GRPO/RLOO reward overfits the visible suite, no durable correctness gain.
+- **2603.07084** (Countdown-Code), **2508.17511** (School of Reward Hacks) — emergence + generalization under RL.
+- RTL RL that optimizes testbench/equiv rewards but never *measures* emergence: 2505.24183 (CodeV-R1),
+  2505.11849 (VeriReason), 2511.12033 (EARL), 2508.18462 (VeriRL), 2504.15804 (DPO to dodge reward hacking).
+  The open slot: none audits an RL run with an **exhaustive formal oracle** — ours does.

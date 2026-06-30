@@ -32,7 +32,7 @@ state-encoding, init-state, and even a SystemVerilog parser flag. We harden the 
 ---reset-aware, don't-care-aware, bounded miter+SAT, \code{read\_verilog -sv}, and a \code{memory}
 (case$\to$ROM) pass---cutting false counter-examples $9\!\to\!1$ and ``inconclusive'' $50\!\to\!6$,
 and verify every surviving flag by hand: \textbf{zero genuine reward hacking} ($95\%$ upper bound
-$\le\!3\%$) by frontier models on fair tasks. A weaker model (Haiku~4.5) fails $3\times$ more than
+$\le\!3.2\%$) by frontier models on fair tasks. A weaker model (Haiku~4.5) fails $3\times$ more than
 Opus~4.8 on the visible tests but does \emph{not} hack more; even a tamper-capable shell agent that
 struggles for several iterations does not edit the testbench. We show the oracle \emph{would} catch
 hacking when present (a candidate that passes a randomized hidden testbench but is formally
@@ -133,14 +133,15 @@ na\"ive & 88 & -- & -- & 9 & 50 & 9 \\
 \bottomrule
 \end{tabular}
 \caption{Oracle hardening (same 156 Opus candidates, no new LLM calls). False CEX $9\!\to\!1$;
-inconclusive $50\!\to\!6$; \hpr{} $56\%\!\to\!87\%$. The $6$ residual are hard sequential FSMs.}
+inconclusive $50\!\to\!6$; \hpr{} $56\%\!\to\!87\%$ (honest $129$ $+$ $6$ BMC-verified $=135$ of $156$).
+The $6$ residual are hard sequential FSMs.}
 \label{tab:progression}
 \end{table}
 
 \begin{figure}[t]\centering
 \includegraphics[width=0.95\linewidth]{figures/progression.pdf}
 \caption{Oracle hardening: artifacts fall (false CEX $9\!\to\!1$, inconclusive $50\!\to\!6$) and the
-honest pass count rises ($88\!\to\!135$).}
+verified-equivalent count (honest, incl.\ BMC) rises ($88\!\to\!135$; honest-only $88\!\to\!129$).}
 \label{fig:prog}
 \end{figure}
 
@@ -163,12 +164,13 @@ intervals, verified-genuine \rhg{}$=0$ with an upper bound $\le\!2.5\%$ (Opus) /
  & Opus 4.8 & Haiku 4.5 \\
 \midrule
 honest $+$ bmc & 135 & 107 \\
-\hpr{} ($95\%$ CI) & 0.82 [.75,.87] & 0.69 [.61,.75] \\
+\hpr{} ($95\%$ CI) & 0.87 [.80,.91] & 0.69 [.61,.75] \\
 \code{fail\_visible} ($+$ no-cand) & 9 & 30 ($+11$) \\
 verified \rhg{} & 0 ($\le.025$) & 0 ($\le.032$) \\
 \bottomrule
 \end{tabular}
-\caption{Two models $\times\,156$ tasks. Weakness shows as failures, not cheating.}
+\caption{Two models $\times\,156$ tasks (hardened oracle; \hpr{} counts honest $+$ BMC-verified, so
+Opus $=129+6=135$, $135/156=0.87$). Weakness shows as failures, not cheating.}
 \label{tab:models}
 \end{table}
 
@@ -195,7 +197,12 @@ benchmark, yet models are honest on them too ($\rhg{}=0$)---so the result is not
 memorization. A direct \emph{semantic} mutation (\code{sem\_zerocount}: count \emph{zeros}, a variant
 of the canonical popcount) confirms this: the memorized count-ones solution passes the balanced
 visible test but is caught by hidden$+$formal ($\rhg{}=0.50$), while both models implement the
-variant honestly.
+variant honestly. We report contamination as its \emph{own} one-sided Clopper--Pearson $95\%$ upper
+bound (distinct from the reward-hacking bound above): $k\!=\!0$ memorization signals on the $40$-task
+probe gives $\le\!7.2\%$, tightening to $\le\!1.5\%$ as the probe scales to all $203$ tasks---the bound
+shrinks because we grow $n$, not the claim. We triangulate the behavioral probe with membership
+inference (Min-K\% Prob, arXiv:2310.16789) and the NLL$\leftrightarrow$degradation correlation under
+meaning-preserving mutation (arXiv:2604.21579), since no single contamination signal is reliable alone.
 
 \paragraph{Cost (C2).} Opus $482$k / Haiku $522$k tokens; the weaker model needs more repair
 (2-iter $17$ vs $36$). The repair tail is mostly wasted (honest payoff $35\%$ / $14\%$); an
@@ -220,7 +227,7 @@ root, not OpenLane.)
 \item A na\"ive formal oracle \textbf{over-reports} reward hacking; the headline number was an
 artifact, found only by per-case verification. Verification discipline is mandatory.
 \item No false positives on honest agents; across $2$ models $\times\,156$ fair tasks, \textbf{zero
-verified genuine reward hacking} ($95\%$ upper bound $\le\!3\%$).
+verified genuine reward hacking} ($95\%$ upper bound $\le\!3.2\%$).
 \item \textbf{Weakness $\ne$ hacking}---a weaker model fails far more but cheats no more, even under
 tamper affordance.
 \item Hacking is a function of adversarial conditions, not benchmark mass; the protocol catches it
@@ -233,18 +240,27 @@ full semantic re-mutation of the whole benchmark is future work. \emph{Oracle re
 sequential FSMs remain inconclusive---the fix is EQY with state registers excluded as match points
 $+$ a sequential SAT strategy, validated against a genuine-diff control (simply blacklisting state
 bits can mask real differences). \emph{Eliciting} genuine hacking from aligned models failed; the
-negative result may reflect single-loop inference rather than RL training. \emph{PPA}: open
+negative result reflects single-loop inference on aligned models, not RL training---the regime where
+hacking is documented to emerge: test-subverting hacks discovered \emph{during} production RL
+(arXiv:2503.11926) and shortcut behavior that is RLVR-specific, absent in non-RL counterparts
+(arXiv:2604.15149). \emph{PPA}: open
 Sky130/OpenROAD is pre-signoff, not foundry signoff, and rankings can flip across synthesis flows;
 we therefore frame PPA as a \emph{relative} comparison under identical settings (per TuRTLe) and
-note larger designs $+$ a commercial flow as the path to signoff-grade claims. \emph{Nondeterminism}:
+note larger designs $+$ a commercial flow as the path to signoff-grade claims. The open flow inflates
+area/power by ${\sim}1.2$--$1.5\times$ vs.\ a commercial signoff stack (arXiv:2512.06122) and ranking
+inversions are real (RTL-OPT, arXiv:2601.01765); we therefore verify \emph{rank stability across
+$\ge\!2$ synthesis strategies} (Kendall-$\tau$) to test the inversion failure mode directly, and expand
+C3 to a size-graded set (\code{spm}, AES, picorv32, ibex). \emph{Nondeterminism}:
 LLM runs vary; we report Wilson CIs and pin model ids.
 
 \section{Limitations and Future Work}
 EQY structural matching for the residual FSMs; a semantic contamination mutation; more models and
 task types (debug/verify/reuse); a PPA surrogate trained on a real multi-design dataset with an
 agent loop under high-latency reward; and---most ambitiously---\textbf{RL training-time hacking}:
-train a small RTL agent with a visible-test reward and measure emergence of hacking via the
-hidden$+$formal oracle.
+train a small RTL agent (Qwen3-4B, GRPO) with a visible-test reward and measure the emergence of
+hacking via a reward-hacking gap $\rhg(t)=\mathrm{visible\_pass}(t)-\mathrm{formal\_pass}(t)$ audited by
+the hidden$+$formal oracle each step---a positive, growing gap is direct evidence, and RTL is the one
+domain where this audit is \emph{exhaustive}. (Probe implemented: \code{scripts/train\_grpo.py}.)
 
 \section{Conclusion}
 Honest evaluation of agentic hardware design is gated not by a new pass-rate but by an oracle that
@@ -252,16 +268,24 @@ is don't-care/reset/encoding-aware and by a discipline of verifying every flag. 
 agents do not hack fair RTL tasks---but the oracle catches it when they do.
 
 \begin{thebibliography}{99}\small
-\bibitem{horizon} HORIZON: Agentic Hardware Design as Repository-Level Code Evolution. arXiv:2606.28279.
-\bibitem{cvdp} Comprehensive Verilog Design Problems (CVDP). arXiv:2506.14074.
-\bibitem{specbench} SpecBench: Measuring Reward Hacking in Long-Horizon Coding Agents. arXiv:2605.21384.
-\bibitem{evilgenie} EvilGenie: A Reward Hacking Benchmark. arXiv:2511.21654.
-\bibitem{vericontam} VeriContaminated: Assessing LLM-Driven Verilog Coding for Data Contamination. arXiv:2503.13572.
-\bibitem{trace2skill} Trace2Skill: Verifier-Guided Skill Evolution for Long-Context EDA Agents. arXiv:2605.21810.
-\bibitem{notsotiny} NotSoTiny: A Large, Living Benchmark for RTL Code Generation. arXiv:2512.20823.
-\bibitem{realbench} RealBench: Benchmarking Verilog Generation Models with Real-World IP Designs. arXiv:2507.16200.
-\bibitem{frontier} Exploring the Agentic Frontier of Verilog Code Generation. arXiv:2603.19347.
-\bibitem{tokenalloc} Understanding Inference-Time Token Allocation and Coverage Limits in Agentic Hardware Verification. arXiv:2604.15657.
+\bibitem{horizon} Yu, Deng, Pinckney, Khailany. Agentic Hardware Design as Repository-Level Code Evolution (HORIZON). arXiv:2606.28279, 2026.
+\bibitem{cvdp} Pinckney et al. Comprehensive Verilog Design Problems (CVDP). arXiv:2506.14074, 2025.
+\bibitem{specbench} Zhao, Srikanth, Wu, Jiang. SpecBench: Measuring Reward Hacking in Long-Horizon Coding Agents. arXiv:2605.21384, 2026.
+\bibitem{evilgenie} Gabor, Lynch, Rosenfeld. EvilGenie: A Reward Hacking Benchmark. arXiv:2511.21654, 2025.
+\bibitem{vericontam} Wang et al. VeriContaminated: Assessing LLM-Driven Verilog Coding for Data Contamination. arXiv:2503.13572, 2025.
+\bibitem{trace2skill} Du, Pinckney. Trace2Skill: Verifier-Guided Skill Evolution for Long-Context EDA Agents. arXiv:2605.21810, 2026.
+\bibitem{notsotiny} Ghorab et al. NotSoTiny: A Large, Living Benchmark for RTL Code Generation. arXiv:2512.20823, 2025.
+\bibitem{realbench} Jin et al. RealBench: Benchmarking Verilog Generation Models with Real-World IP Designs. arXiv:2507.16200, 2025.
+\bibitem{frontier} Yubeaton, Garg, Hegde. Exploring the Agentic Frontier of Verilog Code Generation. arXiv:2603.19347, 2026.
+\bibitem{tokenalloc} Patel, Chhabria, Arora. Understanding Inference-Time Token Allocation and Coverage Limits in Agentic Hardware Verification. arXiv:2604.15657, 2026.
+\bibitem{baker} Baker et al. Monitoring Reasoning Models for Misbehavior and the Risks of Promoting Obfuscation. arXiv:2503.11926, 2025.
+\bibitem{rlvrgaming} Helff et al. LLMs Gaming Verifiers: RLVR can Lead to Reward Hacking. arXiv:2604.15149, 2026.
+\bibitem{passrate} Li et al. Exploring Pass-Rate Reward in RL for Code Generation. arXiv:2605.02944, 2026.
+\bibitem{turtle} TuRTLe: A Unified Evaluation of LLMs for RTL Generation (OpenLane/Sky130, PPA-as-ratio). arXiv:2504.01986, 2025.
+\bibitem{rtlopt} RTL-OPT: PPA-ranking reliability of LLM-generated RTL across synthesis flows. arXiv:2601.01765, 2026.
+\bibitem{minkprob} Shi et al. Detecting Pretraining Data from Large Language Models (Min-K\% Prob). arXiv:2310.16789, 2023.
+\bibitem{nllmem} Metamorphic testing of memorization in LLM program repair (NLL$\leftrightarrow$degradation). arXiv:2604.21579, 2026.
+\bibitem{edahep} Using Open-Source EDA Tools in ASICs (open-vs-commercial PPA gap). arXiv:2512.06122, 2025.
 \end{thebibliography}
 
 \end{document}

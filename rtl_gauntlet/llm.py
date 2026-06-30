@@ -17,6 +17,34 @@ import os
 from dataclasses import dataclass
 
 
+def _load_dotenv() -> None:
+    """Zero-dependency .env loader: read repo-root/.env (then CWD/.env) and set any
+    RTLG_*/OPENAI_* without overriding vars already exported in the shell. Lets a
+    filled-in .env "just work" for run_veval / run_pilot / check_llm — no `source`."""
+    from pathlib import Path
+
+    seen: set[Path] = set()
+    for p in (Path(__file__).resolve().parents[1] / ".env", Path.cwd() / ".env"):
+        if p in seen or not p.is_file():
+            continue
+        seen.add(p)
+        try:
+            for raw in p.read_text().splitlines():
+                line = raw.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                key, val = line.split("=", 1)
+                key = key.strip()
+                val = val.split(" #", 1)[0].strip().strip('"').strip("'")  # drop inline comment
+                if key:
+                    os.environ.setdefault(key, val)
+        except OSError:
+            pass
+
+
+_load_dotenv()
+
+
 @dataclass
 class LLMResponse:
     content: str

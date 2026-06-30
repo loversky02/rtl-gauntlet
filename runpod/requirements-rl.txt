@@ -1,0 +1,13 @@
+# RLVR training stack — RunPod GPU pod (CUDA 12.x). Only needed for scripts/train_grpo.py.
+# transformers/trl pinned to a known-compatible pair (see [[runpod-grpo-env]] gotchas:
+# vllm<->torch<->cuda must agree, and transformers 4.51 + trl 0.17 is the tested combo).
+transformers==4.51.3
+trl==0.17.0
+datasets>=3.0
+accelerate>=1.0
+peft>=0.13
+
+# torch + vllm: install the build that matches the POD's CUDA, BEFORE the pins above.
+# On a CUDA 12.1 pod the tested combo is:
+#   pip install torch==2.5.1 vllm==0.7.3
+# If the pod image already ships torch+vllm, skip those two and keep the image's versions.
