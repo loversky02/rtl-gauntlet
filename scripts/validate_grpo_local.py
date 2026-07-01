@@ -13,6 +13,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 
 import torch  # noqa: E402
+from peft import LoraConfig  # noqa: E402
 from transformers import AutoTokenizer, Qwen2Config, Qwen2ForCausalLM  # noqa: E402
 from trl import GRPOConfig, GRPOTrainer  # noqa: E402
 
@@ -39,9 +40,11 @@ def main() -> int:
                       num_generations=2, learning_rate=1e-4, logging_steps=1,
                       use_vllm=False, bf16=False, fp16=False, max_completion_length=32,
                       max_prompt_length=256, report_to=[])
+    lora = LoraConfig(r=8, lora_alpha=16, task_type="CAUSAL_LM",
+                      target_modules=["q_proj", "k_proj", "v_proj", "o_proj"])
     trainer = GRPOTrainer(
         model=model, reward_funcs=[make_reward(out)], args=gcfg, train_dataset=ds,
-        processing_class=tok,
+        processing_class=tok, peft_config=lora,
         callbacks=[oracle_callback(audit_dirs, out, tokenizer=tok, audit_every=1,
                                    max_new_tokens=32)],
     )

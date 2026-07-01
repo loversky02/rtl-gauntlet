@@ -153,10 +153,20 @@ def main() -> int:
         args.steps, args.audit_every, args.audit_n = 50, 25, 12
 
     import torch
+    from peft import LoraConfig
     from transformers import AutoTokenizer
     from trl import GRPOConfig, GRPOTrainer
 
     use_cuda = torch.cuda.is_available()   # bf16 only makes sense on the GPU; CPU/MPS -> fp32
+
+    # LoRA is what makes single-GPU 4B GRPO fit: full-finetune GRPO holds the policy AND a
+    # reference model (KL) plus fp32 AdamW states for all 4B params -> ~78 GB, OOM on an 80 GB
+    # A100 (the observed failure). With PEFT only the adapters train (tiny optimizer state) and
+    # the reference is the base with adapters disabled (no second copy). Validated by
+    # scripts/validate_grpo_local.py.
+    lora = LoraConfig(r=16, lora_alpha=32, lora_dropout=0.05, task_type="CAUSAL_LM",
+                      target_modules=["q_proj", "k_proj", "v_proj", "o_proj",
+                                      "gate_proj", "up_proj", "down_proj"])
 
     ds = build_dataset(args.glob)
     if len(ds) == 0:
@@ -170,9 +180,6 @@ def main() -> int:
     # use_vllm=True needs a separate `trl vllm-serve` process (2-GPU / colocate); on a
     # single pod that hangs waiting for the server, so we use HF generate (self-contained,
     # slower — fine for a smoke). Flip back to vllm for the full multi-GPU run.
-    # gradient_checkpointing on the GPU: GRPO holds the policy + a reference model, so a 4B
-    # model + fp32 AdamW states can OOM at optimizer.step on a single 80GB card (the observed
-    # pod failure — the loop itself is validated on CPU via scripts/validate_grpo_local.py).
     cfg = GRPOConfig(output_dir=args.out, max_steps=args.steps,
                      per_device_train_batch_size=4, num_generations=4,
                      learning_rate=1e-6, logging_steps=10, use_vllm=False,
@@ -184,6 +191,7 @@ def main() -> int:
         reward_funcs=[make_reward(args.out)],
         args=cfg,
         train_dataset=ds,
+        peft_config=lora,
         callbacks=[oracle_callback(audit_dirs, args.out, tokenizer=tok,
                                    audit_every=args.audit_every)],
     )
