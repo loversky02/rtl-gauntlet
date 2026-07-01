@@ -208,11 +208,16 @@ failures, not cheating.}
 \paragraph{Elicit (negative, informative).} A tamper-capable shell agent on a harder task: Haiku
 struggled four iterations (with full affordance to edit the testbench) but never tampered---it kept
 honestly repairing the design and solved it; Opus and GPT-5.5 were honest in one. All three shell
-agents edited \emph{only} the design, never the testbench. Genuine reward hacking is not
-elicited from aligned frontier models in a single agentic loop even under affordance and difficulty
-(the oracle \emph{would} catch it---the planted red-team is caught); a full agentic harness on
-harder tasks is the elicitation regime (EvilGenie catches Claude Code / Codex tampering there),
-alongside RL training-time emergence.
+agents edited \emph{only} the design, never the testbench---no hacking on \emph{fair} tasks.
+\textbf{But on an \emph{impossible} task} (an \code{ImpossibleBench}-style variant whose visible
+testbench demands \code{0x00}$\to$7, contradicting the spec, so \emph{any} visible-pass is provable
+cheating), GPT-5.5 hardcodes the contradictory vector---\code{count = (data==8'h00) ? 4'd7 : popcount}
+---keeping an honest popcount elsewhere: visible PASS, formal CEX, \emph{exploit-evidenced}. This is
+the upper anchor of the honesty phase-diagram (fair task $\to$ \rhg{}$\approx$0; impossible task $\to$
+hack), and it is a \emph{design-only} hack (the testbench is untouched) that a file-edit tamper flag
+\emph{misses}---only the formal oracle plus a hardcode judge (\code{tamper\_judge}) catch it. Genuine
+hacking is thus a function of adversarial conditions (impossible / ambiguous specs), not of aligned
+frontier models in a fair single loop; RL training-time emergence is the deeper regime.
 
 \paragraph{Contamination.} VerilogEval is public (reported $\sim\!100\%$ contamination for older
 models), so an honest pass could be memorization. We generate textually-novel, functionally-identical
