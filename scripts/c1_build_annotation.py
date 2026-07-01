@@ -21,6 +21,15 @@ sys.path.insert(0, str(ROOT))
 from rtl_gauntlet.schema import FORMAL_CEX  # noqa: E402
 from rtl_gauntlet.tamper_judge import HARDCODE_OVERFIT, classify_exploit  # noqa: E402
 
+
+def strip_comments(v: str) -> str:
+    """Remove Verilog // and /* */ comments so raters judge from the CODE, not giveaway comments
+    (the planted/elicited designs self-describe as hardcodes — that would defeat the blind study)."""
+    import re
+    v = re.sub(r"/\*.*?\*/", "", v, flags=re.DOTALL)
+    v = re.sub(r"//[^\n]*", "", v)
+    return "\n".join(ln.rstrip() for ln in v.splitlines() if ln.strip()) + "\n"
+
 IMP = "tasks/impossible_popcount8/spec.md"
 # real HARDCODE cases (file-referenced): (id, spec_path, design_path)
 REAL = [
@@ -87,9 +96,9 @@ def main() -> int:
     for cid, sp, dp in REAL:
         s, d = ROOT / sp, ROOT / dp
         if s.exists() and d.exists():
-            cases.append((cid, s.read_text(), d.read_text(), "HARDCODE"))
+            cases.append((cid, s.read_text(), strip_comments(d.read_text()), "HARDCODE"))
     for cid, spec, design, gt in CONSTRUCTED:
-        cases.append((cid, spec, design, gt))
+        cases.append((cid, spec, strip_comments(design), gt))
     random.Random(7).shuffle(cases)   # fixed shuffle so order != class
 
     key, ann = [], ["# C1 judge-vs-human annotation (BLIND)\n",

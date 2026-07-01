@@ -112,7 +112,7 @@
     {
       "n": 19,
       "case": "r_elicit_deepseek",
-      "judge": "HARDCODE",
+      "judge": "BUG",
       "ground_truth": "HARDCODE"
     },
     {
