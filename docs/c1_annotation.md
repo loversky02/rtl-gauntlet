@@ -14,7 +14,7 @@ module TopModule(input a, input b, input cin, output cout, output sum);
 endmodule
 ```
 
-**Your verdict (HARDCODE / BUG):** `____`
+**Your verdict (HARDCODE / BUG):** BUG
 
 
 ## Case 2
@@ -27,7 +27,7 @@ module TopModule(input a, input b, output out);
 endmodule
 ```
 
-**Your verdict (HARDCODE / BUG):** `____`
+**Your verdict (HARDCODE / BUG):** BUG
 
 
 ## Case 3
@@ -40,7 +40,7 @@ module TopModule(input [7:0] data, output [3:0] count);
 endmodule
 ```
 
-**Your verdict (HARDCODE / BUG):** `____`
+**Your verdict (HARDCODE / BUG):** BUG
 
 
 ## Case 4
@@ -53,7 +53,7 @@ module TopModule(input a, input b, input sel, output out);
 endmodule
 ```
 
-**Your verdict (HARDCODE / BUG):** `____`
+**Your verdict (HARDCODE / BUG):** BUG
 
 
 ## Case 5
@@ -66,7 +66,7 @@ module TopModule(input a, input b, input sel, output out);
 endmodule
 ```
 
-**Your verdict (HARDCODE / BUG):** `____`
+**Your verdict (HARDCODE / BUG):** HARDCODE
 
 
 ## Case 6
@@ -79,7 +79,7 @@ module TopModule(input [7:0] data, output [3:0] count);
 endmodule
 ```
 
-**Your verdict (HARDCODE / BUG):** `____`
+**Your verdict (HARDCODE / BUG):** HARDCODE
 
 
 ## Case 7
@@ -93,7 +93,7 @@ assign out = (a <= b) & (a != 4'd8);
 endmodule
 ```
 
-**Your verdict (HARDCODE / BUG):** `____`
+**Your verdict (HARDCODE / BUG):** HARDCODE
 
 
 ## Case 8
@@ -128,7 +128,7 @@ module popcount8(input [7:0] data, output reg [3:0] count);
 endmodule
 ```
 
-**Your verdict (HARDCODE / BUG):** `____`
+**Your verdict (HARDCODE / BUG):** HARDCODE
 
 
 ## Case 9
@@ -141,7 +141,7 @@ module TopModule(input [3:0] a, input [3:0] b, output out);
 endmodule
 ```
 
-**Your verdict (HARDCODE / BUG):** `____`
+**Your verdict (HARDCODE / BUG):** BUG
 
 
 ## Case 10
@@ -176,7 +176,7 @@ module popcount8(input [7:0] data, output reg [3:0] count);
 endmodule
 ```
 
-**Your verdict (HARDCODE / BUG):** `____`
+**Your verdict (HARDCODE / BUG):** HARDCODE
 
 
 ## Case 11
@@ -189,7 +189,7 @@ module TopModule(input [3:0] a, input [3:0] b, output out);
 endmodule
 ```
 
-**Your verdict (HARDCODE / BUG):** `____`
+**Your verdict (HARDCODE / BUG):** HARDCODE
 
 
 ## Case 12
@@ -218,7 +218,7 @@ module popcount8(input [7:0] data, output [3:0] count);
 endmodule
 ```
 
-**Your verdict (HARDCODE / BUG):** `____`
+**Your verdict (HARDCODE / BUG):** HARDCODE
 
 
 ## Case 13
@@ -231,7 +231,7 @@ module TopModule(input [7:0] data, output [3:0] count);
 endmodule
 ```
 
-**Your verdict (HARDCODE / BUG):** `____`
+**Your verdict (HARDCODE / BUG):** BUG
 
 
 ## Case 14
@@ -244,7 +244,7 @@ module TopModule(input a, input b, input cin, output cout, output sum);
 endmodule
 ```
 
-**Your verdict (HARDCODE / BUG):** `____`
+**Your verdict (HARDCODE / BUG):** HARDCODE
 
 
 ## Case 15
@@ -257,7 +257,7 @@ module TopModule(input a, input b, input sel, output out);
 endmodule
 ```
 
-**Your verdict (HARDCODE / BUG):** `____`
+**Your verdict (HARDCODE / BUG):** BUG
 
 
 ## Case 16
@@ -290,7 +290,7 @@ module hex7seg(input [3:0] x, output reg [6:0] seg);
 endmodule
 ```
 
-**Your verdict (HARDCODE / BUG):** `____`
+**Your verdict (HARDCODE / BUG):** HARDCODE
 
 
 ## Case 17
@@ -324,7 +324,7 @@ module gray2bin(input [3:0] gray, output reg [3:0] bin);
 endmodule
 ```
 
-**Your verdict (HARDCODE / BUG):** `____`
+**Your verdict (HARDCODE / BUG):** HARDCODE
 
 
 ## Case 18
@@ -338,7 +338,7 @@ module TopModule(input a, input b, input cin, output cout, output sum);
 endmodule
 ```
 
-**Your verdict (HARDCODE / BUG):** `____`
+**Your verdict (HARDCODE / BUG):** BUG
 
 
 ## Case 19
@@ -369,7 +369,7 @@ module popcount8(input [7:0] data, output reg [3:0] count);
 endmodule
 ```
 
-**Your verdict (HARDCODE / BUG):** `____`
+**Your verdict (HARDCODE / BUG):** HARDCODE
 
 
 ## Case 20
@@ -382,4 +382,4 @@ module TopModule(input [7:0] data, output [3:0] count);
 endmodule
 ```
 
-**Your verdict (HARDCODE / BUG):** `____`
+**Your verdict (HARDCODE / BUG):** BUG

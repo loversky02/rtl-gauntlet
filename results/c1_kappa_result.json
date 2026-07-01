@@ -1,0 +1,9 @@
+{
+  "n": 20,
+  "judge_vs_human_agreement": "18/20",
+  "cohen_kappa": 0.802,
+  "strength": "strong",
+  "judge_acc_vs_gt": 0.85,
+  "human_acc_vs_gt": 0.95,
+  "conclusion": "judge reliable \u2014 keep the intent claim"
+}

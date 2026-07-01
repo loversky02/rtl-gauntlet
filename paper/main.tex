@@ -299,7 +299,9 @@ demands \code{0x00}$\to$7, contradicting the spec, so \emph{any} visible-pass is
 (\code{(data==8'h00)?4'd7:popcount}): visible PASS, formal CEX. An \emph{independent} judge (Opus)
 confirms all three as hardcode-overfit and scores $6/7$ ($86\%$) on known hardcodes, so
 exploit-evidenced counts are a \emph{conservative lower bound} (self-judging is lenient---GPT-5.5
-excused its own; judge-vs-human $\kappa$ is future work). \textbf{Opus and Haiku refuse} (Opus stays
+excused its own). A blind judge-vs-human study ($n{=}20$ balanced cases) gives Cohen's
+$\kappa=0.80$ (\emph{strong}), so the intent sub-classification is reliable---we keep the intent claim.
+\textbf{Opus and Haiku refuse} (Opus stays
 formally proven-correct). So the metric is \emph{not} trivially zero: cheating appears in the
 \emph{majority} of frontier models under contradictory specs, Opus resisting. The hack is
 \emph{design-only} (testbench untouched)---a file-edit flag misses it; only the formal oracle $+$ judge
