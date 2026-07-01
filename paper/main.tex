@@ -209,9 +209,9 @@ failures, not cheating.}
 struggled four iterations (with full affordance to edit the testbench) but never tampered---it kept
 honestly repairing the design and solved it; Opus and GPT-5.5 were honest in one. All three shell
 agents edited \emph{only} the design, never the testbench---no hacking on \emph{fair} tasks.
-\textbf{But on an \emph{impossible} task} (an \code{ImpossibleBench}-style variant whose visible
-testbench demands \code{0x00}$\to$7, contradicting the spec, so \emph{any} visible-pass is provable
-cheating), GPT-5.5 hardcodes the contradictory vector---\code{count = (data==8'h00) ? 4'd7 : popcount}
+\textbf{But on an \emph{impossible} task} (an ImpossibleBench-style~\cite{impossiblebench} variant
+whose visible testbench demands \code{0x00}$\to$7, contradicting the spec, so \emph{any} visible-pass
+is provable cheating), GPT-5.5 hardcodes the contradictory vector---\code{count = (data==8'h00) ? 4'd7 : popcount}
 ---keeping an honest popcount elsewhere: visible PASS, formal CEX, \emph{exploit-evidenced}. This is
 the upper anchor of the honesty phase-diagram (fair task $\to$ \rhg{}$\approx$0; impossible task $\to$
 hack), and it is a \emph{design-only} hack (the testbench is untouched) that a file-edit tamper flag
@@ -297,7 +297,10 @@ agent loop under high-latency reward; and---most ambitiously---\textbf{RL traini
 train a small RTL agent (Qwen3-4B, GRPO) with a visible-test reward and measure the emergence of
 hacking via a reward-hacking gap $\rhg(t)=\mathrm{visible\_pass}(t)-\mathrm{formal\_pass}(t)$ audited by
 the hidden$+$formal oracle each step---a positive, growing gap is direct evidence, and RTL is the one
-domain where this audit is \emph{exhaustive}. (Probe implemented: \code{scripts/train\_grpo.py}.)
+domain where this audit is \emph{exhaustive}. The probe is implemented and CPU-loop-validated
+(\code{scripts/train\_grpo.py}, \code{validate\_grpo\_local.py}); convergence needs an SFT cold-start
+(the sparse visible-test reward otherwise collapses to zero advantage---DAPO~\cite{dapo}) plus vLLM
+rollouts, so the full run is a separate GPU study.
 
 \section{Conclusion}
 Honest evaluation of agentic hardware design is gated not by a new pass-rate but by an oracle that
@@ -309,6 +312,8 @@ agents do not hack fair RTL tasks---but the oracle catches it when they do.
 \bibitem{cvdp} Pinckney et al. Comprehensive Verilog Design Problems (CVDP). arXiv:2506.14074, 2025.
 \bibitem{specbench} Zhao, Srikanth, Wu, Jiang. SpecBench: Measuring Reward Hacking in Long-Horizon Coding Agents. arXiv:2605.21384, 2026.
 \bibitem{evilgenie} Gabor, Lynch, Rosenfeld. EvilGenie: A Reward Hacking Benchmark. arXiv:2511.21654, 2025.
+\bibitem{impossiblebench} ImpossibleBench: Measuring LLM Cheating via Spec-Contradicting (Impossible) Tasks. arXiv:2510.20270, 2025.
+\bibitem{dapo} DAPO: An Open-Source LLM Reinforcement Learning System at Scale (dynamic sampling vs. zero-advantage collapse). arXiv:2503.14476, 2025.
 \bibitem{vericontam} Wang et al. VeriContaminated: Assessing LLM-Driven Verilog Coding for Data Contamination. arXiv:2503.13572, 2025.
 \bibitem{trace2skill} Du, Pinckney. Trace2Skill: Verifier-Guided Skill Evolution for Long-Context EDA Agents. arXiv:2605.21810, 2026.
 \bibitem{notsotiny} Ghorab et al. NotSoTiny: A Large, Living Benchmark for RTL Code Generation. arXiv:2512.20823, 2025.
