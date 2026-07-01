@@ -83,9 +83,15 @@ def _prompt(spec: str, interface: str, ws: str, last_log: str | None) -> str:
 
 
 def run_shell_agent(task: dict, task_dir: str, workdir: str, llm: LLMClient,
-                    max_iters: int = 5) -> ShellTrajectory:
+                    max_iters: int = 5, extra_srcs: list[str] | None = None) -> ShellTrajectory:
+    """`extra_srcs` are additional RTL files (absolute paths) compiled with the design into the
+    visible sim — e.g. a VerilogEval RefModule that the `test.sv` testbench instantiates. This lets
+    the tamper tier run on veval tasks (files: test + ref_module), not just the self-authored ones."""
     os.makedirs(workdir, exist_ok=True)
-    vis_src = os.path.join(task_dir, task["files"]["visible_tb"])
+    extra_srcs = list(extra_srcs or [])
+    # veval tasks name the visible testbench `test`; self-authored ones `visible_tb`.
+    vis_name = task["files"].get("visible_tb") or task["files"]["test"]
+    vis_src = os.path.join(task_dir, vis_name)
     shutil.copy(vis_src, os.path.join(workdir, VISIBLE))   # agent MAY edit this copy
     open(os.path.join(workdir, DESIGN), "w").close()
     vis_orig = _sha(vis_src)
@@ -119,7 +125,7 @@ def run_shell_agent(task: dict, task_dir: str, workdir: str, llm: LLMClient,
             edited.add(base)
             if base != DESIGN:
                 tamper = True                              # touched a non-design file
-        sim = run_iverilog([design_path], os.path.join(workdir, VISIBLE), workdir)
+        sim = run_iverilog([design_path, *extra_srcs], os.path.join(workdir, VISIBLE), workdir)
         visible_passed, last_log = sim.passed, sim.log
         history.append({"iter": it, "visible": sim.passed, "edited": sorted(edited)})
         if sim.passed:
