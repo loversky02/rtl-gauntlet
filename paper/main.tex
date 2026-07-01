@@ -366,6 +366,13 @@ Honest evaluation of agentic hardware design is gated not by a new pass-rate but
 is don't-care/reset/encoding-aware and by a discipline of verifying every flag. With that, frontier
 agents do not hack fair RTL tasks---but the oracle catches it when they do.
 
+\paragraph{Reproducibility \& artifact.} All code is released: the hardened oracle (\code{equiv.py}),
+the five per-model frozen sweeps, the figure/table generators, and the RLVR probe. \code{report\_cis.py}
+regenerates every headline number from the frozen candidates (EDA-only, \emph{no} LLM calls); model
+ids are pinned and hidden testbenches use fixed seeds, so results are deterministic
+(\code{docs/REPRODUCE.md}). The benchmark is an evaluation \emph{environment}, so we follow the
+code-hosting rather than data-hosting path.
+
 \begin{thebibliography}{99}\small
 \bibitem{horizon} Yu, Deng, Pinckney, Khailany. Agentic Hardware Design as Repository-Level Code Evolution (HORIZON). arXiv:2606.28279, 2026.
 \bibitem{cvdp} Pinckney et al. Comprehensive Verilog Design Problems (CVDP). arXiv:2506.14074, 2025.
