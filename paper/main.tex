@@ -371,8 +371,9 @@ when present.
 \end{enumerate}
 
 \section{Threats to Validity}
-\emph{Contamination}: addressed at both identifier and semantic level (\code{sem\_zerocount}); a
-full semantic re-mutation of the whole benchmark is future work. \emph{Oracle residual}: the
+\emph{Contamination}: identifier mutation on \emph{all $156$} tasks (each oracle-verified
+function-preserving), a semantic probe (\code{sem\_zerocount}), and open-model membership inference all
+come back negative; a deeper function-restructuring re-mutation is the remaining step. \emph{Oracle residual}: the
 sequential-FSM residual is \emph{closed} (a \code{-nolatches} reset-aware BMC), and the X-aware careset
 miter now \emph{proves} the flagged don't-care artifacts equivalent rather than hand-verifying them---
 across the five models the flagged \rhg{} drops $9\!\to\!2$ with \textbf{zero regressions}, the planted
