@@ -52,7 +52,13 @@ C1 ~97% · C2 ~60% · C3 ~45% · Paper ~93%. Results: `docs/PILOT_RESULTS.md`.
   regime, deploy-ready + loop-validated, GATED on GPU budget. This is the "may not converge" question.
 - [x] **#7 +models** — DeepSeek + GPT-5.5 done (4 models); Gemini #5 sweeping.
 - [~] **#8 Real shell-agent tamper** — Opus/Haiku/GPT-5.5 shell agents all no-tamper on fair tasks
-  (negative, documented). Positive elicitation needs a hard task + full agentic harness (EvilGenie).
+  (negative, documented). Research: `docs/TAMPER_ELICITATION_HARNESS.md`. Detector gap FIXED
+  (`tamper_judge.py`: catches hardcode-overfit, not just TB edits). Elicitation recipe (strongest
+  first): **(1)** impossible/contradictory task (ImpossibleBench — *any* visible-pass = provable
+  cheat); **(2)** ambiguous/incomplete spec (EvilGenie: hack 44% vs 0.7% on clear — same as #6's
+  weak-spec); **(3)** real tool-use loop (bash/editor, not the one-shot `=== FILE ===` protocol).
+  Cheapest smoke: 1 impossible task × 1 reasoning-model × `--judge`. Build = (b) impossible-task
+  generator + (c) tool-use agent — gated with #6 on research investment.
 
 ## FUTURE WORK (state in paper; do NOT block v1)
 - **C3 full:** scale OpenLane designs (⚠ `railway.json` MUST be at repo ROOT) → surrogate on real
