@@ -11,8 +11,8 @@ echo "[1/3] python = $PY ; openlane = $(command -v openlane || echo MISSING)"
 echo "[2/3] Sky130 PDK (ciel)"
 ciel enable --pdk-root "$PDK_ROOT" 2>&1 | tail -3 || true
 
-echo "[3/3] PPA data-gen (real OpenLane flow per design)"
-"$PY" scripts/gen_ppa_data.py --openlane --out /data/ppa_dataset.jsonl || true
+echo "[3/3] PPA data-gen (real OpenLane flow per design; PPA_LIMIT caps it — P&R is slow)"
+"$PY" scripts/gen_ppa_data.py --openlane --out /data/ppa_dataset.jsonl --limit "${PPA_LIMIT:-20}" || true
 
 echo "=====BEGIN ppa_dataset.jsonl====="
 cat /data/ppa_dataset.jsonl 2>/dev/null || echo "(no rows)"
