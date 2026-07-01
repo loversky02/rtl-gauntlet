@@ -31,6 +31,8 @@ tasks/mut_*/
 *.fls
 *.fdb_latexmk
 *.synctex.gz
+# arXiv submission tarball (regenerate per paper/ARXIV.md)
+paper/arxiv-submission.tar.gz
 
 # OS
 .DS_Store
