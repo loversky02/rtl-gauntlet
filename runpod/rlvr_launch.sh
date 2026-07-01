@@ -29,6 +29,10 @@ trap terminate_self EXIT
 job() {
   set -x
   export DEBIAN_FRONTEND=noninteractive PIP_ROOT_USER_ACTION=ignore
+  # Prereqs: launch on a base image whose CMD is bash (e.g. nvidia/cuda:*-devel), NOT runpod/pytorch
+  # (its entrypoint hijacks --args, so the pod idles at 0% util). A bare CUDA image has no git/python.
+  command -v git >/dev/null 2>&1 && command -v python3 >/dev/null 2>&1 || \
+    { apt-get update -y && apt-get install -y --no-install-recommends git curl ca-certificates python3 python3-pip; }
   cd /workspace 2>/dev/null || cd /root
   rm -rf rtl-gauntlet
   git clone --depth 1 -b careset-oracle-revision https://github.com/loversky02/rtl-gauntlet.git
