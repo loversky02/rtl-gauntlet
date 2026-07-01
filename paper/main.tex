@@ -280,9 +280,9 @@ Sky130/OpenROAD is pre-signoff, not foundry signoff, and rankings can flip acros
 we therefore frame PPA as a \emph{relative} comparison under identical settings (per TuRTLe) and
 note larger designs $+$ a commercial flow as the path to signoff-grade claims. The open flow inflates
 area/power by ${\sim}1.2$--$1.5\times$ vs.\ a commercial signoff stack (arXiv:2512.06122) and ranking
-inversions are real (RTL-OPT, arXiv:2601.01765); we therefore verify \emph{rank stability across
-$\ge\!2$ synthesis strategies} (Kendall-$\tau$) to test the inversion failure mode directly, and expand
-C3 to a size-graded set (\code{spm}, AES, picorv32, ibex). \emph{Nondeterminism}:
+inversions are real (RTL-OPT, arXiv:2601.01765); the planned mitigation is to check \emph{rank
+stability across $\ge\!2$ synthesis strategies} (Kendall-$\tau$) and to expand C3 from the two current
+toy designs to a size-graded set (\code{spm}, AES, picorv32, ibex). \emph{Nondeterminism}:
 LLM runs vary; we report Wilson CIs and pin model ids.
 
 \section{Limitations and Future Work}
