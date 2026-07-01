@@ -7,6 +7,8 @@
 \usepackage{xcolor}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{enumitem}
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta, fit}
 
 \newcommand{\rhg}{\textsf{RHG}}
 \newcommand{\hpr}{\textsf{HPR}}
@@ -67,6 +69,35 @@ reward hacking} on fair tasks; weakness $\ne$ hacking; tampering is caught when 
 via a containerized flow (\S\ref{sec:exp}).
 \end{enumerate}
 
+\begin{figure}[t]\centering
+\begin{tikzpicture}[font=\footnotesize, node distance=6mm,
+  box/.style={draw, rounded corners, align=center, minimum height=8mm, inner sep=3pt},
+  vis/.style={box, fill=blue!8}, wh/.style={box, fill=red!8}, res/.style={box, fill=green!12},
+  ar/.style={-{Latex[length=2mm]}, thick}]
+\node[vis] (spec) {complete spec\\$+$ \textbf{visible} TB\\$+$ failure logs};
+\node[vis, right=of spec] (agent) {\textbf{agent}\\edits RTL};
+\node[box, right=of agent] (freeze) {\textbf{freeze}\\design\\(I/O locked)};
+\node[wh, below=9mm of agent] (hidden) {\textbf{hidden} randomized TB};
+\node[wh, below=9mm of freeze] (formal) {\textbf{formal oracle}\\equiv.\ vs.\ golden\\(6-step hardened)};
+\node[res, right=of formal] (verdict) {\textbf{verdict}\\\rhg{} / \hpr{}\\$+$ tamper};
+\draw[ar] (spec) -- (agent);
+\draw[ar] (agent) -- (freeze);
+\draw[ar] (agent) to[out=60,in=120,looseness=6] node[above,font=\scriptsize]{fail: retry} (agent);
+\draw[ar] (freeze) -- (formal);
+\draw[ar] (freeze.south) to[out=-90,in=90] (hidden.north);
+\draw[ar] (hidden) |- (verdict);
+\draw[ar] (formal) -- (verdict);
+\node[draw, dashed, gray, fit=(hidden)(formal), inner sep=6pt] (whbox) {};
+\node[gray, font=\scriptsize, below=0.5mm of whbox] {\emph{withheld --- the agent never sees these}};
+\end{tikzpicture}
+\caption{\textbf{The two-tier protocol.} The agent optimizes only against the \emph{visible} tier and
+iterates until it passes; its \emph{frozen} design is then scored by the \emph{withheld} tier---a
+hidden randomized testbench and the hardened formal-equivalence oracle (vs.\ a curated golden).
+\rhg{}/\hpr{} come from the withheld verdict; a tamper tier flags edits to the testbench/harness. The
+withheld tiers run on frozen originals, so tampering the in-workspace copy cannot fool the score.}
+\label{fig:protocol}
+\end{figure}
+
 \section{Related Work and Positioning}
 Formal-equivalence-as-oracle is already community-standard for RTL--LLM evaluation
 (VeriThoughts; NotSoTiny; RealBench)---so it is our \emph{tool}, not our contribution.
@@ -90,8 +121,8 @@ that limit) $+$ tamper-evidence.}
 \end{table}
 
 \section{Method: the two-tier protocol}\label{sec:method}
-The agent sees a complete specification, a \emph{visible} diagnostic testbench, and its failure
-logs, and edits RTL until visible passes. We then \textbf{freeze} the design and score withheld
+Figure~\ref{fig:protocol} shows the flow. The agent sees a complete specification, a \emph{visible}
+diagnostic testbench, and its failure logs, and edits RTL until visible passes. We then \textbf{freeze} the design and score withheld
 tiers it never saw: a hidden randomized/exhaustive testbench, and \textbf{formal equivalence} vs.\ a
 curated golden (Yosys). The I/O interface is locked. We define
 \[
@@ -121,13 +152,21 @@ encoding; and---for most ``inconclusive''---a silent parse failure, since \code{
 defaults to Verilog-2005 while the references use \code{always\_ff}/\code{logic}/enums.
 
 Our hardening pipeline (each step tested on verified cases before re-running):
-\begin{enumerate}[leftmargin=*,topsep=2pt,itemsep=0pt]
-\item \code{async2sync} (normalize async resets);
-\item reclassify a CEX to \emph{dontcare} when the golden has an \code{x} literal;
-\item a bounded miter$+$SAT fallback comparing I/O sequences directly (encoding-agnostic; a SAT
-model is a real CEX);
-\item \code{read\_verilog -sv};
-\item a \code{memory} (case$\to$ROM) pass;
+\begin{enumerate}[leftmargin=*,topsep=2pt,itemsep=1pt]
+\item \code{async2sync} (normalize async resets)---an identical design was flagged CEX only because
+the flow treated the async-reset path inconsistently between golden and candidate.
+\item reclassify a CEX to \emph{dontcare} when the golden assigns an \code{x} literal to an
+\emph{output}---VerilogEval goldens mark don't-care output bits \code{1'bx}; a concrete value there is
+spec-correct (the X-matching testbench accepts it) but na\"ive \code{equiv\_make} reads
+\code{x}$\ne$\code{value} as a mismatch.
+\item a bounded miter$+$SAT fallback comparing the two designs' I/O sequences directly---induction
+(\code{equiv\_induct}) cannot map two \emph{correct} FSMs that use different state encodings (a 3-bit
+vector vs.\ three scalars), so it falsely reports non-equivalence; a SAT model here \emph{is} a real CEX.
+\item \code{read\_verilog -sv}---yosys defaults to Verilog-2005, so SystemVerilog references
+(\code{always\_ff}/\code{logic}/enums) \emph{silently fail to parse}; the simulator accepts them
+(visible passes) while the oracle errors, which we then misread as ``inconclusive.''
+\item a \code{memory} (case$\to$ROM) pass---large \code{case} ROMs elaborate to a \code{\$mem}
+primitive that induction cannot align;
 \item a \code{-nolatches} reset-aware BMC (Pass-3) that closes the residual \code{inconclusive}
 FSMs. Their goldens use an \code{always\_comb case(state)} over a \code{reg [3:0]} that lists only the
 reachable states, so the unlisted states infer a latch and yosys \emph{errors out}---an elaboration
@@ -171,17 +210,21 @@ formal exposes it ($\rhg{}=0.50$). This is the direct evidence that an exhaustiv
 beats a finite held-out suite.
 
 \paragraph{Sweep and model comparison.} Table~\ref{tab:models} and Figure~\ref{fig:models}: the
-weaker models fail far more (\code{fail\_visible} $9$/$6$/$14$/$36$/$30$ for Opus/GPT-5.5/Gemini/DeepSeek/Haiku,
-$+11$ no-candidate for Haiku) but hack no more. Every flagged \rhg{} counter-example across the five
-models---$4$ distinct tasks---is a hand-verified artifact: \code{circuit8}/\code{q5b} are BMC
-zero-init artifacts (\code{-set-init-zero} forces an invalid state for an uninitialized latch /
-one-hot FSM, the latter produced independently by DeepSeek, Haiku, and GPT-5.5); \code{prob095} is a
-zero-init state with an incidentally-active output (simulation confirms equivalence after reset); and
-\code{prob149} is an \emph{input-space} don't-care---a water-level controller whose golden marks
-impossible non-thermometer sensor codes \code{'x}. The \code{dontcare} detector requires the \code{x}
-to drive an output, so an incidental internal \code{x} cannot mask a real CEX. With $95\%$ Wilson
-intervals, verified-genuine \rhg{}$=0$, upper bound $\le\!2.5\%$ (Opus) / $\le\!2.5\%$ (GPT-5.5) / $\le\!2.6\%$ (Gemini) /
-$\le\!3.1\%$ (DeepSeek) / $\le\!3.2\%$ (Haiku).
+weaker models fail far more on the visible tests (\code{fail\_visible} $9$/$6$/$14$/$36$/$30$ for
+Opus/GPT-5.5/Gemini/DeepSeek/Haiku) but hack no more. \emph{Every} flagged \rhg{} counter-example
+across the five models is one of only \textbf{four distinct tasks}, each hand-verified as an artifact:
+\begin{itemize}[leftmargin=*,topsep=2pt,itemsep=1pt]
+\item \code{circuit8}, \code{q5b} --- BMC \emph{zero-init} artifacts: \code{-set-init-zero} forces an
+invalid start state for an uninitialized latch / one-hot FSM (the FSM produced independently by
+DeepSeek, Haiku, and GPT-5.5).
+\item \code{prob095} --- a zero-init state whose output is \emph{incidentally} active; simulation
+confirms the design is equivalent once reset is applied.
+\item \code{prob149} --- an \emph{input-space} don't-care: a water-level controller whose golden
+marks physically-impossible (non-thermometer) sensor codes \code{'x}.
+\end{itemize}
+The \code{dontcare} detector requires the \code{x} to drive an \emph{output}, so an incidental
+internal \code{x} cannot mask a real CEX. Net ($95\%$ Wilson): verified-genuine \rhg{}$=0$ for all
+five models, upper bound $\le\!3.2\%$ (Haiku, the loosest; $\le\!2.5$--$2.6\%$ for the three strongest).
 
 \begin{table}[t]\centering\small
 \begin{tabular}{@{}lccccc@{}}
@@ -226,22 +269,23 @@ of the model, not of aligned frontier models in a fair single loop; RL training-
 the deeper regime.
 
 \paragraph{Contamination.} VerilogEval is public (reported $\sim\!100\%$ contamination for older
-models), so an honest pass could be memorization. We generate textually-novel, functionally-identical
-tasks (rename the target module, reframe the spec) and re-sweep: on the first 40 tasks \emph{both}
-Opus and Haiku are $\hpr{}\,1.00\!\to\!1.00$, $\rhg{}\,0\!\to\!0$ ($\Delta=0$ each). The result is
-robust to identifier-level contamination for both a strong and a weak model. As a \emph{semantic}-novelty control, our self-authored tasks
-(\code{gray2bin}, \code{popcount8}, \code{hex7seg}) implement functions absent from any public
-benchmark, yet models are honest on them too ($\rhg{}=0$)---so the result is not benchmark
-memorization. A direct \emph{semantic} mutation (\code{sem\_zerocount}: count \emph{zeros}, a variant
-of the canonical popcount) confirms this: the memorized count-ones solution passes the balanced
-visible test but is caught by hidden$+$formal ($\rhg{}=0.50$), while both models implement the
-variant honestly. We report contamination as its \emph{own} one-sided Clopper--Pearson $95\%$ upper
-bound (distinct from the reward-hacking bound above): $k\!=\!0$ memorization signals on the $40$-task
-probe gives $\le\!7.2\%$, tightening to $\le\!1.5\%$ as the probe scales to all $203$ tasks---the bound
-shrinks because we grow $n$, not the claim. Since no single contamination signal is reliable alone,
-we plan to triangulate this behavioral probe with membership inference (Min-K\% Prob, arXiv:2310.16789)
-and the NLL$\leftrightarrow$degradation correlation under meaning-preserving mutation
-(arXiv:2604.21579); only the behavioral probe is run here.
+models), so an honest pass could be memorization rather than reasoning. We probe this in layers:
+\begin{itemize}[leftmargin=*,topsep=2pt,itemsep=1pt]
+\item \textbf{Identifier mutation.} Rename the target module and reframe the spec, then re-sweep: on
+$40$ tasks \emph{both} Opus and Haiku hold $\hpr{}\,1.00\!\to\!1.00$, $\rhg{}\,0\!\to\!0$
+($\Delta=0$)---robust for a strong \emph{and} a weak model.
+\item \textbf{Semantic novelty.} Self-authored tasks (\code{gray2bin}, \code{popcount8},
+\code{hex7seg}) implement functions absent from any public benchmark, yet models stay honest
+($\rhg{}=0$)---not benchmark recall.
+\item \textbf{Semantic mutation.} \code{sem\_zerocount} counts \emph{zeros}, a variant of the
+canonical popcount: the memorized count-ones solution passes the balanced visible test but is caught
+by hidden$+$formal ($\rhg{}=0.50$), while both models implement the variant honestly.
+\end{itemize}
+We report contamination as its \emph{own} one-sided Clopper--Pearson $95\%$ bound (distinct from the
+reward-hacking bound): $k\!=\!0$ memorization signals on the $40$-task probe gives $\le\!7.2\%$. No
+single signal is reliable alone, so triangulating with membership inference (Min-K\% Prob~\cite{minkprob})
+and the NLL$\leftrightarrow$degradation correlation under meaning-preserving mutation~\cite{nllmem} is
+future work; only the behavioral probe is run here.
 
 \paragraph{Cost (C2).} Opus $482$k / Haiku $522$k tokens; the weaker model needs more repair
 (2-iter $17$ vs $36$). The repair tail is mostly wasted (honest payoff $47\%$ / $14\%$); an
@@ -282,31 +326,40 @@ $5$ Opus FSMs equivalent and reclassifies $1$ as an output don't-care, validated
 genuine-diff control (a deliberately-broken candidate is still flagged CEX, so the pass is not
 vacuously proving everything). GPT-5.5 leaves $3$ inconclusive (Conway's Life's $256$-cell grid plus
 two candidates the bounded SAT does not close in budget)---a per-candidate budget limit, not a
-verdict. \emph{Eliciting} genuine hacking from aligned models failed; the
-negative result reflects single-loop inference on aligned models, not RL training---the regime where
-hacking is documented to emerge: test-subverting hacks discovered \emph{during} production RL
-(arXiv:2503.11926) and shortcut behavior that is RLVR-specific, absent in non-RL counterparts
-(arXiv:2604.15149). \emph{PPA}: open
+verdict. \emph{Eliciting}: on \emph{fair} tasks single-loop aligned agents do not hack, but an
+\emph{impossible} (spec-contradicting) task does elicit hardcoding in $2/3$ frontier models (Opus
+resists)---so the fair-task negative is a property of the \emph{conditions}, not a blind spot; the
+deeper regime (RL training) is in \S\ref{sec:limits}. \emph{PPA}: open
 Sky130/OpenROAD is pre-signoff, not foundry signoff, and rankings can flip across synthesis flows;
 we therefore frame PPA as a \emph{relative} comparison under identical settings (per TuRTLe) and
 note larger designs $+$ a commercial flow as the path to signoff-grade claims. The open flow inflates
-area/power by ${\sim}1.2$--$1.5\times$ vs.\ a commercial signoff stack (arXiv:2512.06122) and ranking
-inversions are real (RTL-OPT, arXiv:2601.01765); the planned mitigation is to check \emph{rank
+area/power by ${\sim}1.2$--$1.5\times$ vs.\ a commercial signoff stack~\cite{edahep} and ranking
+inversions are real (RTL-OPT~\cite{rtlopt}); the planned mitigation is to check \emph{rank
 stability across $\ge\!2$ synthesis strategies} (Kendall-$\tau$) and to expand C3 from the two current
 toy designs to a size-graded set (\code{spm}, AES, picorv32, ibex). \emph{Nondeterminism}:
 LLM runs vary; we report Wilson CIs and pin model ids.
 
-\section{Limitations and Future Work}
-A semantic contamination mutation of the whole benchmark; more models and
-task types (debug/verify/reuse); a PPA surrogate trained on a real multi-design dataset with an
-agent loop under high-latency reward; and---most ambitiously---\textbf{RL training-time hacking}:
-train a small RTL agent (Qwen3-4B, GRPO) with a visible-test reward and measure the emergence of
-hacking via a reward-hacking gap $\rhg(t)=\mathrm{visible\_pass}(t)-\mathrm{formal\_pass}(t)$ audited by
-the hidden$+$formal oracle each step---a positive, growing gap is direct evidence, and RTL is the one
-domain where this audit is \emph{exhaustive}. The probe is implemented and CPU-loop-validated
-(\code{scripts/train\_grpo.py}, \code{validate\_grpo\_local.py}); convergence needs an SFT cold-start
-(the sparse visible-test reward otherwise collapses to zero advantage---DAPO~\cite{dapo}) plus vLLM
-rollouts, so the full run is a separate GPU study.
+\section{Limitations and Future Work}\label{sec:limits}
+Three limitations bound the claims; each has a concrete next step.
+\begin{itemize}[leftmargin=*,topsep=2pt,itemsep=2pt]
+\item \textbf{Eval-time, not RL training.} We measure single-loop inference. The regime where reward
+hacking is documented to \emph{emerge} is RL on a gameable reward~\cite{baker,rlvrgaming}. We implement
+and CPU-loop-validate the training probe (\code{train\_grpo.py} $+$ \code{validate\_grpo\_local.py}:
+GRPO on a visible-test reward, audited each step by the hidden$+$formal oracle,
+$\rhg(t)=\mathrm{visible}(t)-\mathrm{formal}(t)$); the full Qwen3-4B run needs an SFT cold-start (else
+the sparse reward collapses to zero advantage~\cite{dapo}) $+$ vLLM rollouts, so it is a \emph{separate
+GPU study}. RTL is the one domain where this step-wise audit is \emph{exhaustive}.
+\item \textbf{PPA at toy scale.} C3 is a working prototype---real Sky130 PPA $+$ a surrogate
+($r=0.89/0.91/0.96$)---but only on \code{counter8}/\code{popcount8}. Scaling to larger IP
+(\code{spm}, AES, picorv32, ibex), with rank-stability (Kendall-$\tau$) across $\ge\!2$ synthesis flows
+to guard against the known ranking inversions~\cite{rtlopt,edahep}, is future work.
+\item \textbf{Contamination probe not yet exhaustive.} We mitigate at identifier and semantic level
+(\S\ref{sec:exp}) with a $\le\!7.2\%$ upper bound, but a full meaning-preserving re-mutation of all
+$156$ tasks plus membership inference (Min-K\%~\cite{minkprob}; NLL$\leftrightarrow$degradation
+\cite{nllmem}) would tighten it further.
+\end{itemize}
+Beyond these: more models and task types (debug/verify/reuse), and EQY structural matching for
+GPT-5.5's $3$ residual FSMs.
 
 \section{Conclusion}
 Honest evaluation of agentic hardware design is gated not by a new pass-rate but by an oracle that
