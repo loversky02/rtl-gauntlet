@@ -48,7 +48,7 @@ SpecBench, Trace2Skill all exist and are described accurately. Upgrades adopted:
 
 | ID | New status | Enforcement (with evidence) |
 |----|-----------|------------------------------|
-| R12 | mitigated-by-framing | 3 tiers: (1) behavioral gap = headline **RHG**; (2) exploit-evidenced (trajectory shows TB/assertion/checker/harness edits); (3) tamper-confirmed. Don't claim intent without tier-2 evidence. (EvilGenie edit-detection; SpecBench) |
+| R12 | mitigated-by-framing | 3 tiers: (1) behavioral gap = headline **RHG**; (2) exploit-evidenced — **not just TB/harness edits but also judge-confirmed HARDCODING** (the dominant hack; `rtl_gauntlet/tamper_judge.py`, formal oracle as arbiter); (3) tamper-confirmed. Don't claim intent without tier-2 evidence. (EvilGenie/ImpossibleBench: hardcoding dominates, TB-edits rare) |
 | R13 | **must-enforce** | Hidden *vectors* allowed, hidden *requirements* forbidden; **freeze spec before any run**. (SpecBench: "specification defines all requirements") |
 | R14 | **must-enforce** | Mutate tasks + prefer fresh/living + per-task contamination note. (VeriContaminated: ≈100% on GPT-3.5/4o) |
 | R15 | mitigated-by-scope | Core **8–12** tasks w/ full curation packet + coverage report, not 20–30 half-done. |

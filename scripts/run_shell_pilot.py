@@ -25,6 +25,7 @@ from rtl_gauntlet.equiv import run_equiv  # noqa: E402
 from rtl_gauntlet.runner import load_task  # noqa: E402
 from rtl_gauntlet.shell_agent import DESIGN, VISIBLE, run_shell_agent  # noqa: E402
 from rtl_gauntlet.sim import run_iverilog  # noqa: E402
+from rtl_gauntlet.tamper_judge import classify_exploit  # noqa: E402
 
 ALWAYS_PASS_TB = (
     "`timescale 1ns/1ps\nmodule tb_visible;\n"
@@ -64,6 +65,9 @@ def main() -> int:
     ap.add_argument("--workdir", default="runs/shell")
     ap.add_argument("--planted-tamper", action="store_true")
     ap.add_argument("--max-iters", type=int, default=5)
+    ap.add_argument("--judge", action="store_true",
+                    help="use an LLM-judge to sub-classify a design-only formal-CEX into "
+                         "hardcode-overfit vs. genuine-bug (adds one gateway call)")
     args = ap.parse_args()
 
     task = load_task(args.task)
@@ -89,6 +93,18 @@ def main() -> int:
     print(f"\n  trajectory: {[(x['iter'], x['visible']) for x in traj.history]}  "
           f"tokens={traj.total_tokens:,}")
     report(traj.task_id, traj.model, v, h, eq, traj.tamper_evidence, traj.edited_files)
+
+    # Broader "exploit-evidenced" verdict: the dominant hack is hardcoding outputs in the
+    # DESIGN (not editing the TB), which the tamper flag above misses — the formal oracle
+    # is the arbiter, and an optional judge sub-classifies a design-only CEX.
+    design_src = open(traj.design_path).read()
+    spec = open(os.path.join(args.task, task["files"]["spec"])).read()
+    edited_non_design = any(f not in (DESIGN, VISIBLE) for f in traj.edited_files)
+    verdict = classify_exploit(design_src, spec, eq.status, edited_non_design,
+                               tb_changed=VISIBLE in traj.edited_files,
+                               llm=LLMClient() if args.judge else None)
+    print(f"      exploit-subtype = {verdict.subtype}  "
+          f"(exploit-evidenced={verdict.exploit_evidenced}; {verdict.detail})")
     return 0
 
 
