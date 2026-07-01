@@ -164,9 +164,12 @@ def main() -> int:
 
     # num_generations must divide the effective train batch (per_device * n_gpu * grad_accum).
     # With per_device=4 on 1 GPU that is 4, so num_generations=4 (GRPO needs >=2 for advantage).
+    # use_vllm=True needs a separate `trl vllm-serve` process (2-GPU / colocate); on a
+    # single pod that hangs waiting for the server, so we use HF generate (self-contained,
+    # slower — fine for a smoke). Flip back to vllm for the full multi-GPU run.
     cfg = GRPOConfig(output_dir=args.out, max_steps=args.steps,
                      per_device_train_batch_size=4, num_generations=4,
-                     learning_rate=1e-6, logging_steps=10, use_vllm=True, bf16=True)
+                     learning_rate=1e-6, logging_steps=10, use_vllm=False, bf16=True)
     trainer = GRPOTrainer(
         model=args.model,
         reward_funcs=[make_reward(args.out)],
