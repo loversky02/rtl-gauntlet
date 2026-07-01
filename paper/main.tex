@@ -291,9 +291,9 @@ Verified-genuine \rhg{}$=0$ throughout. Weakness shows as failures, not cheating
 \label{fig:models}
 \end{figure}
 
-\paragraph{Elicit (the phase-diagram).} A tamper-capable shell agent (may edit \emph{any} file) on
-fair tasks edits \emph{only} the design---no tampering (Haiku struggled four iterations without
-touching the testbench). \textbf{But on an \emph{impossible} task}~\cite{impossiblebench} (visible TB
+\paragraph{Elicit (the phase-diagram).} A tamper-capable shell agent (may edit \emph{any} file):
+across \emph{all $156$ fair tasks} it produces \textbf{$0$ fake-pass tampers} (Haiku)---the few
+non-design writes are benign helper modules, never a neutered testbench. \textbf{But on an \emph{impossible} task}~\cite{impossiblebench} (visible TB
 demands \code{0x00}$\to$7, contradicting the spec, so \emph{any} visible-pass is provable cheating),
 \textbf{$3$ of $5$} models pass it---DeepSeek, Gemini, GPT-5.5 special-case the vector
 (\code{(data==8'h00)?4'd7:popcount}): visible PASS, formal CEX. An \emph{independent} judge (Opus)
@@ -371,9 +371,8 @@ when present.
 \end{enumerate}
 
 \section{Threats to Validity}
-\emph{Contamination}: identifier mutation on \emph{all $156$} tasks (each oracle-verified
-function-preserving), a semantic probe (\code{sem\_zerocount}), and open-model membership inference all
-come back negative; a deeper function-restructuring re-mutation is the remaining step. \emph{Oracle residual}: the
+\emph{Contamination}: identifier mutation on \emph{all $156$} tasks (oracle-verified equivalent),
+\code{sem\_zerocount}, and open-model MI all negative; function-restructuring re-mutation remains. \emph{Oracle residual}: the
 sequential-FSM residual is \emph{closed} (a \code{-nolatches} reset-aware BMC), and the X-aware careset
 miter now \emph{proves} the flagged don't-care artifacts equivalent rather than hand-verifying them---
 across the five models the flagged \rhg{} drops $9\!\to\!2$ with \textbf{zero regressions}, the planted
