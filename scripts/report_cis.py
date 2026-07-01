@@ -15,7 +15,9 @@ sys.path.insert(0, str(ROOT))
 
 from rtl_gauntlet.metrics import wilson_ci  # noqa: E402
 
-HONEST = {"honest", "bmc_equiv"}
+# honest = proven equivalent by any sound path: full proof, bounded miter, or the X-aware
+# don't-care-masked miter (careset_equiv, A1 — replaces hand-verified don't-care CEXes).
+HONEST = {"honest", "bmc_equiv", "careset_equiv"}
 NON_VISIBLE = {"fail_visible", "no_candidate"}
 
 
@@ -38,20 +40,18 @@ def summarize(name: str, f: str) -> None:
 
 
 def main() -> int:
-    # resweep4 = the FINAL (+memory) oracle stage, matching the paper's 135/156 = 0.865.
-    # NOT resweep3 (the pre-memory +sv stage = 128/156 = 0.82) — that mismatch was the
-    # source of the Opus HPR 0.82-vs-0.87 inconsistency.
-    # resweep5 / *_p3 = the +reset-BMC stage: a `-nolatches` reset-aware Pass-3 that
-    # closes the residual `inconclusive` FSMs (see equiv.py). resweep4/_sv were the prior
-    # +memory stage. All four models re-scored on the same (final) oracle.
-    summarize("Opus 4.8", str(ROOT / "results" / "resweep5_opus.json"))
-    summarize("Haiku 4.5", str(ROOT / "results" / "resweep_haiku_p3.json"))
-    summarize("DeepSeek (deepseek-chat)", str(ROOT / "results" / "sweep_deepseek_p3.json"))
-    summarize("GPT-5.5 (cx/gpt-5.5)", str(ROOT / "results" / "sweep_gpt55_p3.json"))
-    gem = ROOT / "results" / "sweep_gemini.json"   # model #5 — auto-included once swept
-    if gem.is_file():
-        summarize("Gemini (gemini-2.5-pro)", str(gem))
-    print("\n  Verified-genuine RHG = 0 for both; the CI upper bound bounds undetected hacking.")
+    # resweep_*_careset = the FINAL seven-step oracle (incl. the X-aware careset miter that
+    # machine-proves the flagged don't-care artifacts — see docs/A1_SOUND_ORACLE.md and
+    # scripts/compare_careset.py). HONEST now includes careset_equiv. All five models re-scored
+    # on the same (final) oracle via `run_veval.py --candidates-from` (no LLM). Prior stages:
+    # resweep5_opus / *_p3 = the +reset-BMC (pre-careset) stage.
+    summarize("Opus 4.8", str(ROOT / "results" / "resweep_opus_careset.json"))
+    summarize("GPT-5.5 (cx/gpt-5.5)", str(ROOT / "results" / "resweep_gpt_careset.json"))
+    summarize("Gemini (gemini-2.5-pro)", str(ROOT / "results" / "resweep_gemini_careset.json"))
+    summarize("DeepSeek (deepseek-chat)", str(ROOT / "results" / "resweep_deepseek_careset.json"))
+    summarize("Haiku 4.5", str(ROOT / "results" / "resweep_haiku_careset.json"))
+    print("\n  Verified-genuine RHG = 0 for all five; the CI upper bound bounds undetected hacking.")
+    print("  Flagged RHG_cex 9→2 across models (both circuit8); see scripts/compare_careset.py.")
     return 0
 
 

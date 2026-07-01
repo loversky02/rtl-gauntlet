@@ -17,10 +17,10 @@ plt.rcParams.update({"font.size": 11, "figure.dpi": 150, "savefig.bbox": "tight"
 
 
 def fig_progression():
-    stages = ["naïve", "+reset\n+don't-care", "+BMC", "+SV", "+memory", "+reset\n-BMC"]
-    false_cex = [9, 3, 1, 1, 1, 1]
-    inconclusive = [50, 50, 50, 14, 6, 0]
-    honest = [88, 91, 94, 128, 135, 140]       # honest + bmc_equiv
+    stages = ["naïve", "+reset\n+don't-care", "+BMC", "+SV", "+memory", "+reset\n-BMC", "+careset"]
+    false_cex = [9, 3, 1, 1, 1, 1, 1]          # Opus residual = circuit8 (mixed-edge, hand-verified)
+    inconclusive = [50, 50, 50, 14, 6, 0, 0]
+    honest = [88, 91, 94, 128, 135, 140, 144]  # honest + bmc_equiv + careset_equiv (Opus 129+11+4)
     fig, ax = plt.subplots(figsize=(6.2, 3.4))
     ax.plot(stages, false_cex, "o-", color="#c0392b", label="false CEX")
     ax.plot(stages, inconclusive, "s-", color="#e67e22", label="inconclusive")
@@ -41,12 +41,12 @@ def fig_progression():
 
 
 def fig_models():
-    cats = ["honest", "bmc", "dontcare", "RHG_cex", "inconcl", "fail", "no-cand"]
-    opus = [129, 11, 6, 1, 0, 9, 0]            # resweep5 (+reset-BMC)
-    gpt = [125, 12, 7, 3, 3, 6, 0]             # sweep_gpt55_p3
-    gemini = [123, 11, 5, 2, 1, 14, 0]         # sweep_gemini
-    deepseek = [113, 5, 0, 2, 0, 36, 0]        # sweep_deepseek_p3
-    haiku = [109, 4, 1, 1, 0, 30, 11]          # resweep_haiku_p3
+    cats = ["honest", "bmc", "careset", "dontcare", "RHG_cex", "inconcl", "fail", "no-cand"]
+    opus = [129, 11, 4, 2, 1, 0, 9, 0]         # resweep_opus_careset
+    gpt = [126, 12, 6, 3, 1, 2, 6, 0]          # resweep_gpt_careset
+    gemini = [123, 11, 6, 1, 0, 1, 14, 0]      # resweep_gemini_careset
+    deepseek = [113, 5, 2, 0, 0, 0, 36, 0]     # resweep_deepseek_careset
+    haiku = [109, 4, 1, 1, 0, 0, 30, 11]       # resweep_haiku_careset
     x = range(len(cats))
     fig, ax = plt.subplots(figsize=(8.6, 3.4))
     w = 0.16
@@ -58,7 +58,7 @@ def fig_models():
     ax.set_xticks(list(x))
     ax.set_xticklabels(cats, rotation=20, ha="right")
     ax.set_ylabel("# of 156 tasks")
-    ax.set_title("Weakness ≠ hacking (5 models): more visible-fails, every RHG_cex a verified artifact")
+    ax.set_title("Weakness ≠ hacking (5 models): flagged RHG_cex 9→2 (careset-proven; circuit8 residual)")
     ax.legend(loc="upper right", fontsize=8, ncol=2)
     ax.grid(True, axis="y", alpha=0.3)
     fig.savefig(f"{OUT}/models.pdf")
@@ -66,12 +66,12 @@ def fig_models():
 
 
 def fig_cost():
-    models = ["Opus 4.8", "Haiku 4.5"]
-    saved = [11.6, 23.4]
-    payoff = [47, 14]   # repair-tail payoff from analyze_cost.py on resweep5 (Opus 0.471)
+    models = ["Opus", "GPT-5.5", "Haiku", "Gemini"]   # 4 models with per-iter token logs
+    saved = [11.6, 17.2, 23.4, 24.2]   # early-stop@1 tokens saved %  (analyze_cost.py)
+    payoff = [47, 59, 14, 48]          # repair-tail payoff %
     x = range(len(models))
-    fig, ax = plt.subplots(figsize=(5.2, 3.4))
-    w = 0.35
+    fig, ax = plt.subplots(figsize=(6.2, 3.4))
+    w = 0.38
     ax.bar([i - w / 2 for i in x], saved, w, label="tokens saved (early-stop @1) %", color="#16a085")
     ax.bar([i + w / 2 for i in x], payoff, w, label="repair-tail payoff %", color="#d35400")
     ax.set_xticks(list(x))

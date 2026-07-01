@@ -91,6 +91,8 @@ def classify(visible, status):
         return "dontcare"
     if status == "bmc_equiv":
         return "bmc_equiv"
+    if status == "careset_equiv":
+        return "careset_equiv"   # X-aware don't-care-masked proof of equivalence (honest)
     return "inconclusive"
 
 

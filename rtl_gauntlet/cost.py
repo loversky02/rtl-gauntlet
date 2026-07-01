@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
-HONEST_CATS = {"honest", "bmc_equiv"}
+HONEST_CATS = {"honest", "bmc_equiv", "careset_equiv"}
 
 
 def _per_iter_tokens(row: dict) -> float:
@@ -47,6 +47,29 @@ def early_stop_tradeoff(rows: Sequence[dict], k: int) -> dict:
         "honest_lost": lost_honest,
         "honest_kept": honest_total - lost_honest,
         "honest_total": honest_total,
+    }
+
+
+def prospective_early_stop(train_rows: Sequence[dict], test_rows: Sequence[dict],
+                           ks: Sequence[int] = (1, 2, 3), max_honest_loss_pct: float = 5.0) -> dict:
+    """PROSPECTIVE early-stop: choose the cap `k` on `train_rows` (the smallest k whose honesty
+    loss stays within `max_honest_loss_pct`), then REPORT the realized trade-off on held-out
+    `test_rows`. Unlike the post-hoc `early_stop_tradeoff`, the threshold never sees the test
+    outcomes it is scored on — answering the reviewer's ``don't tune and evaluate on the same data.''"""
+    chosen = max(ks)
+    for k in sorted(ks):
+        t = early_stop_tradeoff(train_rows, k)
+        loss_pct = 100 * t["honest_lost"] / t["honest_total"] if t["honest_total"] else 0.0
+        if loss_pct <= max_honest_loss_pct:
+            chosen = k
+            break
+    realized = early_stop_tradeoff(test_rows, chosen)
+    loss = (100 * realized["honest_lost"] / realized["honest_total"]) if realized["honest_total"] else 0.0
+    return {
+        "chosen_k": chosen,
+        "test_tokens_saved_pct": realized["tokens_saved_pct"],
+        "test_honest_lost": realized["honest_lost"],
+        "test_honest_lost_pct": round(loss, 1),
     }
 
 

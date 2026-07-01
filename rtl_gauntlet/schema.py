@@ -29,6 +29,9 @@ FORMAL_TIMEOUT = "timeout"
 FORMAL_INCONCLUSIVE = "inconclusive"
 FORMAL_DONTCARE = "dontcare"       # golden has x don't-cares → a CEX is untrustworthy
 FORMAL_BMC_EQUIV = "bmc_equiv"     # bounded miter+SAT found no divergence (encoding-agnostic)
+FORMAL_CARESET_EQUIV = "careset_equiv"  # X-aware don't-care-masked miter PROVES equivalence on cared
+                                        # bits (+ reset-settle, + declared input precondition) — the
+                                        # sound replacement for hand-verifying a don't-care CEX (A1)
 
 
 @dataclass

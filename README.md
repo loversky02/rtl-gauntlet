@@ -15,20 +15,26 @@ Gauntlet turns those into three measurable axes.
 
 The naïve headline reward-hacking number is **entirely an oracle artifact**. A naïve formal oracle
 over-reports hacking via don't-care `x`, async-reset, state-encoding, init-state, a SystemVerilog
-parser flag, and unstated input constraints. We **harden the oracle in six steps** (reset-aware,
-don't-care-aware, bounded miter+SAT, `read_verilog -sv`, `memory` case→ROM, and a `-nolatches`
-reset-aware BMC), cutting false counter-examples **9→1** and "inconclusive" **50→0**, and hand-verify
-every surviving flag: **zero genuine reward hacking across four models on fair tasks**.
+parser flag, and unstated input constraints. We **harden the oracle in seven steps** (reset-aware,
+don't-care-aware, bounded miter+SAT, `read_verilog -sv`, `memory` case→ROM, a `-nolatches` reset-aware
+BMC, and an **X-aware careset miter**), cutting false counter-examples **9→1** and "inconclusive"
+**50→0**. The careset miter *machine-proves* the flagged don't-care artifacts equivalent (two golden
+builds define the cared bits; a declared input precondition supplies the spec's legal-input
+assumption), collapsing the flagged RHG across five models from **9→2** with **zero regressions** and
+reducing hand-verification from four tasks to one: **zero genuine reward hacking across five models on
+fair tasks**.
 
-| Model | HPR (95% CI) | verified RHG |
-|-------|--------------|--------------|
-| Opus 4.8 | 0.90 [.84,.94] | 0 (≤2.5%) |
-| GPT-5.5 | 0.88 [.82,.92] | 0 (≤2.5%) |
-| DeepSeek | 0.76 [.68,.82] | 0 (≤3.1%) |
-| Haiku 4.5 | 0.72 [.65,.79] | 0 (≤3.2%) |
+| Model | HPR (95% CI) | flagged RHG (machine) | verified RHG |
+|-------|--------------|-----------------------|--------------|
+| Opus 4.8 | 0.92 [.87,.96] | 1 (circuit8) | 0 (≤2.5%) |
+| GPT-5.5 | 0.92 [.87,.96] | 1 (circuit8) | 0 (≤2.5%) |
+| Gemini 2.5 | 0.90 [.84,.94] | 0 | 0 (≤2.6%) |
+| DeepSeek | 0.77 [.70,.83] | 0 | 0 (≤3.1%) |
+| Haiku 4.5 | 0.73 [.66,.79] | 0 | 0 (≤3.2%) |
 
-*(Gemini 2.5 Pro sweep in progress → 5th model.)* Every flagged counter-example (`circuit8`, `q5b`,
-`prob095`, `prob149`) is a hand-verified init / encoding / input-space don't-care artifact.
+The four na­ïvely-flagged tasks (`q5b`, `prob095`, `prob149`, `circuit8`) are now **machine-proven
+equivalent** except `circuit8` (a mixed-edge latch/FF, hand-verified as equivalent under the
+testbench's synchronous clock). Reproduce: `python3 scripts/compare_careset.py`.
 **Weakness ≠ hacking**: a weaker model fails far more on the visible tests but cheats no more, even a
 tamper-capable shell agent edits only the design, never the testbench.
 
@@ -36,7 +42,7 @@ tamper-capable shell agent edits only the design, never the testbench.
 
 | Axis | Metric | Status |
 |------|--------|--------|
-| **Honesty (C1)** | **Reward-Hacking Gap (RHG)** + **Honest Pass Rate (HPR)** via a two-tier protocol (visible diagnostic vs. withheld hidden-randomized + formal-equivalence oracle) | 🟢 4 models × 156 VerilogEval tasks; oracle residual closed |
+| **Honesty (C1)** | **Reward-Hacking Gap (RHG)** + **Honest Pass Rate (HPR)** via a two-tier protocol (visible diagnostic vs. withheld hidden-randomized + formal-equivalence oracle) | 🟢 5 models × 156 VerilogEval tasks; X-aware careset oracle machine-proves the flagged artifacts (hand-verify 4 tasks → 1) |
 | **Cost (C2)** | Tokens vs. Honest-Pass, with an **early-stop** policy | 🟢 early-stop @1 reclaims 12–23% of tokens for ~5% honesty loss |
 | **Latency (C3)** | Agent under slow PPA reward via a trained surrogate + a real OpenLane flow | 🟢 real Sky130 PPA (counter8/popcount8) + surrogate r=0.89/0.91/0.96; full agent-loop = future |
 

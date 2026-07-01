@@ -22,6 +22,7 @@ from dataclasses import dataclass
 
 from .schema import (
     FORMAL_BMC_EQUIV,
+    FORMAL_CARESET_EQUIV,
     FORMAL_CEX,
     FORMAL_DONTCARE,
     FORMAL_INCONCLUSIVE,
@@ -219,6 +220,124 @@ def _run_yosys(script: str, path: str, timeout: int) -> tuple[str, int, bool]:
         return "yosys timeout", 124, True
 
 
+def _iface_ports(golden_src: str, top: str) -> tuple[list[tuple[str, int]], list[tuple[str, int]]]:
+    """Parse (inputs, outputs) as [(name, width)] from the module header in the golden source.
+    Line/comma-oriented; robust to `[ranges]` and reg/wire/logic qualifiers (VerilogEval style)."""
+    m = re.search(rf"module\s+{re.escape(top)}\s*\((.*?)\)\s*;", golden_src, re.DOTALL)
+    if not m:
+        return [], []
+    ins: list[tuple[str, int]] = []
+    outs: list[tuple[str, int]] = []
+    for raw in re.split(r",(?![^\[]*\])", m.group(1)):
+        mm = re.match(r"\s*(input|output|inout)\s+(?:reg\s+|wire\s+|logic\s+|signed\s+)*"
+                      r"(\[[^\]]*\]\s*)?(\w+)", raw)
+        if not mm:
+            continue
+        d, rng, name = mm.group(1), mm.group(2), mm.group(3)
+        w = 1
+        if rng:
+            r2 = re.search(r"\[\s*(\d+)\s*:\s*(\d+)\s*\]", rng)
+            if r2:
+                w = abs(int(r2.group(1)) - int(r2.group(2))) + 1
+        (ins if d == "input" else outs).append((name, w))
+    return ins, outs
+
+
+def _clk_name(ins: list[tuple[str, int]]) -> str | None:
+    for n, _ in ins:
+        if n.lower() in ("clk", "clock"):
+            return n
+    return None
+
+
+def _load_precond(golden: str) -> str:
+    """A per-task input precondition — a Verilog snippet defining `wire pre_ok` — encoding the spec's
+    legal-input assumption (e.g. thermometer/gradual-change) that the withheld testbench also respects.
+    Looked up as (1) a `precond.v` sibling of the golden, or (2) the tracked
+    `rtl_gauntlet/preconds/<task_id>.v` (task dirs are gitignored/regenerated, so declared preconditions
+    live in the package). Empty ⇒ no precondition (`pre_ok = 1`)."""
+    task_id = os.path.basename(os.path.dirname(os.path.abspath(golden)))
+    for p in (os.path.join(os.path.dirname(golden), "precond.v"),
+              os.path.join(os.path.dirname(__file__), "preconds", f"{task_id}.v")):
+        try:
+            return open(p).read()
+        except OSError:
+            continue
+    return ""
+
+
+def run_careset_equiv(golden: str, candidate: str, top: str, workdir: str,
+                      precond_v: str = "", settle: int = 2, seq: int = 24,
+                      timeout: int = 300) -> EquivResult:
+    """SOUND X-aware don't-care-masked miter (A1 — see docs/A1_SOUND_ORACLE.md).
+
+    Two golden builds (`setundef -zero -init` and `-one -init`) define the care set as the bits where
+    they AGREE (bits whose value depends on an `x` — an output `1'bx` literal OR an uninitialised
+    register — disagree and are masked). The miter asserts equivalence ONLY on cared bits, ONLY
+    `settle` cycles after the last reset (init-transient mask), and ONLY where the declared input
+    precondition `pre_ok` holds. This replaces hand-verifying a don't-care CEX with a machine proof;
+    it still CEXes genuine bugs (non-vacuous). Returns FORMAL_CARESET_EQUIV / FORMAL_CEX /
+    FORMAL_INCONCLUSIVE."""
+    os.makedirs(workdir, exist_ok=True)
+    try:
+        gsrc = open(golden).read()
+    except OSError:
+        return EquivResult(False, FORMAL_INCONCLUSIVE, "golden unreadable")
+    ins, outs = _iface_ports(gsrc, top)
+    if not outs:
+        return EquivResult(False, FORMAL_INCONCLUSIVE, "careset: no outputs parsed")
+    clk = _clk_name(ins)
+    rp = _reset_port(gsrc)
+    rst, rstval = rp if rp else (None, 1)
+
+    def elab(src: str, mod: str, undef: str) -> str:
+        return (f'read_verilog -sv -nolatches "{src}"\nhierarchy -top {top}\nproc\nasync2sync\n'
+                f'setundef -{undef} -init\nopt -purge\nrename {top} {mod}\n'
+                f'write_verilog -noattr "{workdir}/{mod}.v"\ndesign -reset\n')
+    mk = elab(golden, "gold0", "zero") + elab(golden, "gold1", "one") + elab(candidate, "gate", "zero")
+    log0, rc0, _ = _run_yosys(mk, os.path.join(workdir, "cs_mk.ys"), timeout)
+    if rc0 != 0:
+        return EquivResult(False, FORMAL_INCONCLUSIVE, "careset elaboration failed:\n" + log0[-800:])
+
+    def conns(suf: str) -> str:
+        return (", ".join(f".{n}({n})" for n, _ in ins) + ", " +
+                ", ".join(f".{n}({n}_{suf})" for n, _ in outs))
+    decls = "".join(f"  wire [{w-1}:0] {n}_0,{n}_1,{n}_g;\n" for n, w in outs)
+    cat = lambda suf: "{" + ",".join(f"{n}_{suf}" for n, _ in outs) + "}"  # noqa: E731
+    width = sum(w for _, w in outs)
+    inports = ", ".join((f"input [{w-1}:0] {n}" if w > 1 else f"input {n}") for n, w in ins)
+    pre = precond_v if precond_v else "  wire pre_ok = 1'b1;\n"
+    if clk:
+        since_rst = f"({rst} == 1'b{rstval})" if rst else "1'b0"
+        seqlogic = (f"  reg [3:0] since;\n  always @(posedge {clk}) since <= {since_rst} ? 4'd0 : "
+                    f"((since==4'd15) ? 4'd15 : since+4'd1);\n"
+                    f"  wire active = (since >= 4'd{settle}) && pre_ok;\n")
+    else:
+        seqlogic = "  wire active = pre_ok;\n"
+    miter = (f"module miter({inports});\n{decls}"
+             f"  gold0 u0({conns('0')});\n  gold1 u1({conns('1')});\n  gate ug({conns('g')});\n"
+             f"  wire [{width-1}:0] o0 = {cat('0')};\n  wire [{width-1}:0] o1 = {cat('1')};\n"
+             f"  wire [{width-1}:0] og = {cat('g')};\n"
+             f"  wire [{width-1}:0] care = ~(o0 ^ o1);\n  wire bad = |((o0 ^ og) & care);\n"
+             f"{pre}{seqlogic}  always @* if (active) assert(!bad);\nendmodule\n")
+    with open(os.path.join(workdir, "cs_miter.v"), "w") as f:
+        f.write(miter)
+    setat = f"-set-at 1 {rst} {rstval}" if rst else ""
+    seqf = f"-seq {seq}" if clk else ""
+    run = (f'read_verilog "{workdir}/gold0.v" "{workdir}/gold1.v" "{workdir}/gate.v"\n'
+           f'read_verilog -sv "{workdir}/cs_miter.v"\nhierarchy -top miter\nproc\nflatten\nasync2sync\n'
+           f'setundef -zero -init\nopt\nsat {seqf} {setat} -prove-asserts\n')
+    log, _, to = _run_yosys(run, os.path.join(workdir, "cs_run.ys"), timeout)
+    if to:
+        return EquivResult(False, FORMAL_INCONCLUSIVE, "careset sat timeout")
+    low = log.lower()
+    if "no model found" in low:
+        return EquivResult(True, FORMAL_CARESET_EQUIV, log)
+    if "model found" in low:
+        return EquivResult(False, FORMAL_CEX, log)
+    return EquivResult(False, FORMAL_INCONCLUSIVE, log[-800:])
+
+
 def run_equiv(
     golden: str,
     candidate: str,
@@ -240,9 +359,18 @@ def run_equiv(
     log2, rc2, to2 = _run_yosys(build_bmc_script(golden, candidate, top, seq_depth),
                                 os.path.join(workdir, "bmc.ys"), timeout)
     proven, status = parse_bmc(log2, rc2, to2)
-    if status == FORMAL_CEX and _golden_has_dontcare(golden):
-        # golden x don't-care → a CEX is untrustworthy; don't claim disproof (not RHG).
-        status = FORMAL_DONTCARE
+    if status == FORMAL_CEX:
+        # A CEX from -set-init-zero BMC may be a don't-care artifact (output x, init/reset transient,
+        # or an out-of-spec input). Adjudicate it SOUNDLY with the X-aware care-masked miter (A1)
+        # instead of the old coarse "golden has an x ⇒ reclassify the whole CEX" heuristic: it PROVES
+        # equivalence on cared bits (+ reset-settle + any declared input precondition), or leaves a
+        # genuine CEX. Falls back to the coarse dontcare flag only if the miter can't decide.
+        cr = run_careset_equiv(golden, candidate, top, os.path.join(workdir, "careset2"),
+                               precond_v=_load_precond(golden), timeout=timeout)
+        if cr.status == FORMAL_CARESET_EQUIV:
+            return EquivResult(True, FORMAL_CARESET_EQUIV, cr.log)
+        if _golden_has_dontcare(golden):
+            status = FORMAL_DONTCARE  # fallback: coarse don't-care (miter did not prove it)
     # Pass 3 — only for the residual `inconclusive`/timeout: a `-nolatches`, reset-aware
     # BMC. This closes the sequential-FSM residual (incomplete-case latch elaboration +
     # non-zero reset state) WITHOUT touching any proven/CEX/bmc_equiv verdict above, so
@@ -259,9 +387,14 @@ def run_equiv(
             build_reset_bmc_script(golden, candidate, top, reset_port, reset_val),
             os.path.join(workdir, "rbmc.ys"), timeout)
         proven3, status3 = parse_bmc(log3, rc3, to3)
-        if status3 == FORMAL_CEX and _golden_has_dontcare(golden):
-            status3 = FORMAL_DONTCARE
-        if status3 in (FORMAL_BMC_EQUIV, FORMAL_CEX, FORMAL_DONTCARE):
+        if status3 == FORMAL_CEX:
+            cr = run_careset_equiv(golden, candidate, top, os.path.join(workdir, "careset3"),
+                                   precond_v=_load_precond(golden), timeout=timeout)
+            if cr.status == FORMAL_CARESET_EQUIV:
+                return EquivResult(True, FORMAL_CARESET_EQUIV, cr.log)
+            if _golden_has_dontcare(golden):
+                status3 = FORMAL_DONTCARE
+        if status3 in (FORMAL_BMC_EQUIV, FORMAL_CEX, FORMAL_DONTCARE, FORMAL_CARESET_EQUIV):
             return EquivResult(proven3, status3, log3)
     return EquivResult(proven, status, log2)
 

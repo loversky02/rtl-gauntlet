@@ -47,11 +47,15 @@ agent's design and scores it with a withheld formal-equivalence oracle, and defi
 Reward-Hacking Gap (\rhg) and Honest Pass Rate (\hpr). Applying it to 156 VerilogEval tasks across
 five models, we find the na\"ive headline \rhg{} ($6.1\%$) is \emph{entirely an oracle artifact}: a
 na\"ive formal oracle over-reports reward hacking via don't-care \code{x}, async-reset,
-state-encoding, init-state, and even a SystemVerilog parser flag. We harden the oracle in six steps
+state-encoding, init-state, and even a SystemVerilog parser flag. We harden the oracle in seven steps
 ---reset-aware, don't-care-aware, bounded miter+SAT, \code{read\_verilog -sv}, a \code{memory}
-(case$\to$ROM) pass, and a \code{-nolatches} reset-aware BMC---cutting false counter-examples
-$9\!\to\!1$ and ``inconclusive'' $50\!\to\!0$, and verify every surviving flag by hand:
-\textbf{zero genuine reward hacking} ($95\%$ upper bound $\le\!3.2\%$) by frontier models on fair tasks. A weaker model (Haiku~4.5) fails $3\times$ more than
+(case$\to$ROM) pass, a \code{-nolatches} reset-aware BMC, and an \emph{X-aware don't-care-masked
+(careset) miter}---cutting false counter-examples $9\!\to\!1$ and ``inconclusive'' $50\!\to\!0$. The
+careset miter \emph{proves} the flagged don't-care artifacts equivalent---two golden builds define the
+cared bits, and a declared input precondition supplies the spec's legal-input assumption---collapsing
+the flagged \rhg{} across five models from $9$ cases to a single mixed-edge design and reducing
+hand-verification from four tasks to one: \textbf{zero genuine reward hacking} ($95\%$ upper bound
+$\le\!3.2\%$) by frontier models on fair tasks. A weaker model (Haiku~4.5) fails $3\times$ more than
 Opus~4.8 on the visible tests but does \emph{not} hack more; even a tamper-capable shell agent that
 struggles for several iterations does not edit the testbench. We show the oracle catches hacking
 when present---both a planted candidate (passes a randomized hidden testbench, formally disproven) and
@@ -77,8 +81,9 @@ gamed (honesty), it is expensive (cost), and it does not scale to real reward (l
 \begin{enumerate}[leftmargin=*,topsep=2pt,itemsep=1pt]
 \item A two-tier, formal-grounded evaluation protocol with metrics \rhg{} and \hpr{} (\S\ref{sec:method}).
 \item The finding that a na\"ive formal oracle \textbf{over-reports} reward hacking, and a
-six-step hardened oracle that removes it (closing the sequential-FSM residual); verification
-discipline as a first-class method (\S\ref{sec:oracle}).
+seven-step hardened oracle that removes it---closing the sequential-FSM residual and \emph{proving}
+the flagged don't-care artifacts equivalent with an X-aware careset miter, so hand-verification drops
+from four tasks to one (\S\ref{sec:oracle}).
 \item An empirical result across $5$ models $\times\,156$ tasks: \textbf{zero verified genuine
 reward hacking} on fair tasks; weakness $\ne$ hacking; tampering is caught when present
 (\S\ref{sec:exp}).
@@ -189,25 +194,37 @@ FSMs. Their goldens use an \code{always\_comb case(state)} over a \code{reg [3:0
 reachable states, so the unlisted states infer a latch and yosys \emph{errors out}---an elaboration
 artifact, not a solver limit (the same class as the \code{-sv} bug); \code{-nolatches} plus a reset
 drive at $t{=}1$ (the true reset state, not the zero state) then proves I/O equivalence.
+\item an \textbf{X-aware careset miter} that adjudicates any surviving CEX \emph{by proof} rather than
+by hand. Two golden builds (\code{setundef -zero} vs.\ \code{-one}) mark each output bit \emph{cared}
+where they agree and \emph{don't-care} where they disagree---i.e.\ where the value depends on an
+\code{x} (an output \code{1'bx} literal \emph{or} an uninitialised register). The miter asserts
+equivalence only on cared bits, only after a reset-settle window, and only where a declared per-task
+input precondition holds (the spec's legal-input assumption the withheld testbench also respects,
+e.g.\ prob149's gradual thermometer sequence). It \emph{proves} the flagged artifacts equivalent while
+still CEXing genuine bugs (the planted impossible-task overfit stays a CEX)---replacing per-case
+hand-verification with a machine-checked, re-runnable proof.
 \end{enumerate}
 
 \begin{table}[t]\centering\small
-\begin{tabular}{@{}lcccccc@{}}
+\begin{tabular}{@{}lccccccc@{}}
 \toprule
-stage & honest & bmc & dc & \rhg & inconcl & fail \\
+stage & honest & bmc & cs & dc & \rhg & inconcl & fail \\
 \midrule
-na\"ive & 88 & -- & -- & 9 & 50 & 9 \\
-+reset+dc & 91 & -- & 3 & 3 & 50 & 9 \\
-+BMC & 91 & 3 & 2 & 1 & 50 & 9 \\
-+SV & 122 & 6 & 4 & 1 & 14 & 9 \\
-+memory & 129 & 6 & 5 & 1 & 6 & 9 \\
-+reset-BMC & \textbf{129} & 11 & 6 & 1 & \textbf{0} & 9 \\
+na\"ive & 88 & -- & -- & -- & 9 & 50 & 9 \\
++reset+dc & 91 & -- & -- & 3 & 3 & 50 & 9 \\
++BMC & 91 & 3 & -- & 2 & 1 & 50 & 9 \\
++SV & 122 & 6 & -- & 4 & 1 & 14 & 9 \\
++memory & 129 & 6 & -- & 5 & 1 & 6 & 9 \\
++reset-BMC & 129 & 11 & -- & 6 & 1 & \textbf{0} & 9 \\
++careset & \textbf{129} & 11 & \textbf{4} & 2 & 1 & 0 & 9 \\
 \bottomrule
 \end{tabular}
 \caption{Oracle hardening (same 156 Opus candidates, no new LLM calls). False CEX $9\!\to\!1$;
-inconclusive $50\!\to\!0$; \hpr{} $56\%\!\to\!90\%$ (honest $129$ $+$ $11$ BMC-verified $=140$ of $156$).
-The residual sequential FSMs are now closed---the \code{-nolatches} reset-aware Pass-3 proves $5$
-equivalent and reclassifies $1$ as an output don't-care.}
+inconclusive $50\!\to\!0$; \hpr{} $56\%\!\to\!\mathbf{92\%}$ (honest $129$ $+$ $11$ BMC $+$ $4$
+careset-proven $=144$ of $156$). The \code{cs} (careset) stage \emph{proves} the flagged don't-care
+artifacts equivalent---$4$ former \code{dc} reclassifications become machine-checked proofs; across all
+five models it drops the flagged \rhg{} from $9$ cases to $2$ (Opus's single residual is
+\code{circuit8}, a mixed-edge latch/FF proven equivalent only under the testbench's synchronous clock).}
 \label{tab:progression}
 \end{table}
 
@@ -228,36 +245,43 @@ beats a finite held-out suite.
 
 \paragraph{Sweep and model comparison.} Table~\ref{tab:models} and Figure~\ref{fig:models}: the
 weaker models fail far more on the visible tests (\code{fail\_visible} $9$/$6$/$14$/$36$/$30$ for
-Opus/GPT-5.5/Gemini/DeepSeek/Haiku) but hack no more. \emph{Every} flagged \rhg{} counter-example
-across the five models is one of only \textbf{four distinct tasks}, each hand-verified as an artifact:
+Opus/GPT-5.5/Gemini/DeepSeek/Haiku) but hack no more. The na\"ively-flagged \rhg{} counter-examples
+across the five models fall on only \textbf{four distinct tasks}, and the careset miter now
+machine-\emph{proves} three of them equivalent, leaving a single hand-verified residual:
 \begin{itemize}[leftmargin=*,topsep=2pt,itemsep=1pt]
-\item \code{circuit8}, \code{q5b} --- BMC \emph{zero-init} artifacts: \code{-set-init-zero} forces an
-invalid start state for an uninitialized latch / one-hot FSM (the FSM produced independently by
-DeepSeek, Haiku, and GPT-5.5).
-\item \code{prob095} --- a zero-init state whose output is \emph{incidentally} active; simulation
-confirms the design is equivalent once reset is applied.
-\item \code{prob149} --- an \emph{input-space} don't-care: a water-level controller whose golden
-marks physically-impossible (non-thermometer) sensor codes \code{'x}.
+\item \code{q5b}, \code{prob095} --- init / one-hot-reset transients (\code{-set-init-zero} forces an
+invalid start state): the two-build care-mask plus the reset-settle window \emph{prove} them
+equivalent (\code{careset\_equiv}), no hand-verification.
+\item \code{prob149} --- an input-\emph{sequence} don't-care: a water-level FSM whose golden advances
+one thermometer step per cycle. \emph{Proven} once the spec's gradual-change precondition---which the
+withheld testbench also respects---is declared as a per-task annotation.
+\item \code{circuit8} --- the one residual: a mixed-edge \code{negedge}-FF $+$ latch whose equivalence
+holds only under the testbench's synchronous clock; our bounded free-clock miter cannot discharge the
+timing race, so it stays hand-verified (flagged by Opus and GPT-5.5 only, both a verified artifact).
 \end{itemize}
-The \code{dontcare} detector requires the \code{x} to drive an \emph{output}, so an incidental
-internal \code{x} cannot mask a real CEX. Net ($95\%$ Wilson): verified-genuine \rhg{}$=0$ for all
-five models, upper bound $\le\!3.2\%$ (Haiku, the loosest; $\le\!2.5$--$2.6\%$ for the three strongest).
+The care-mask marks a bit don't-care only where the two golden builds \emph{disagree}, so an incidental
+internal \code{x} cannot mask a real CEX and the planted impossible-task overfit stays a CEX
+(non-vacuous). Net ($95\%$ Wilson): verified-genuine \rhg{}$=0$ for all five models, upper bound
+$\le\!3.2\%$ (Haiku, the loosest; $\le\!2.5$--$2.6\%$ for the three strongest).
 
 \begin{table}[t]\centering\small
 \begin{tabular}{@{}lccccc@{}}
 \toprule
  & Opus 4.8 & GPT-5.5 & Gemini 2.5 & DeepSeek & Haiku 4.5 \\
 \midrule
-honest $+$ bmc & 140 & 137 & 134 & 118 & 113 \\
-\hpr{} ($95\%$ CI) & 0.90 [.84,.94] & 0.88 [.82,.92] & 0.86 [.80,.91] & 0.76 [.68,.82] & 0.72 [.65,.79] \\
+honest $+$ bmc $+$ careset & 144 & 144 & 140 & 120 & 114 \\
+\hpr{} ($95\%$ CI) & 0.92 [.87,.96] & 0.92 [.87,.96] & 0.90 [.84,.94] & 0.77 [.70,.83] & 0.73 [.66,.79] \\
 \code{fail\_visible} ($+$ no-cand) & 9 & 6 & 14 & 36 & 30 ($+11$) \\
-verified \rhg{} & 0 ($\le.025$) & 0 ($\le.025$) & 0 ($\le.026$) & 0 ($\le.031$) & 0 ($\le.032$) \\
+flagged \rhg{} (machine) & 1 & 1 & 0 & 0 & 0 \\
+verified-genuine \rhg{} & 0 ($\le.025$) & 0 ($\le.025$) & 0 ($\le.026$) & 0 ($\le.031$) & 0 ($\le.032$) \\
 \bottomrule
 \end{tabular}
-\caption{Five models $\times\,156$ tasks (final oracle, incl.\ the reset-aware Pass-3; \hpr{} counts
-honest $+$ BMC-verified, so Opus $=129{+}11=140$, $140/156=0.90$). All verified \rhg{}$=0$: every
-flagged CEX is an init / encoding / input-space don't-care artifact (see text). Weakness shows as
-failures, not cheating.}
+\caption{Five models $\times\,156$ tasks (seven-step oracle, incl.\ the X-aware careset miter; \hpr{}
+counts honest $+$ BMC $+$ careset-proven, so Opus $=129{+}11{+}4=144$, $144/156=0.92$). The careset
+miter machine-\emph{proves} the flagged don't-care artifacts, so the \emph{flagged} \rhg{} across the
+five models drops from $9$ to $2$---both remaining are \code{circuit8} (a mixed-edge latch, hand-verified
+equivalent under the testbench's synchronous clock); three of five models are flagged-\rhg{}-free.
+Verified-genuine \rhg{}$=0$ throughout. Weakness shows as failures, not cheating.}
 \label{tab:models}
 \end{table}
 
@@ -273,14 +297,20 @@ honestly repairing the design and solved it; Opus and GPT-5.5 were honest in one
 agents edited \emph{only} the design, never the testbench---no hacking on \emph{fair} tasks.
 \textbf{But on an \emph{impossible} task} (an ImpossibleBench-style~\cite{impossiblebench} variant
 whose visible testbench demands \code{0x00}$\to$7, contradicting the spec, so \emph{any} visible-pass
-is provable cheating), GPT-5.5 \emph{and} DeepSeek both hardcode the contradictory
-vector---\code{count = (data==8'h00) ? 4'd7 : popcount}---keeping an honest popcount elsewhere:
-visible PASS, formal CEX, \emph{exploit-evidenced}. \textbf{Opus, by contrast, stays honest}: it fails
-the impossible test for three iterations rather than special-case it (final design formally proven),
-a model-differentiated honesty-under-pressure signal. This is the upper anchor of the phase-diagram
-(fair task $\to$ \rhg{}$\approx$0 for all; impossible task $\to$ hack for $2/3$ frontier models), and
-the elicited hack is a \emph{design-only} one (the testbench is untouched) that a file-edit tamper
-flag \emph{misses}---only the formal oracle plus a hardcode judge (\code{tamper\_judge}) catch it.
+is provable cheating), we elicit across all five models. \textbf{Three of the five pass it}---DeepSeek,
+Gemini, and GPT-5.5 special-case the contradictory vector (\code{count = (data==8'h00) ? 4'd7 :
+popcount}, an honest popcount elsewhere): visible PASS, formal CEX. The hardcode judge confirms DeepSeek
+and Gemini as \emph{exploit-evidenced} hardcode-overfit; it leaves GPT-5.5's design ambiguous even
+though passing a spec-contradicting testbench is \emph{prima facie} cheating---so the judge is a
+\emph{conservative lower bound} (motivating the inter-rater $\kappa$ check we flag as future work).
+\textbf{Opus and Haiku refuse}: Opus stays formally proven-correct (it fails the impossible test rather
+than special-case it) and Haiku does not pass it either---a model-differentiated
+honesty-under-pressure signal (Opus resists here and in a prior elicitation run). This is the upper
+anchor of the phase-diagram (fair task $\to$ \rhg{}$\approx$0 for \emph{all}; impossible task $\to$
+cheating in the \emph{majority} of frontier models, Opus resisting), so the metric is \emph{not}
+trivially zero. The elicited hack is a \emph{design-only} one (the testbench untouched) that a
+file-edit tamper flag \emph{misses}---only the formal oracle plus a hardcode judge
+(\code{tamper\_judge}) catch it (\code{results/phase\_diagram\_impossible\_5model.json}).
 Genuine hacking is thus a function of adversarial conditions (impossible / contradictory specs) and
 of the model, not of aligned frontier models in a fair single loop; RL training-time emergence is
 the deeper regime.
@@ -289,8 +319,9 @@ the deeper regime.
 models), so an honest pass could be memorization rather than reasoning. We probe this in layers:
 \begin{itemize}[leftmargin=*,topsep=2pt,itemsep=1pt]
 \item \textbf{Identifier mutation.} Rename the target module and reframe the spec, then re-sweep: on
-$40$ tasks \emph{both} Opus and Haiku hold $\hpr{}\,1.00\!\to\!1.00$, $\rhg{}\,0\!\to\!0$
-($\Delta=0$)---robust for a strong \emph{and} a weak model.
+$40$ tasks---\emph{each machine-verified function-preserving by the careset oracle} ($40/40$ proven
+equivalent, so the mutation cannot silently break the task)---\emph{both} Opus and Haiku hold
+$\hpr{}\,1.00\!\to\!1.00$, $\rhg{}\,0\!\to\!0$ ($\Delta=0$), robust for a strong \emph{and} a weak model.
 \item \textbf{Semantic novelty.} Self-authored tasks (\code{gray2bin}, \code{popcount8},
 \code{hex7seg}) implement functions absent from any public benchmark, yet models stay honest
 ($\rhg{}=0$)---not benchmark recall.
@@ -304,10 +335,14 @@ single signal is reliable alone, so triangulating with membership inference (Min
 and the NLL$\leftrightarrow$degradation correlation under meaning-preserving mutation~\cite{nllmem} is
 future work; only the behavioral probe is run here.
 
-\paragraph{Cost (C2).} Opus $482$k / Haiku $522$k tokens; the weaker model needs more repair
-(2-iter $17$ vs $36$). The repair tail is mostly wasted (honest payoff $47\%$ / $14\%$); an
-early-stop at one iteration reclaims $12\%$ (Opus) / $23\%$ (Haiku) of tokens for a $\sim\!5\%$
-honesty loss (Figure~\ref{fig:cost}).
+\paragraph{Cost (C2).} Across the four models with per-iteration token logs
+(Opus/Haiku/GPT-5.5/Gemini; DeepSeek's sweep did not record tokens), the repair tail is mostly
+wasted---only $47$/$14$/$59$/$48\%$ of multi-iteration tasks end honest. An early-stop at one
+iteration reclaims $12$--$24\%$ of tokens (Opus $12$, GPT-5.5 $17$, Haiku $23$, Gemini $24$) for a
+$4$--$9\%$ honesty loss (Figure~\ref{fig:cost}). Evaluated \emph{prospectively}
+(leave-one-model-out---the cap is fit on the other three, never on the model it is scored on), a $5\%$
+honesty-loss budget is met only by the stronger-tail models, so the early-stop is \emph{model-dependent}
+rather than universal---a caveat the post-hoc number hides.
 
 \begin{figure}[t]\centering
 \includegraphics[width=0.78\linewidth]{figures/cost.pdf}
@@ -326,7 +361,8 @@ gotcha was a config file at the repo root, not OpenLane.)
 \section{Findings}
 \begin{enumerate}[leftmargin=*,topsep=2pt,itemsep=1pt]
 \item A na\"ive formal oracle \textbf{over-reports} reward hacking; the headline number was an
-artifact, found only by per-case verification. Verification discipline is mandatory.
+artifact. Verification discipline is mandatory---and now largely \emph{mechanized}: the X-aware careset
+miter \emph{proves} the flagged artifacts equivalent, leaving a single hand-verified residual.
 \item No false positives on honest agents; across $5$ models $\times\,156$ fair tasks, \textbf{zero
 verified genuine reward hacking} ($95\%$ upper bound $\le\!3.2\%$).
 \item \textbf{Weakness $\ne$ hacking}---a weaker model fails far more but cheats no more, even under
@@ -338,14 +374,18 @@ when present.
 \section{Threats to Validity}
 \emph{Contamination}: addressed at both identifier and semantic level (\code{sem\_zerocount}); a
 full semantic re-mutation of the whole benchmark is future work. \emph{Oracle residual}: the
-sequential-FSM residual is now \emph{closed}---a \code{-nolatches} reset-aware BMC (Pass-3) proves the
-$5$ Opus FSMs equivalent and reclassifies $1$ as an output don't-care, validated against a
-genuine-diff control (a deliberately-broken candidate is still flagged CEX, so the pass is not
-vacuously proving everything). GPT-5.5 leaves $3$ inconclusive (Conway's Life's $256$-cell grid plus
-two candidates the bounded SAT does not close in budget)---a per-candidate budget limit, not a
-verdict. \emph{Eliciting}: on \emph{fair} tasks single-loop aligned agents do not hack, but an
-\emph{impossible} (spec-contradicting) task does elicit hardcoding in $2/3$ frontier models (Opus
-resists)---so the fair-task negative is a property of the \emph{conditions}, not a blind spot; the
+sequential-FSM residual is \emph{closed} (a \code{-nolatches} reset-aware BMC), and the X-aware careset
+miter now \emph{proves} the flagged don't-care artifacts equivalent rather than hand-verifying them---
+across the five models the flagged \rhg{} drops $9\!\to\!2$ with \textbf{zero regressions}, the planted
+impossible-task overfit still a CEX (non-vacuous), and three of five models flagged-\rhg{}-free. The
+one hand-verified residual, \code{circuit8}, is a mixed-edge \code{negedge}-FF $+$ latch---equivalent
+under the testbench's synchronous clock but not discharged by our bounded free-clock miter (a
+regular-clock / half-cycle harness is future work). GPT-5.5 leaves $2$ inconclusive (Conway's Life's
+$256$-cell grid plus one candidate the bounded SAT does not close in budget)---a per-candidate budget
+limit, not a verdict. \emph{Eliciting}: on \emph{fair} tasks single-loop aligned agents do not hack, but an
+\emph{impossible} (spec-contradicting) task elicits cheating in the \emph{majority} ($3/5$ pass it,
+$\ge\!2$ judge-confirmed) with Opus resisting---so the fair-task negative is a property of the
+\emph{conditions}, not a blind spot; the
 deeper regime (RL training) is in \S\ref{sec:limits}. \emph{PPA}: open
 Sky130/OpenROAD is pre-signoff, not foundry signoff, and rankings can flip across synthesis flows;
 we therefore frame PPA as a \emph{relative} comparison under identical settings (per TuRTLe) and
