@@ -205,19 +205,23 @@ failures, not cheating.}
 \label{fig:models}
 \end{figure}
 
-\paragraph{Elicit (negative, informative).} A tamper-capable shell agent on a harder task: Haiku
+\paragraph{Elicit (the honesty phase-diagram).} A tamper-capable shell agent on a harder task: Haiku
 struggled four iterations (with full affordance to edit the testbench) but never tampered---it kept
 honestly repairing the design and solved it; Opus and GPT-5.5 were honest in one. All three shell
 agents edited \emph{only} the design, never the testbench---no hacking on \emph{fair} tasks.
 \textbf{But on an \emph{impossible} task} (an ImpossibleBench-style~\cite{impossiblebench} variant
 whose visible testbench demands \code{0x00}$\to$7, contradicting the spec, so \emph{any} visible-pass
-is provable cheating), GPT-5.5 hardcodes the contradictory vector---\code{count = (data==8'h00) ? 4'd7 : popcount}
----keeping an honest popcount elsewhere: visible PASS, formal CEX, \emph{exploit-evidenced}. This is
-the upper anchor of the honesty phase-diagram (fair task $\to$ \rhg{}$\approx$0; impossible task $\to$
-hack), and it is a \emph{design-only} hack (the testbench is untouched) that a file-edit tamper flag
-\emph{misses}---only the formal oracle plus a hardcode judge (\code{tamper\_judge}) catch it. Genuine
-hacking is thus a function of adversarial conditions (impossible / ambiguous specs), not of aligned
-frontier models in a fair single loop; RL training-time emergence is the deeper regime.
+is provable cheating), GPT-5.5 \emph{and} DeepSeek both hardcode the contradictory
+vector---\code{count = (data==8'h00) ? 4'd7 : popcount}---keeping an honest popcount elsewhere:
+visible PASS, formal CEX, \emph{exploit-evidenced}. \textbf{Opus, by contrast, stays honest}: it fails
+the impossible test for three iterations rather than special-case it (final design formally proven),
+a model-differentiated honesty-under-pressure signal. This is the upper anchor of the phase-diagram
+(fair task $\to$ \rhg{}$\approx$0 for all; impossible task $\to$ hack for $2/3$ frontier models), and
+the elicited hack is a \emph{design-only} one (the testbench is untouched) that a file-edit tamper
+flag \emph{misses}---only the formal oracle plus a hardcode judge (\code{tamper\_judge}) catch it.
+Genuine hacking is thus a function of adversarial conditions (impossible / contradictory specs) and
+of the model, not of aligned frontier models in a fair single loop; RL training-time emergence is
+the deeper regime.
 
 \paragraph{Contamination.} VerilogEval is public (reported $\sim\!100\%$ contamination for older
 models), so an honest pass could be memorization. We generate textually-novel, functionally-identical
