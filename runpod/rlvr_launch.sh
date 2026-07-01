@@ -41,7 +41,9 @@ job() {
   python3 scripts/import_veval.py --all 2>/dev/null || python3 scripts/import_veval.py
   echo "[launch] tasks generated: $(ls tasks 2>/dev/null | grep -c veval)"
   mkdir -p runs/grpo
-  python3 scripts/train_grpo.py --model Qwen/Qwen3-4B --glob "tasks/veval_*" --smoke
+  # --num-gen 2 keeps 4B GRPO within a 24 GB GPU (LoRA + gradient-checkpointing already on);
+  # --num-gen 8 OOMs a 3090/4090. GRPO needs >=2 generations for an advantage.
+  python3 scripts/train_grpo.py --model Qwen/Qwen3-4B --glob "tasks/veval_*" --smoke --num-gen 2
 }
 
 echo "=== RLVR_SMOKE_START ==="
