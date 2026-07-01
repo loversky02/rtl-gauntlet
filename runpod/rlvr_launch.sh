@@ -31,7 +31,7 @@ job() {
   export DEBIAN_FRONTEND=noninteractive PIP_ROOT_USER_ACTION=ignore
   cd /workspace 2>/dev/null || cd /root
   rm -rf rtl-gauntlet
-  git clone --depth 1 https://github.com/loversky02/rtl-gauntlet.git
+  git clone --depth 1 -b careset-oracle-revision https://github.com/loversky02/rtl-gauntlet.git
   cd rtl-gauntlet
   git clone --depth 1 https://github.com/NVlabs/verilog-eval.git external/verilog-eval
   command -v yosys >/dev/null 2>&1 || { apt-get update -y && apt-get install -y iverilog yosys; }
