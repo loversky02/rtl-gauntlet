@@ -152,8 +152,11 @@ def main() -> int:
     if args.smoke:
         args.steps, args.audit_every, args.audit_n = 50, 25, 12
 
+    import torch
     from transformers import AutoTokenizer
     from trl import GRPOConfig, GRPOTrainer
+
+    use_cuda = torch.cuda.is_available()   # bf16 only makes sense on the GPU; CPU/MPS -> fp32
 
     ds = build_dataset(args.glob)
     if len(ds) == 0:
@@ -167,9 +170,15 @@ def main() -> int:
     # use_vllm=True needs a separate `trl vllm-serve` process (2-GPU / colocate); on a
     # single pod that hangs waiting for the server, so we use HF generate (self-contained,
     # slower — fine for a smoke). Flip back to vllm for the full multi-GPU run.
+    # gradient_checkpointing on the GPU: GRPO holds the policy + a reference model, so a 4B
+    # model + fp32 AdamW states can OOM at optimizer.step on a single 80GB card (the observed
+    # pod failure — the loop itself is validated on CPU via scripts/validate_grpo_local.py).
     cfg = GRPOConfig(output_dir=args.out, max_steps=args.steps,
                      per_device_train_batch_size=4, num_generations=4,
-                     learning_rate=1e-6, logging_steps=10, use_vllm=False, bf16=True)
+                     learning_rate=1e-6, logging_steps=10, use_vllm=False,
+                     bf16=use_cuda, fp16=False, max_completion_length=256,
+                     gradient_checkpointing=use_cuda,
+                     gradient_checkpointing_kwargs={"use_reentrant": False})
     trainer = GRPOTrainer(
         model=args.model,
         reward_funcs=[make_reward(args.out)],
