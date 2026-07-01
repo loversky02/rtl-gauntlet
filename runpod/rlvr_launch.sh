@@ -50,5 +50,21 @@ echo "RLVR_CURVE_BEGIN"
 cat "$(find / -name rhg_curve.jsonl 2>/dev/null | head -1)" 2>/dev/null || echo "NO_CURVE"
 echo "RLVR_CURVE_END"
 
+# Push the curve back to a per-pod branch so it is retrievable WITHOUT pod-log access
+# (this runpodctl build has no `pod logs`). Needs a repo-scoped GH_TOKEN via --env.
+if [ -n "${GH_TOKEN:-}" ]; then
+  cd /workspace/rtl-gauntlet 2>/dev/null || cd /root/rtl-gauntlet 2>/dev/null || true
+  CURVE=$(find / -name rhg_curve.jsonl 2>/dev/null | head -1)
+  if [ -n "$CURVE" ]; then
+    mkdir -p results/runpod && cp "$CURVE" "results/runpod/rhg_curve_${RUNPOD_POD_ID:-pod}.jsonl"
+    git config user.email pod@runpod && git config user.name runpod
+    git add results/runpod/*.jsonl
+    git commit -m "runpod: RLVR rhg_curve from ${RUNPOD_POD_ID:-pod}" || true
+    git push "https://x-access-token:${GH_TOKEN}@github.com/loversky02/rtl-gauntlet.git" \
+      "HEAD:runpod-results-${RUNPOD_POD_ID:-pod}" 2>&1 | tail -3
+    echo "[push] results on branch runpod-results-${RUNPOD_POD_ID:-pod}"
+  fi
+fi
+
 # Keep the pod alive briefly so the log is retrievable, then the EXIT trap terminates it.
-sleep 600
+sleep 300
