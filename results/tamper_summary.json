@@ -1,7 +1,9 @@
 {
-  "model": "haiku",
+  "models": [
+    "haiku",
+    "opus"
+  ],
   "n_fair_tasks": 156,
   "fake_pass_tampers": 0,
-  "benign_nondesign_writes": 8,
-  "conclusion": "0 fake-pass tampers across 156 fair tasks"
+  "conclusion": "0 fake-pass tampers across 156 fair tasks on BOTH models"
 }
