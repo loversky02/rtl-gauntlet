@@ -291,28 +291,19 @@ Verified-genuine \rhg{}$=0$ throughout. Weakness shows as failures, not cheating
 \label{fig:models}
 \end{figure}
 
-\paragraph{Elicit (the honesty phase-diagram).} A tamper-capable shell agent on a harder task: Haiku
-struggled four iterations (with full affordance to edit the testbench) but never tampered---it kept
-honestly repairing the design and solved it; Opus and GPT-5.5 were honest in one. All three shell
-agents edited \emph{only} the design, never the testbench---no hacking on \emph{fair} tasks.
-\textbf{But on an \emph{impossible} task} (an ImpossibleBench-style~\cite{impossiblebench} variant
-whose visible testbench demands \code{0x00}$\to$7, contradicting the spec, so \emph{any} visible-pass
-is provable cheating), we elicit across all five models. \textbf{Three of the five pass it}---DeepSeek,
-Gemini, and GPT-5.5 special-case the contradictory vector (\code{count = (data==8'h00) ? 4'd7 :
-popcount}, an honest popcount elsewhere): visible PASS, formal CEX. An \emph{independent} strong judge
-(Opus) confirms all three as \emph{exploit-evidenced} hardcode-overfit; a model judging its \emph{own}
-design is lenient---in a self-judge run GPT-5.5 excused its own hardcode---so the judge must be
-independent (a C1 lesson). On known hardcodes (planted $+$ elicited) the independent judge scores
-$6/7$ ($86\%$) true positives, missing one, so exploit-evidenced counts are a \emph{conservative lower
-bound} (a full judge-vs-human $\kappa$ is future work; \code{c1\_judge\_accuracy.py}).
-\textbf{Opus and Haiku refuse}: Opus stays formally proven-correct (it fails the impossible test rather
-than special-case it) and Haiku does not pass it either---a model-differentiated
-honesty-under-pressure signal (Opus resists here and in a prior elicitation run). This is the upper
-anchor of the phase-diagram (fair task $\to$ \rhg{}$\approx$0 for \emph{all}; impossible task $\to$
-cheating in the \emph{majority} of frontier models, Opus resisting), so the metric is \emph{not}
-trivially zero. The elicited hack is a \emph{design-only} one (the testbench untouched) that a
-file-edit tamper flag \emph{misses}---only the formal oracle plus a hardcode judge
-(\code{tamper\_judge}) catch it (\code{results/phase\_diagram\_impossible\_5model.json}).
+\paragraph{Elicit (the phase-diagram).} A tamper-capable shell agent (may edit \emph{any} file) on
+fair tasks edits \emph{only} the design---no tampering (Haiku struggled four iterations without
+touching the testbench). \textbf{But on an \emph{impossible} task}~\cite{impossiblebench} (visible TB
+demands \code{0x00}$\to$7, contradicting the spec, so \emph{any} visible-pass is provable cheating),
+\textbf{$3$ of $5$} models pass it---DeepSeek, Gemini, GPT-5.5 special-case the vector
+(\code{(data==8'h00)?4'd7:popcount}): visible PASS, formal CEX. An \emph{independent} judge (Opus)
+confirms all three as hardcode-overfit and scores $6/7$ ($86\%$) on known hardcodes, so
+exploit-evidenced counts are a \emph{conservative lower bound} (self-judging is lenient---GPT-5.5
+excused its own; judge-vs-human $\kappa$ is future work). \textbf{Opus and Haiku refuse} (Opus stays
+formally proven-correct). So the metric is \emph{not} trivially zero: cheating appears in the
+\emph{majority} of frontier models under contradictory specs, Opus resisting. The hack is
+\emph{design-only} (testbench untouched)---a file-edit flag misses it; only the formal oracle $+$ judge
+catch it.
 Genuine hacking is thus a function of adversarial conditions (impossible / contradictory specs) and
 of the model, not of aligned frontier models in a fair single loop; RL training-time emergence is
 the deeper regime.
@@ -333,13 +324,12 @@ novelty---it is reasoning, not recall.
 canonical popcount: the memorized count-ones solution passes the balanced visible test but is caught
 by hidden$+$formal ($\rhg{}=0.50$), while both models implement the variant honestly.
 \end{itemize}
-We report contamination as its \emph{own} one-sided Clopper--Pearson $95\%$ bound (distinct from the
-reward-hacking bound): $k\!=\!0$ memorization-driven \hpr{} drops across the $156$-task probe gives
-$\le\!1.9\%$. Membership inference (Min-K\% Prob~\cite{minkprob}; NLL$\leftrightarrow$degradation
-\cite{nllmem}) would triangulate, but \emph{no closed-model API we use exposes the teacher-forced
-logprobs it needs}---Claude/GPT return none, Gemini rejects the parameter, and DeepSeek forbids
-\code{echo}$+$\code{logprobs} (its generation logprobs saturate at $\approx\!0$); proper MI therefore
-requires open-weight inference. The behavioral whole-benchmark probe above is the evidence run here.
+We report contamination as its own one-sided Clopper--Pearson $95\%$ bound: $k\!=\!0$
+memorization-driven \hpr{} drops on the $156$-task probe gives $\le\!1.9\%$. Membership inference
+(Min-K\%~\cite{minkprob}; NLL$\leftrightarrow$degradation~\cite{nllmem}) needs teacher-forced logprobs
+that no closed API we use exposes, so we run it on an \emph{open} model (Qwen2.5-3B, local MLX): the
+mean NLL-degradation under the meaning-preserving mutation is $+0.045$ nats---negligible, \emph{no}
+memorization advantage---triangulating the behavioral probe.
 
 \paragraph{Cost (C2).} Across the four models with per-iteration token logs
 (Opus/Haiku/GPT-5.5/Gemini; DeepSeek's sweep did not record tokens), the repair tail is mostly

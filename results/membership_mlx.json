@@ -1,0 +1,249 @@
+{
+  "model": "mlx-community/Qwen2.5-3B-Instruct-4bit",
+  "n": 30,
+  "mean_dNLL_mut_minus_orig": 0.0447,
+  "frac_mut_more_surprising": 0.633,
+  "interpretation": "no memorization advantage (\u0394NLL\u22480: the mutant is no more surprising than the canonical)",
+  "rows": [
+    {
+      "task": "prob001_zero",
+      "nll_orig": 1.493,
+      "nll_mut": 1.217,
+      "mink_orig": -5.627,
+      "mink_mut": -5.121,
+      "dnll_mut_minus_orig": -0.276
+    },
+    {
+      "task": "prob002_m2014_q4i",
+      "nll_orig": 1.364,
+      "nll_mut": 1.453,
+      "mink_orig": -5.055,
+      "mink_mut": -6.129,
+      "dnll_mut_minus_orig": 0.089
+    },
+    {
+      "task": "prob003_step_one",
+      "nll_orig": 1.256,
+      "nll_mut": 1.18,
+      "mink_orig": -5.053,
+      "mink_mut": -5.291,
+      "dnll_mut_minus_orig": -0.075
+    },
+    {
+      "task": "prob004_vector2",
+      "nll_orig": 0.401,
+      "nll_mut": 0.386,
+      "mink_orig": -1.874,
+      "mink_mut": -1.858,
+      "dnll_mut_minus_orig": -0.015
+    },
+    {
+      "task": "prob005_notgate",
+      "nll_orig": 0.758,
+      "nll_mut": 0.935,
+      "mink_orig": -3.496,
+      "mink_mut": -4.531,
+      "dnll_mut_minus_orig": 0.177
+    },
+    {
+      "task": "prob006_vectorr",
+      "nll_orig": 0.475,
+      "nll_mut": 0.486,
+      "mink_orig": -2.287,
+      "mink_mut": -2.417,
+      "dnll_mut_minus_orig": 0.01
+    },
+    {
+      "task": "prob007_wire",
+      "nll_orig": 0.915,
+      "nll_mut": 0.977,
+      "mink_orig": -3.93,
+      "mink_mut": -4.586,
+      "dnll_mut_minus_orig": 0.061
+    },
+    {
+      "task": "prob008_m2014_q4h",
+      "nll_orig": 0.857,
+      "nll_mut": 0.995,
+      "mink_orig": -3.551,
+      "mink_mut": -4.764,
+      "dnll_mut_minus_orig": 0.139
+    },
+    {
+      "task": "prob009_popcount3",
+      "nll_orig": 0.551,
+      "nll_mut": 0.623,
+      "mink_orig": -2.443,
+      "mink_mut": -2.897,
+      "dnll_mut_minus_orig": 0.073
+    },
+    {
+      "task": "prob010_mt2015_q4a",
+      "nll_orig": 0.56,
+      "nll_mut": 0.621,
+      "mink_orig": -2.27,
+      "mink_mut": -2.81,
+      "dnll_mut_minus_orig": 0.06
+    },
+    {
+      "task": "prob011_norgate",
+      "nll_orig": 0.651,
+      "nll_mut": 0.732,
+      "mink_orig": -2.959,
+      "mink_mut": -3.481,
+      "dnll_mut_minus_orig": 0.081
+    },
+    {
+      "task": "prob012_xnorgate",
+      "nll_orig": 0.769,
+      "nll_mut": 0.812,
+      "mink_orig": -3.603,
+      "mink_mut": -3.908,
+      "dnll_mut_minus_orig": 0.043
+    },
+    {
+      "task": "prob013_m2014_q4e",
+      "nll_orig": 0.499,
+      "nll_mut": 0.656,
+      "mink_orig": -2.309,
+      "mink_mut": -3.254,
+      "dnll_mut_minus_orig": 0.157
+    },
+    {
+      "task": "prob014_andgate",
+      "nll_orig": 0.538,
+      "nll_mut": 0.704,
+      "mink_orig": -2.273,
+      "mink_mut": -3.43,
+      "dnll_mut_minus_orig": 0.166
+    },
+    {
+      "task": "prob015_vector1",
+      "nll_orig": 0.406,
+      "nll_mut": 0.502,
+      "mink_orig": -1.803,
+      "mink_mut": -2.324,
+      "dnll_mut_minus_orig": 0.096
+    },
+    {
+      "task": "prob016_m2014_q4j",
+      "nll_orig": 0.418,
+      "nll_mut": 0.427,
+      "mink_orig": -1.75,
+      "mink_mut": -1.875,
+      "dnll_mut_minus_orig": 0.009
+    },
+    {
+      "task": "prob017_mux2to1v",
+      "nll_orig": 0.293,
+      "nll_mut": 0.306,
+      "mink_orig": -1.341,
+      "mink_mut": -1.475,
+      "dnll_mut_minus_orig": 0.013
+    },
+    {
+      "task": "prob018_mux256to1",
+      "nll_orig": 0.417,
+      "nll_mut": 0.43,
+      "mink_orig": -1.878,
+      "mink_mut": -1.995,
+      "dnll_mut_minus_orig": 0.012
+    },
+    {
+      "task": "prob019_m2014_q4f",
+      "nll_orig": 0.509,
+      "nll_mut": 0.616,
+      "mink_orig": -2.285,
+      "mink_mut": -2.931,
+      "dnll_mut_minus_orig": 0.107
+    },
+    {
+      "task": "prob020_mt2015_eq2",
+      "nll_orig": 0.511,
+      "nll_mut": 0.651,
+      "mink_orig": -2.341,
+      "mink_mut": -3.059,
+      "dnll_mut_minus_orig": 0.14
+    },
+    {
+      "task": "prob021_mux256to1v",
+      "nll_orig": 0.373,
+      "nll_mut": 0.336,
+      "mink_orig": -1.68,
+      "mink_mut": -1.527,
+      "dnll_mut_minus_orig": -0.038
+    },
+    {
+      "task": "prob022_mux2to1",
+      "nll_orig": 0.537,
+      "nll_mut": 0.541,
+      "mink_orig": -2.344,
+      "mink_mut": -2.591,
+      "dnll_mut_minus_orig": 0.004
+    },
+    {
+      "task": "prob023_vector100r",
+      "nll_orig": 0.867,
+      "nll_mut": 0.901,
+      "mink_orig": -3.523,
+      "mink_mut": -3.724,
+      "dnll_mut_minus_orig": 0.034
+    },
+    {
+      "task": "prob024_hadd",
+      "nll_orig": 0.731,
+      "nll_mut": 0.762,
+      "mink_orig": -2.912,
+      "mink_mut": -3.315,
+      "dnll_mut_minus_orig": 0.031
+    },
+    {
+      "task": "prob025_reduction",
+      "nll_orig": 0.996,
+      "nll_mut": 0.871,
+      "mink_orig": -4.722,
+      "mink_mut": -4.189,
+      "dnll_mut_minus_orig": -0.125
+    },
+    {
+      "task": "prob026_alwaysblock1",
+      "nll_orig": 0.445,
+      "nll_mut": 0.513,
+      "mink_orig": -2.002,
+      "mink_mut": -2.368,
+      "dnll_mut_minus_orig": 0.068
+    },
+    {
+      "task": "prob027_fadd",
+      "nll_orig": 0.593,
+      "nll_mut": 0.603,
+      "mink_orig": -2.483,
+      "mink_mut": -2.783,
+      "dnll_mut_minus_orig": 0.01
+    },
+    {
+      "task": "prob028_m2014_q4a",
+      "nll_orig": 0.559,
+      "nll_mut": 0.691,
+      "mink_orig": -2.316,
+      "mink_mut": -3.06,
+      "dnll_mut_minus_orig": 0.132
+    },
+    {
+      "task": "prob029_m2014_q4g",
+      "nll_orig": 0.57,
+      "nll_mut": 0.667,
+      "mink_orig": -2.645,
+      "mink_mut": -3.233,
+      "dnll_mut_minus_orig": 0.096
+    },
+    {
+      "task": "prob030_popcount255",
+      "nll_orig": 0.625,
+      "nll_mut": 0.685,
+      "mink_orig": -2.483,
+      "mink_mut": -2.87,
+      "dnll_mut_minus_orig": 0.06
+    }
+  ]
+}
