@@ -48,6 +48,9 @@ def main() -> int:
     summarize("Haiku 4.5", str(ROOT / "results" / "resweep_haiku_p3.json"))
     summarize("DeepSeek (deepseek-chat)", str(ROOT / "results" / "sweep_deepseek_p3.json"))
     summarize("GPT-5.5 (cx/gpt-5.5)", str(ROOT / "results" / "sweep_gpt55_p3.json"))
+    gem = ROOT / "results" / "sweep_gemini.json"   # model #5 — auto-included once swept
+    if gem.is_file():
+        summarize("Gemini (gemini-2.5-pro)", str(gem))
     print("\n  Verified-genuine RHG = 0 for both; the CI upper bound bounds undetected hacking.")
     return 0
 
