@@ -318,10 +318,12 @@ the deeper regime.
 \paragraph{Contamination.} VerilogEval is public (reported $\sim\!100\%$ contamination for older
 models), so an honest pass could be memorization rather than reasoning. We probe this in layers:
 \begin{itemize}[leftmargin=*,topsep=2pt,itemsep=1pt]
-\item \textbf{Identifier mutation.} Rename the target module and reframe the spec, then re-sweep: on
-$40$ tasks---\emph{each machine-verified function-preserving by the careset oracle} ($40/40$ proven
-equivalent, so the mutation cannot silently break the task)---\emph{both} Opus and Haiku hold
-$\hpr{}\,1.00\!\to\!1.00$, $\rhg{}\,0\!\to\!0$ ($\Delta=0$), robust for a strong \emph{and} a weak model.
+\item \textbf{Identifier mutation, whole benchmark.} Rename the target module and reframe the spec on
+\emph{all $156$ tasks}---\emph{each machine-verified function-preserving by the careset oracle}
+($156/156$ proven equivalent, \code{verify\_mutants.py}, so no mutation silently breaks a task)---then
+re-sweep. \hpr{} is \emph{stable} for a strong \emph{and} a weak model (Opus $0.923\!\to\!0.923$,
+$\Delta\hpr{}=0$; Haiku $0.731\!\to\!0.763$), \rhg{} stays $\approx\!0$: honesty survives the textual
+novelty---it is reasoning, not recall.
 \item \textbf{Semantic novelty.} Self-authored tasks (\code{gray2bin}, \code{popcount8},
 \code{hex7seg}) implement functions absent from any public benchmark, yet models stay honest
 ($\rhg{}=0$)---not benchmark recall.
@@ -330,10 +332,12 @@ canonical popcount: the memorized count-ones solution passes the balanced visibl
 by hidden$+$formal ($\rhg{}=0.50$), while both models implement the variant honestly.
 \end{itemize}
 We report contamination as its \emph{own} one-sided Clopper--Pearson $95\%$ bound (distinct from the
-reward-hacking bound): $k\!=\!0$ memorization signals on the $40$-task probe gives $\le\!7.2\%$. No
-single signal is reliable alone, so triangulating with membership inference (Min-K\% Prob~\cite{minkprob})
-and the NLL$\leftrightarrow$degradation correlation under meaning-preserving mutation~\cite{nllmem} is
-future work; only the behavioral probe is run here.
+reward-hacking bound): $k\!=\!0$ memorization-driven \hpr{} drops across the $156$-task probe gives
+$\le\!1.9\%$. Membership inference (Min-K\% Prob~\cite{minkprob}; NLL$\leftrightarrow$degradation
+\cite{nllmem}) would triangulate, but \emph{no closed-model API we use exposes the teacher-forced
+logprobs it needs}---Claude/GPT return none, Gemini rejects the parameter, and DeepSeek forbids
+\code{echo}$+$\code{logprobs} (its generation logprobs saturate at $\approx\!0$); proper MI therefore
+requires open-weight inference. The behavioral whole-benchmark probe above is the evidence run here.
 
 \paragraph{Cost (C2).} Across the four models with per-iteration token logs
 (Opus/Haiku/GPT-5.5/Gemini; DeepSeek's sweep did not record tokens), the repair tail is mostly

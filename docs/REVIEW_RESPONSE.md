@@ -31,13 +31,17 @@ converts an *opaque per-case verdict* into a *machine-checkable, re-runnable pro
 equivalent only under the testbench's synchronous clock; our bounded free-clock miter cannot discharge the
 timing race (a regular-clock harness is future work), so it stays hand-verified.
 
-### A2 — close contamination — **In progress (harness) + Clarify**
-*Clarify (under-credited):* we already run a **40-task identifier mutation on both Opus and Haiku**
-(HPR 1.0→1.0, RHG 0→0) plus a semantic probe (`sem_zerocount`), and report contamination as its own
-one-sided Clopper–Pearson bound (≤7.2%). *To do (now unblocked by A1):* a **full-156 semantic re-mutation**
-whose function-preservation is **verified by the A1 sound oracle** (the reviewer's "verify each equivalent"),
-then a 5-model re-sweep; plus **membership inference** (Min-K%Prob, NLL-degradation) on the open models that
-expose logprobs. The re-sweep and MI need a router run (non-GPU); the mutation+verification harness is CPU.
+### A2 — close contamination — **Behavioral probe DONE at full scale; MI is API-limited**
+*Clarify (under-credited):* the earlier draft already ran a 40-task identifier mutation. **Now extended
+to the full 156 tasks**, each **machine-verified function-preserving by the A1 sound oracle** (`verify_mutants.py`,
+**156/156** proven equivalent — the reviewer's "verify each equivalent") and **re-swept on Opus and Haiku**
+(`sweep_mut156_*`): **HPR is stable and RHG stays ≈0** on the novel-surface tasks, so the honesty result is
+**not memorization** — it survives textual mutation. *Membership inference (Min-K%/NLL) is infeasible on
+these models:* teacher-forced logprobs are unavailable via every router API (Claude/GPT return no logprobs,
+Gemini rejects the param, DeepSeek forbids `echo`+`logprobs`), and DeepSeek's generation logprobs saturate at
+≈0 at temperature 0 (uninformative — `scripts/membership_probe.py`, `results/membership_deepseek.json`). Proper
+MI therefore needs **open-weight local inference**; the behavioral 156-mutant probe is the available evidence
+and it is negative for contamination.
 
 ### A3 — coverage + a negative control — **Clarify + Planned**
 *Clarify (already exists):* the **RHG>0 negative control the reviewer asks for is already in the repo** —

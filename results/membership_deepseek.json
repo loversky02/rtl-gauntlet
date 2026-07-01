@@ -1,0 +1,249 @@
+{
+  "model": "deepseek-chat",
+  "n": 40,
+  "mean_delta_orig_minus_mut": 0.0,
+  "frac_original_more_confident": 0.0,
+  "interpretation": "possible memorization signal \u2014 inspect",
+  "rows": [
+    {
+      "task": "prob001_zero",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob002_m2014_q4i",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob003_step_one",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob004_vector2",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob005_notgate",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob006_vectorr",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob007_wire",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob008_m2014_q4h",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob009_popcount3",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob010_mt2015_q4a",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob011_norgate",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob012_xnorgate",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob013_m2014_q4e",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob014_andgate",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob015_vector1",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob016_m2014_q4j",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob017_mux2to1v",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob018_mux256to1",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob019_m2014_q4f",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob020_mt2015_eq2",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob021_mux256to1v",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob022_mux2to1",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob023_vector100r",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob024_hadd",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob025_reduction",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob026_alwaysblock1",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob027_fadd",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob028_m2014_q4a",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob029_m2014_q4g",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob030_popcount255",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob031_dff",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob032_vector0",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob033_ece241_2014_q1c",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob034_dff8",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob035_count1to10",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob036_ringer",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob037_review2015_count1k",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob038_count15",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob039_always_if",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    },
+    {
+      "task": "prob040_count10",
+      "logprob_original": 0.0,
+      "logprob_mutated": 0.0,
+      "delta": 0.0
+    }
+  ]
+}
