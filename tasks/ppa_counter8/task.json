@@ -1,0 +1,9 @@
+{
+  "task_id": "ppa_counter8",
+  "top": "counter8",
+  "source": "ppa-graded",
+  "size": "tiny",
+  "files": {
+    "golden": "golden.v"
+  }
+}

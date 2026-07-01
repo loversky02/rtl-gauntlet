@@ -63,11 +63,13 @@ def _clock_port(rtl_text: str) -> str | None:
     return m.group(1) if m else None
 
 
-def run_openlane(rtl_path: str, top: str, workdir: str, timeout: int = 3600) -> PPAResult:
+def run_openlane(rtl_path: str, top: str, workdir: str, timeout: int = 3600,
+                 config_extra: dict | None = None) -> PPAResult:
     """Real PPA via OpenLane 2 (Sky130). Expects to run INSIDE the openlane2 image
     (tools present → no Docker-in-Docker); on Railway the container is that image.
     Generates a per-design config (clock only if the RTL has a clock port — risk R-config),
-    runs `openlane config.json`, and parses the flow's final metrics. ok=False on failure."""
+    runs `openlane config.json`, and parses the flow's final metrics. ok=False on failure.
+    `config_extra` overrides/adds config keys (e.g. a SYNTH_STRATEGY, for rank-stability sweeps)."""
     os.makedirs(os.path.join(workdir, "src"), exist_ok=True)
     shutil.copy(rtl_path, os.path.join(workdir, "src", "design.v"))
     cfg = {"DESIGN_NAME": top, "VERILOG_FILES": "dir::src/*.v", "PDK": "sky130A",
@@ -76,6 +78,8 @@ def run_openlane(rtl_path: str, top: str, workdir: str, timeout: int = 3600) -> 
     if clk:
         cfg["CLOCK_PORT"] = clk
     # else combinational: no CLOCK_PORT → OpenLane runs a comb flow (area/power; timing N/A)
+    if config_extra:
+        cfg.update(config_extra)
     json.dump(cfg, open(os.path.join(workdir, "config.json"), "w"))
     try:
         subprocess.run(["openlane", "config.json"], cwd=workdir,
