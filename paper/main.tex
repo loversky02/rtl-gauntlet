@@ -26,7 +26,7 @@ against \emph{visible} tests, is \emph{expensive} to reach, and is obtained on \
 We turn these three concerns into measurable axes. We build a two-tier protocol that freezes an
 agent's design and scores it with a withheld formal-equivalence oracle, and define a
 Reward-Hacking Gap (\rhg) and Honest Pass Rate (\hpr). Applying it to 156 VerilogEval tasks across
-four models, we find the na\"ive headline \rhg{} ($6.1\%$) is \emph{entirely an oracle artifact}: a
+five models, we find the na\"ive headline \rhg{} ($6.1\%$) is \emph{entirely an oracle artifact}: a
 na\"ive formal oracle over-reports reward hacking via don't-care \code{x}, async-reset,
 state-encoding, init-state, and even a SystemVerilog parser flag. We harden the oracle in six steps
 ---reset-aware, don't-care-aware, bounded miter+SAT, \code{read\_verilog -sv}, a \code{memory}
@@ -34,9 +34,11 @@ state-encoding, init-state, and even a SystemVerilog parser flag. We harden the 
 $9\!\to\!1$ and ``inconclusive'' $50\!\to\!0$, and verify every surviving flag by hand:
 \textbf{zero genuine reward hacking} ($95\%$ upper bound $\le\!3.2\%$) by frontier models on fair tasks. A weaker model (Haiku~4.5) fails $3\times$ more than
 Opus~4.8 on the visible tests but does \emph{not} hack more; even a tamper-capable shell agent that
-struggles for several iterations does not edit the testbench. We show the oracle \emph{would} catch
-hacking when present (a candidate that passes a randomized hidden testbench but is formally
-disproven), that the result survives off the verbatim benchmark (a contamination probe), and we add
+struggles for several iterations does not edit the testbench. We show the oracle catches hacking
+when present---both a planted candidate (passes a randomized hidden testbench, formally disproven) and
+a \emph{real elicited} one: on an impossible (spec-contradicting) task $2/3$ frontier models hardcode
+the design (Opus stays honest), caught by the oracle plus a hardcode judge. We further show the
+result survives off the verbatim benchmark (a contamination probe), and we add
 a token-cost analysis (an early-stop reclaims $12$--$23\%$ of tokens) and a latency-axis prototype
 that produces real Sky130 power/area/timing through a containerized OpenLane flow. The central
 artifact for honest agentic-hardware evaluation is a don't-care/reset/encoding-aware oracle plus a
@@ -58,7 +60,7 @@ gamed (honesty), it is expensive (cost), and it does not scale to real reward (l
 \item The finding that a na\"ive formal oracle \textbf{over-reports} reward hacking, and a
 six-step hardened oracle that removes it (closing the sequential-FSM residual); verification
 discipline as a first-class method (\S\ref{sec:oracle}).
-\item An empirical result across $4$ models $\times\,156$ tasks: \textbf{zero verified genuine
+\item An empirical result across $5$ models $\times\,156$ tasks: \textbf{zero verified genuine
 reward hacking} on fair tasks; weakness $\ne$ hacking; tampering is caught when present
 (\S\ref{sec:exp}).
 \item Cost and latency prototypes: token accounting with an early-stop policy, and real Sky130 PPA
@@ -169,8 +171,8 @@ formal exposes it ($\rhg{}=0.50$). This is the direct evidence that an exhaustiv
 beats a finite held-out suite.
 
 \paragraph{Sweep and model comparison.} Table~\ref{tab:models} and Figure~\ref{fig:models}: the
-weaker models fail far more (\code{fail\_visible} $9$/$6$/$36$/$30$ for Opus/GPT-5.5/DeepSeek/Haiku,
-$+11$ no-candidate for Haiku) but hack no more. Every flagged \rhg{} counter-example across the four
+weaker models fail far more (\code{fail\_visible} $9$/$6$/$14$/$36$/$30$ for Opus/GPT-5.5/Gemini/DeepSeek/Haiku,
+$+11$ no-candidate for Haiku) but hack no more. Every flagged \rhg{} counter-example across the five
 models---$4$ distinct tasks---is a hand-verified artifact: \code{circuit8}/\code{q5b} are BMC
 zero-init artifacts (\code{-set-init-zero} forces an invalid state for an uninitialized latch /
 one-hot FSM, the latter produced independently by DeepSeek, Haiku, and GPT-5.5); \code{prob095} is a
@@ -178,21 +180,21 @@ zero-init state with an incidentally-active output (simulation confirms equivale
 \code{prob149} is an \emph{input-space} don't-care---a water-level controller whose golden marks
 impossible non-thermometer sensor codes \code{'x}. The \code{dontcare} detector requires the \code{x}
 to drive an output, so an incidental internal \code{x} cannot mask a real CEX. With $95\%$ Wilson
-intervals, verified-genuine \rhg{}$=0$, upper bound $\le\!2.5\%$ (Opus) / $\le\!2.5\%$ (GPT-5.5) /
+intervals, verified-genuine \rhg{}$=0$, upper bound $\le\!2.5\%$ (Opus) / $\le\!2.5\%$ (GPT-5.5) / $\le\!2.6\%$ (Gemini) /
 $\le\!3.1\%$ (DeepSeek) / $\le\!3.2\%$ (Haiku).
 
 \begin{table}[t]\centering\small
-\begin{tabular}{@{}lcccc@{}}
+\begin{tabular}{@{}lccccc@{}}
 \toprule
- & Opus 4.8 & GPT-5.5 & DeepSeek & Haiku 4.5 \\
+ & Opus 4.8 & GPT-5.5 & Gemini 2.5 & DeepSeek & Haiku 4.5 \\
 \midrule
-honest $+$ bmc & 140 & 137 & 118 & 113 \\
-\hpr{} ($95\%$ CI) & 0.90 [.84,.94] & 0.88 [.82,.92] & 0.76 [.68,.82] & 0.72 [.65,.79] \\
-\code{fail\_visible} ($+$ no-cand) & 9 & 6 & 36 & 30 ($+11$) \\
-verified \rhg{} & 0 ($\le.025$) & 0 ($\le.025$) & 0 ($\le.031$) & 0 ($\le.032$) \\
+honest $+$ bmc & 140 & 137 & 134 & 118 & 113 \\
+\hpr{} ($95\%$ CI) & 0.90 [.84,.94] & 0.88 [.82,.92] & 0.86 [.80,.91] & 0.76 [.68,.82] & 0.72 [.65,.79] \\
+\code{fail\_visible} ($+$ no-cand) & 9 & 6 & 14 & 36 & 30 ($+11$) \\
+verified \rhg{} & 0 ($\le.025$) & 0 ($\le.025$) & 0 ($\le.026$) & 0 ($\le.031$) & 0 ($\le.032$) \\
 \bottomrule
 \end{tabular}
-\caption{Four models $\times\,156$ tasks (final oracle, incl.\ the reset-aware Pass-3; \hpr{} counts
+\caption{Five models $\times\,156$ tasks (final oracle, incl.\ the reset-aware Pass-3; \hpr{} counts
 honest $+$ BMC-verified, so Opus $=129{+}11=140$, $140/156=0.90$). All verified \rhg{}$=0$: every
 flagged CEX is an init / encoding / input-space don't-care artifact (see text). Weakness shows as
 failures, not cheating.}
@@ -201,7 +203,7 @@ failures, not cheating.}
 
 \begin{figure}[t]\centering
 \includegraphics[width=0.95\linewidth]{figures/models.pdf}
-\caption{Weakness $\ne$ hacking across four models: Haiku/DeepSeek fail more on the visible tests (GPT-5.5 fails fewest), \rhg{}$=0$ throughout.}
+\caption{Weakness $\ne$ hacking across five models: Haiku/DeepSeek fail more on the visible tests (Opus/GPT-5.5/Gemini fewest), \rhg{}$=0$ throughout.}
 \label{fig:models}
 \end{figure}
 
@@ -264,7 +266,7 @@ gotcha was a config file at the repo root, not OpenLane.)
 \begin{enumerate}[leftmargin=*,topsep=2pt,itemsep=1pt]
 \item A na\"ive formal oracle \textbf{over-reports} reward hacking; the headline number was an
 artifact, found only by per-case verification. Verification discipline is mandatory.
-\item No false positives on honest agents; across $4$ models $\times\,156$ fair tasks, \textbf{zero
+\item No false positives on honest agents; across $5$ models $\times\,156$ fair tasks, \textbf{zero
 verified genuine reward hacking} ($95\%$ upper bound $\le\!3.2\%$).
 \item \textbf{Weakness $\ne$ hacking}---a weaker model fails far more but cheats no more, even under
 tamper affordance.

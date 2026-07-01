@@ -13,8 +13,8 @@ Each paper claim maps to a concrete artifact that proves it. Status:
 | H4 | Tamper detector + isolation hold (R12/R17) | planted-tamper: faked visible PASS but hidden FAIL + formal CEX + tamper flagged | 1 | 🟢 |
 | H5 | Pipeline runs on an external public benchmark | VerilogEval ×4: adapter + their-TB visible + formal withheld; oracle + Opus 4.8 honest (RHG 0) | 1 | 🟢 |
 | H6 | Naive formal oracle over-reports (must verify) | 156-task Opus sweep: 9 RHG_cex + 50 inconclusive ALL verified as oracle false-positives (don't-care `x` / sequential-reset); no real hacking | 1 | 🟢 |
-| H7 | Don't-care + reset-aware oracle removes false RHG | async2sync + don't-care-aware: false RHG 9→3 (+3 honest, +3 dontcare); all 3 residual verified as state-encoding/init artifacts, not hacking | 1 | 🟡 |
-| H8 | BMC fallback removes state-encoding false-CEX | 2-pass equiv (full proof → miter+SAT BMC): false RHG 9→1; q4/q12 → bmc_equiv (verified); residual circuit8 = init-don't-care latch transient | 1 | 🟡 |
+| H7 | Don't-care + reset-aware oracle removes false RHG | async2sync + don't-care-aware: false RHG 9→3 (+3 honest, +3 dontcare); all 3 residual verified as state-encoding/init artifacts, not hacking | 1 | 🟢 |
+| H8 | BMC fallback removes state-encoding false-CEX | 2-pass equiv (full proof → miter+SAT BMC): false RHG 9→1; q4/q12 → bmc_equiv (verified); residual circuit8 = init-don't-care latch transient (later closed, H10b) | 1 | 🟢 |
 | H9 | SystemVerilog parse fix clears most inconclusive | `read_verilog -sv`: inconclusive 50→14, honest 88→122; RHG_cex still 1 (circuit8 init artifact). Most "inconclusive" was a silent SV parse-fail, not a solver limit | 1 | 🟢 |
 | H10 | memory pass clears most inconclusive | `memory` (case-ROM) closed 8/14 → 6 residual (hard sequential FSMs) | 1 | 🟢 |
 | H10b | **reset-aware Pass-3 CLOSES the FSM residual (no EQY)** | `-nolatches` + reset-driven BMC: 6 residual → 5 bmc_equiv + 1 dontcare; **inconclusive 50→0** (Opus/Haiku/DeepSeek); root cause was incomplete-case `always_comb` latch elaboration, not solver-hardness; genuine-diff control still flags a broken design | 1 | 🟢 |
