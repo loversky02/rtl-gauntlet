@@ -3,18 +3,23 @@
 **To resume next session:** open Claude in this repo, say *"tiếp tục RTL Gauntlet must-haves"* —
 memory auto-loads; then read this file.
 
-**Status (updated):** All must-haves #1–#5 addressed + #6 (negative result). Oracle: false-CEX
-9→1, inconclusive 50→6, HPR 87%. **Paper compiled**: `paper/main.tex` → `paper/main.pdf` (6 pp,
-`pdflatex`), figures via `scripts/make_figures.py`. C1 ~93% · C2 ~60% · C3 ~45% · Paper ~90%.
-Results: `docs/PILOT_RESULTS.md`. Risks: `docs/RISKS.md`. Build PDF: `cd paper && pdflatex main.tex`.
+**Status (updated):** All must-haves #1–#5 + #6 (negative) + #7 (4 models) + **oracle residual
+CLOSED**. Oracle: false-CEX 9→1, inconclusive 50→**0** (Opus), HPR **90%**. Four models, all verified
+RHG=0: Opus **0.90** / GPT-5.5 **0.88** / DeepSeek **0.76** / Haiku **0.72**. **Paper compiled**:
+`paper/main.tex` → `paper/main.pdf` (**7 pp**, `pdflatex`), figures via `scripts/make_figures.py`.
+C1 ~97% · C2 ~60% · C3 ~45% · Paper ~93%. Results: `docs/PILOT_RESULTS.md`.
 
-**Remaining (all future-work / polish):**
-- EQY structural-match for the 6 residual FSMs (formal-hard).
-- **+1–2 models**: gpt-5.5 BLOCKED — 9router `cx`/codex route returns 401 `token_revoked` (re-auth
-  the gateway oauth token). Gemini/DeepSeek are *direct providers = real money* → ask before running.
-  (Semantic-novelty contamination control is already covered: self-authored tasks gray2bin/popcount8/
-  hex7seg are absent from public benchmarks and models stay honest on them — in the paper.)
+**DONE this session:**
+- **#3 residual CLOSED** — `-nolatches` reset-aware Pass-3 in `equiv.py` (Pass-3 on inconclusive):
+  5 Opus FSMs → bmc_equiv, 1 → dontcare; genuine-diff control still flags a broken candidate. No EQY
+  install needed. GPT-5.5 leaves 3 (Conway 256-cell + budget).
+- **#7 GPT-5.5 added** (`cx/gpt-5.5` via 9router). Route drops calls under burst when the gateway's
+  OpenAI upstream blips → `llm.py` now retries w/ backoff; valid sweep = 0.96 visible-pass, RHG_cex 3
+  all verified artifacts (q5b, circuit8 init; prob149 input-space don't-care).
+
+**Remaining (future-work / polish):**
 - RLVR training-time hacking study — scaffolded (`scripts/train_grpo.py`, `docs/RLVR.md`), needs GPU.
+- Gemini as a 5th model (direct provider = real money → ask first).
 - author/affiliation + prettier figures for actual submission.
 
 **Environment (already set up):**

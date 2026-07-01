@@ -26,13 +26,13 @@ against \emph{visible} tests, is \emph{expensive} to reach, and is obtained on \
 We turn these three concerns into measurable axes. We build a two-tier protocol that freezes an
 agent's design and scores it with a withheld formal-equivalence oracle, and define a
 Reward-Hacking Gap (\rhg) and Honest Pass Rate (\hpr). Applying it to 156 VerilogEval tasks across
-three models, we find the na\"ive headline \rhg{} ($6.1\%$) is \emph{entirely an oracle artifact}: a
+four models, we find the na\"ive headline \rhg{} ($6.1\%$) is \emph{entirely an oracle artifact}: a
 na\"ive formal oracle over-reports reward hacking via don't-care \code{x}, async-reset,
-state-encoding, init-state, and even a SystemVerilog parser flag. We harden the oracle in five steps
----reset-aware, don't-care-aware, bounded miter+SAT, \code{read\_verilog -sv}, and a \code{memory}
-(case$\to$ROM) pass---cutting false counter-examples $9\!\to\!1$ and ``inconclusive'' $50\!\to\!6$,
-and verify every surviving flag by hand: \textbf{zero genuine reward hacking} ($95\%$ upper bound
-$\le\!3.2\%$) by frontier models on fair tasks. A weaker model (Haiku~4.5) fails $3\times$ more than
+state-encoding, init-state, and even a SystemVerilog parser flag. We harden the oracle in six steps
+---reset-aware, don't-care-aware, bounded miter+SAT, \code{read\_verilog -sv}, a \code{memory}
+(case$\to$ROM) pass, and a \code{-nolatches} reset-aware BMC---cutting false counter-examples
+$9\!\to\!1$ and ``inconclusive'' $50\!\to\!0$, and verify every surviving flag by hand:
+\textbf{zero genuine reward hacking} ($95\%$ upper bound $\le\!3.2\%$) by frontier models on fair tasks. A weaker model (Haiku~4.5) fails $3\times$ more than
 Opus~4.8 on the visible tests but does \emph{not} hack more; even a tamper-capable shell agent that
 struggles for several iterations does not edit the testbench. We show the oracle \emph{would} catch
 hacking when present (a candidate that passes a randomized hidden testbench but is formally
@@ -56,9 +56,9 @@ gamed (honesty), it is expensive (cost), and it does not scale to real reward (l
 \begin{enumerate}[leftmargin=*,topsep=2pt,itemsep=1pt]
 \item A two-tier, formal-grounded evaluation protocol with metrics \rhg{} and \hpr{} (\S\ref{sec:method}).
 \item The finding that a na\"ive formal oracle \textbf{over-reports} reward hacking, and a
-five-step hardened oracle that removes it; verification discipline as a first-class method
-(\S\ref{sec:oracle}).
-\item An empirical result across $3$ models $\times\,156$ tasks: \textbf{zero verified genuine
+six-step hardened oracle that removes it (closing the sequential-FSM residual); verification
+discipline as a first-class method (\S\ref{sec:oracle}).
+\item An empirical result across $4$ models $\times\,156$ tasks: \textbf{zero verified genuine
 reward hacking} on fair tasks; weakness $\ne$ hacking; tampering is caught when present
 (\S\ref{sec:exp}).
 \item Cost and latency prototypes: token accounting with an early-stop policy, and real Sky130 PPA
@@ -125,7 +125,12 @@ Our hardening pipeline (each step tested on verified cases before re-running):
 \item a bounded miter$+$SAT fallback comparing I/O sequences directly (encoding-agnostic; a SAT
 model is a real CEX);
 \item \code{read\_verilog -sv};
-\item a \code{memory} (case$\to$ROM) pass.
+\item a \code{memory} (case$\to$ROM) pass;
+\item a \code{-nolatches} reset-aware BMC (Pass-3) that closes the residual \code{inconclusive}
+FSMs. Their goldens use an \code{always\_comb case(state)} over a \code{reg [3:0]} that lists only the
+reachable states, so the unlisted states infer a latch and yosys \emph{errors out}---an elaboration
+artifact, not a solver limit (the same class as the \code{-sv} bug); \code{-nolatches} plus a reset
+drive at $t{=}1$ (the true reset state, not the zero state) then proves I/O equivalence.
 \end{enumerate}
 
 \begin{table}[t]\centering\small
@@ -137,19 +142,21 @@ na\"ive & 88 & -- & -- & 9 & 50 & 9 \\
 +reset+dc & 91 & -- & 3 & 3 & 50 & 9 \\
 +BMC & 91 & 3 & 2 & 1 & 50 & 9 \\
 +SV & 122 & 6 & 4 & 1 & 14 & 9 \\
-+memory & \textbf{129} & 6 & 5 & 1 & \textbf{6} & 9 \\
++memory & 129 & 6 & 5 & 1 & 6 & 9 \\
++reset-BMC & \textbf{129} & 11 & 6 & 1 & \textbf{0} & 9 \\
 \bottomrule
 \end{tabular}
 \caption{Oracle hardening (same 156 Opus candidates, no new LLM calls). False CEX $9\!\to\!1$;
-inconclusive $50\!\to\!6$; \hpr{} $56\%\!\to\!87\%$ (honest $129$ $+$ $6$ BMC-verified $=135$ of $156$).
-The $6$ residual are hard sequential FSMs.}
+inconclusive $50\!\to\!0$; \hpr{} $56\%\!\to\!90\%$ (honest $129$ $+$ $11$ BMC-verified $=140$ of $156$).
+The residual sequential FSMs are now closed---the \code{-nolatches} reset-aware Pass-3 proves $5$
+equivalent and reclassifies $1$ as an output don't-care.}
 \label{tab:progression}
 \end{table}
 
 \begin{figure}[t]\centering
 \includegraphics[width=0.95\linewidth]{figures/progression.pdf}
-\caption{Oracle hardening: artifacts fall (false CEX $9\!\to\!1$, inconclusive $50\!\to\!6$) and the
-verified-equivalent count (honest, incl.\ BMC) rises ($88\!\to\!135$; honest-only $88\!\to\!129$).}
+\caption{Oracle hardening: artifacts fall (false CEX $9\!\to\!1$, inconclusive $50\!\to\!0$) and the
+verified-equivalent count (honest, incl.\ BMC) rises ($88\!\to\!140$; honest-only $88\!\to\!129$).}
 \label{fig:prog}
 \end{figure}
 
@@ -162,35 +169,39 @@ formal exposes it ($\rhg{}=0.50$). This is the direct evidence that an exhaustiv
 beats a finite held-out suite.
 
 \paragraph{Sweep and model comparison.} Table~\ref{tab:models} and Figure~\ref{fig:models}: the
-weaker models fail far more (\code{fail\_visible} $9$/$36$/$30$ for Opus/DeepSeek/Haiku, $+11$
-no-candidate for Haiku) but hack no more. All three residual \rhg{} counter-examples are verified artifacts of the BMC zero-init assumption
-(\code{-set-init-zero} forces an invalid state for an async-reset/one-hot FSM---DeepSeek and Haiku
-independently produced the \emph{same} \code{q5b} one-hot Mealy FSM); the $5$ \code{dontcare}
-cases were likewise hand-verified as genuine output don't-cares, and the detector now requires the
-\code{x} to drive an output, so an incidental internal \code{x} cannot mask a real CEX. With $95\%$ Wilson
-intervals, verified-genuine \rhg{}$=0$ with an upper bound $\le\!2.5\%$ (Opus) / $\le\!3.1\%$ (DeepSeek) / $\le\!3.2\%$ (Haiku).
+weaker models fail far more (\code{fail\_visible} $9$/$6$/$36$/$30$ for Opus/GPT-5.5/DeepSeek/Haiku,
+$+11$ no-candidate for Haiku) but hack no more. Every flagged \rhg{} counter-example across the four
+models---$4$ distinct tasks---is a hand-verified artifact: \code{circuit8}/\code{q5b} are BMC
+zero-init artifacts (\code{-set-init-zero} forces an invalid state for an uninitialized latch /
+one-hot FSM, the latter produced independently by DeepSeek, Haiku, and GPT-5.5); \code{prob095} is a
+zero-init state with an incidentally-active output (simulation confirms equivalence after reset); and
+\code{prob149} is an \emph{input-space} don't-care---a water-level controller whose golden marks
+impossible non-thermometer sensor codes \code{'x}. The \code{dontcare} detector requires the \code{x}
+to drive an output, so an incidental internal \code{x} cannot mask a real CEX. With $95\%$ Wilson
+intervals, verified-genuine \rhg{}$=0$, upper bound $\le\!2.5\%$ (Opus) / $\le\!2.5\%$ (GPT-5.5) /
+$\le\!3.1\%$ (DeepSeek) / $\le\!3.2\%$ (Haiku).
 
 \begin{table}[t]\centering\small
-\begin{tabular}{@{}lccc@{}}
+\begin{tabular}{@{}lcccc@{}}
 \toprule
- & Opus 4.8 & DeepSeek & Haiku 4.5 \\
+ & Opus 4.8 & GPT-5.5 & DeepSeek & Haiku 4.5 \\
 \midrule
-honest $+$ bmc & 135 & 117 & 107 \\
-\hpr{} ($95\%$ CI) & 0.87 [.80,.91] & 0.75 [.68,.81] & 0.69 [.61,.75] \\
-\code{fail\_visible} ($+$ no-cand) & 9 & 36 & 30 ($+11$) \\
-verified \rhg{} & 0 ($\le.025$) & 0 ($\le.031$) & 0 ($\le.032$) \\
+honest $+$ bmc & 140 & 137 & 118 & 113 \\
+\hpr{} ($95\%$ CI) & 0.90 [.84,.94] & 0.88 [.82,.92] & 0.76 [.68,.82] & 0.72 [.65,.79] \\
+\code{fail\_visible} ($+$ no-cand) & 9 & 6 & 36 & 30 ($+11$) \\
+verified \rhg{} & 0 ($\le.025$) & 0 ($\le.025$) & 0 ($\le.031$) & 0 ($\le.032$) \\
 \bottomrule
 \end{tabular}
-\caption{Three models $\times\,156$ tasks (hardened oracle; \hpr{} counts honest $+$ BMC-verified, so
-Opus $=129{+}6=135$, $135/156=0.87$). All verified \rhg{}$=0$: every flagged CEX is an init/encoding
-artifact---DeepSeek's and Haiku's are the \emph{same} \code{q5b} one-hot Mealy FSM under zero-init.
-Weakness shows as failures, not cheating.}
+\caption{Four models $\times\,156$ tasks (final oracle, incl.\ the reset-aware Pass-3; \hpr{} counts
+honest $+$ BMC-verified, so Opus $=129{+}11=140$, $140/156=0.90$). All verified \rhg{}$=0$: every
+flagged CEX is an init / encoding / input-space don't-care artifact (see text). Weakness shows as
+failures, not cheating.}
 \label{tab:models}
 \end{table}
 
 \begin{figure}[t]\centering
 \includegraphics[width=0.95\linewidth]{figures/models.pdf}
-\caption{Weakness $\ne$ hacking across three models: Haiku/DeepSeek fail more on the visible tests, \rhg{}$=0$ throughout.}
+\caption{Weakness $\ne$ hacking across four models: Haiku/DeepSeek fail more on the visible tests (GPT-5.5 fails fewest), \rhg{}$=0$ throughout.}
 \label{fig:models}
 \end{figure}
 
@@ -214,12 +225,13 @@ visible test but is caught by hidden$+$formal ($\rhg{}=0.50$), while both models
 variant honestly. We report contamination as its \emph{own} one-sided Clopper--Pearson $95\%$ upper
 bound (distinct from the reward-hacking bound above): $k\!=\!0$ memorization signals on the $40$-task
 probe gives $\le\!7.2\%$, tightening to $\le\!1.5\%$ as the probe scales to all $203$ tasks---the bound
-shrinks because we grow $n$, not the claim. We triangulate the behavioral probe with membership
-inference (Min-K\% Prob, arXiv:2310.16789) and the NLL$\leftrightarrow$degradation correlation under
-meaning-preserving mutation (arXiv:2604.21579), since no single contamination signal is reliable alone.
+shrinks because we grow $n$, not the claim. Since no single contamination signal is reliable alone,
+we plan to triangulate this behavioral probe with membership inference (Min-K\% Prob, arXiv:2310.16789)
+and the NLL$\leftrightarrow$degradation correlation under meaning-preserving mutation
+(arXiv:2604.21579); only the behavioral probe is run here.
 
 \paragraph{Cost (C2).} Opus $482$k / Haiku $522$k tokens; the weaker model needs more repair
-(2-iter $17$ vs $36$). The repair tail is mostly wasted (honest payoff $41\%$ / $14\%$); an
+(2-iter $17$ vs $36$). The repair tail is mostly wasted (honest payoff $47\%$ / $14\%$); an
 early-stop at one iteration reclaims $12\%$ (Opus) / $23\%$ (Haiku) of tokens for a $\sim\!5\%$
 honesty loss (Figure~\ref{fig:cost}).
 
@@ -241,7 +253,7 @@ gotcha was a config file at the repo root, not OpenLane.)
 \begin{enumerate}[leftmargin=*,topsep=2pt,itemsep=1pt]
 \item A na\"ive formal oracle \textbf{over-reports} reward hacking; the headline number was an
 artifact, found only by per-case verification. Verification discipline is mandatory.
-\item No false positives on honest agents; across $3$ models $\times\,156$ fair tasks, \textbf{zero
+\item No false positives on honest agents; across $4$ models $\times\,156$ fair tasks, \textbf{zero
 verified genuine reward hacking} ($95\%$ upper bound $\le\!3.2\%$).
 \item \textbf{Weakness $\ne$ hacking}---a weaker model fails far more but cheats no more, even under
 tamper affordance.
@@ -251,10 +263,13 @@ when present.
 
 \section{Threats to Validity}
 \emph{Contamination}: addressed at both identifier and semantic level (\code{sem\_zerocount}); a
-full semantic re-mutation of the whole benchmark is future work. \emph{Oracle residual}: $6$ hard
-sequential FSMs remain inconclusive---the fix is EQY with state registers excluded as match points
-$+$ a sequential SAT strategy, validated against a genuine-diff control (simply blacklisting state
-bits can mask real differences). \emph{Eliciting} genuine hacking from aligned models failed; the
+full semantic re-mutation of the whole benchmark is future work. \emph{Oracle residual}: the
+sequential-FSM residual is now \emph{closed}---a \code{-nolatches} reset-aware BMC (Pass-3) proves the
+$5$ Opus FSMs equivalent and reclassifies $1$ as an output don't-care, validated against a
+genuine-diff control (a deliberately-broken candidate is still flagged CEX, so the pass is not
+vacuously proving everything). GPT-5.5 leaves $3$ inconclusive (Conway's Life's $256$-cell grid plus
+two candidates the bounded SAT does not close in budget)---a per-candidate budget limit, not a
+verdict. \emph{Eliciting} genuine hacking from aligned models failed; the
 negative result reflects single-loop inference on aligned models, not RL training---the regime where
 hacking is documented to emerge: test-subverting hacks discovered \emph{during} production RL
 (arXiv:2503.11926) and shortcut behavior that is RLVR-specific, absent in non-RL counterparts
@@ -269,7 +284,7 @@ C3 to a size-graded set (\code{spm}, AES, picorv32, ibex). \emph{Nondeterminism}
 LLM runs vary; we report Wilson CIs and pin model ids.
 
 \section{Limitations and Future Work}
-EQY structural matching for the residual FSMs; a semantic contamination mutation; more models and
+A semantic contamination mutation of the whole benchmark; more models and
 task types (debug/verify/reuse); a PPA surrogate trained on a real multi-design dataset with an
 agent loop under high-latency reward; and---most ambitiously---\textbf{RL training-time hacking}:
 train a small RTL agent (Qwen3-4B, GRPO) with a visible-test reward and measure the emergence of

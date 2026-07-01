@@ -1,0 +1,1260 @@
+{
+  "summary": {
+    "honest": 125,
+    "inconclusive": 9,
+    "fail_visible": 6,
+    "dontcare": 6,
+    "bmc_equiv": 7,
+    "RHG_cex": 3
+  },
+  "rows": [
+    {
+      "task": "veval_prob001_zero",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 169
+    },
+    {
+      "task": "veval_prob002_m2014_q4i",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 179
+    },
+    {
+      "task": "veval_prob003_step_one",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 175
+    },
+    {
+      "task": "veval_prob004_vector2",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 237
+    },
+    {
+      "task": "veval_prob005_notgate",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 181
+    },
+    {
+      "task": "veval_prob006_vectorr",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 252
+    },
+    {
+      "task": "veval_prob007_wire",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 179
+    },
+    {
+      "task": "veval_prob008_m2014_q4h",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 196
+    },
+    {
+      "task": "veval_prob009_popcount3",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 236
+    },
+    {
+      "task": "veval_prob010_mt2015_q4a",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 212
+    },
+    {
+      "task": "veval_prob011_norgate",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 197
+    },
+    {
+      "task": "veval_prob012_xnorgate",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 199
+    },
+    {
+      "task": "veval_prob013_m2014_q4e",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 213
+    },
+    {
+      "task": "veval_prob014_andgate",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 198
+    },
+    {
+      "task": "veval_prob015_vector1",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 289
+    },
+    {
+      "task": "veval_prob016_m2014_q4j",
+      "visible": true,
+      "formal": "inconclusive",
+      "category": "inconclusive",
+      "iters": 1,
+      "tokens": 936
+    },
+    {
+      "task": "veval_prob017_mux2to1v",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 275
+    },
+    {
+      "task": "veval_prob018_mux256to1",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 285
+    },
+    {
+      "task": "veval_prob019_m2014_q4f",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 255
+    },
+    {
+      "task": "veval_prob020_mt2015_eq2",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 269
+    },
+    {
+      "task": "veval_prob021_mux256to1v",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 319
+    },
+    {
+      "task": "veval_prob022_mux2to1",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 238
+    },
+    {
+      "task": "veval_prob023_vector100r",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 262
+    },
+    {
+      "task": "veval_prob024_hadd",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 238
+    },
+    {
+      "task": "veval_prob025_reduction",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 261
+    },
+    {
+      "task": "veval_prob026_alwaysblock1",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 255
+    },
+    {
+      "task": "veval_prob027_fadd",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 267
+    },
+    {
+      "task": "veval_prob028_m2014_q4a",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 265
+    },
+    {
+      "task": "veval_prob029_m2014_q4g",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 294
+    },
+    {
+      "task": "veval_prob030_popcount255",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 287
+    },
+    {
+      "task": "veval_prob031_dff",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 251
+    },
+    {
+      "task": "veval_prob032_vector0",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 327
+    },
+    {
+      "task": "veval_prob033_ece241_2014_q1c",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 324
+    },
+    {
+      "task": "veval_prob034_dff8",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 2,
+      "tokens": 863
+    },
+    {
+      "task": "veval_prob035_count1to10",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 312
+    },
+    {
+      "task": "veval_prob036_ringer",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 320
+    },
+    {
+      "task": "veval_prob037_review2015_count1k",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 324
+    },
+    {
+      "task": "veval_prob038_count15",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 293
+    },
+    {
+      "task": "veval_prob039_always_if",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 353
+    },
+    {
+      "task": "veval_prob040_count10",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 319
+    },
+    {
+      "task": "veval_prob041_dff8r",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 291
+    },
+    {
+      "task": "veval_prob042_vector4",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 375
+    },
+    {
+      "task": "veval_prob043_vector5",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 677
+    },
+    {
+      "task": "veval_prob044_vectorgates",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 387
+    },
+    {
+      "task": "veval_prob045_edgedetect2",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 332
+    },
+    {
+      "task": "veval_prob046_dff8p",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 305
+    },
+    {
+      "task": "veval_prob047_dff8ar",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 306
+    },
+    {
+      "task": "veval_prob048_m2014_q4c",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 292
+    },
+    {
+      "task": "veval_prob049_m2014_q4b",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 256
+    },
+    {
+      "task": "veval_prob050_kmap1",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 324
+    },
+    {
+      "task": "veval_prob051_gates4",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 317
+    },
+    {
+      "task": "veval_prob052_gates100",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 318
+    },
+    {
+      "task": "veval_prob053_m2014_q4d",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 2,
+      "tokens": 1213
+    },
+    {
+      "task": "veval_prob054_edgedetect",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 416
+    },
+    {
+      "task": "veval_prob055_conditional",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 355
+    },
+    {
+      "task": "veval_prob056_ece241_2013_q7",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 352
+    },
+    {
+      "task": "veval_prob057_kmap2",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 1085
+    },
+    {
+      "task": "veval_prob058_alwaysblock2",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 384
+    },
+    {
+      "task": "veval_prob059_wire4",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 283
+    },
+    {
+      "task": "veval_prob060_m2014_q4k",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 345
+    },
+    {
+      "task": "veval_prob061_2014_q4a",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 324
+    },
+    {
+      "task": "veval_prob062_bugs_mux2",
+      "visible": false,
+      "formal": "cex",
+      "category": "fail_visible",
+      "iters": 2,
+      "tokens": 1543
+    },
+    {
+      "task": "veval_prob063_review2015_shiftcount",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 409
+    },
+    {
+      "task": "veval_prob064_vector3",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 537
+    },
+    {
+      "task": "veval_prob065_7420",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 426
+    },
+    {
+      "task": "veval_prob066_edgecapture",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 2,
+      "tokens": 1205
+    },
+    {
+      "task": "veval_prob067_countslow",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 376
+    },
+    {
+      "task": "veval_prob068_countbcd",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 830
+    },
+    {
+      "task": "veval_prob069_truthtable1",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 377
+    },
+    {
+      "task": "veval_prob070_ece241_2013_q2",
+      "visible": true,
+      "formal": "dontcare",
+      "category": "dontcare",
+      "iters": 1,
+      "tokens": 1395
+    },
+    {
+      "task": "veval_prob071_always_casez",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 433
+    },
+    {
+      "task": "veval_prob072_thermostat",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 469
+    },
+    {
+      "task": "veval_prob073_dff16e",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 442
+    },
+    {
+      "task": "veval_prob074_ece241_2014_q4",
+      "visible": true,
+      "formal": "bmc_equiv",
+      "category": "bmc_equiv",
+      "iters": 1,
+      "tokens": 599
+    },
+    {
+      "task": "veval_prob075_counter_2bc",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 502
+    },
+    {
+      "task": "veval_prob076_always_case",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 514
+    },
+    {
+      "task": "veval_prob077_wire_decl",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 427
+    },
+    {
+      "task": "veval_prob078_dualedge",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 2,
+      "tokens": 1313
+    },
+    {
+      "task": "veval_prob079_fsm3onehot",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 618
+    },
+    {
+      "task": "veval_prob080_timer",
+      "visible": true,
+      "formal": "bmc_equiv",
+      "category": "bmc_equiv",
+      "iters": 1,
+      "tokens": 549
+    },
+    {
+      "task": "veval_prob081_7458",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 620
+    },
+    {
+      "task": "veval_prob082_lfsr32",
+      "visible": false,
+      "formal": "proven",
+      "category": "fail_visible",
+      "iters": 2,
+      "tokens": 1916
+    },
+    {
+      "task": "veval_prob083_mt2015_q4b",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 514
+    },
+    {
+      "task": "veval_prob084_ece241_2013_q12",
+      "visible": true,
+      "formal": "bmc_equiv",
+      "category": "bmc_equiv",
+      "iters": 1,
+      "tokens": 625
+    },
+    {
+      "task": "veval_prob085_shift4",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 468
+    },
+    {
+      "task": "veval_prob086_lfsr5",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 483
+    },
+    {
+      "task": "veval_prob087_gates",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 485
+    },
+    {
+      "task": "veval_prob088_ece241_2014_q5b",
+      "visible": true,
+      "formal": "cex",
+      "category": "RHG_cex",
+      "iters": 1,
+      "tokens": 556
+    },
+    {
+      "task": "veval_prob089_ece241_2014_q5a",
+      "visible": true,
+      "formal": "bmc_equiv",
+      "category": "bmc_equiv",
+      "iters": 1,
+      "tokens": 963
+    },
+    {
+      "task": "veval_prob090_circuit1",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 489
+    },
+    {
+      "task": "veval_prob091_2012_q2b",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 512
+    },
+    {
+      "task": "veval_prob092_gatesv100",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 2,
+      "tokens": 1754
+    },
+    {
+      "task": "veval_prob093_ece241_2014_q3",
+      "visible": false,
+      "formal": "cex",
+      "category": "fail_visible",
+      "iters": 2,
+      "tokens": 2679
+    },
+    {
+      "task": "veval_prob094_gatesv",
+      "visible": true,
+      "formal": "dontcare",
+      "category": "dontcare",
+      "iters": 1,
+      "tokens": 622
+    },
+    {
+      "task": "veval_prob095_review2015_fsmshift",
+      "visible": true,
+      "formal": "inconclusive",
+      "category": "inconclusive",
+      "iters": 1,
+      "tokens": 870
+    },
+    {
+      "task": "veval_prob096_review2015_fsmseq",
+      "visible": true,
+      "formal": "inconclusive",
+      "category": "inconclusive",
+      "iters": 1,
+      "tokens": 547
+    },
+    {
+      "task": "veval_prob097_mux9to1v",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 645
+    },
+    {
+      "task": "veval_prob098_circuit7",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 2,
+      "tokens": 3910
+    },
+    {
+      "task": "veval_prob099_m2014_q6c",
+      "visible": false,
+      "formal": "inconclusive",
+      "category": "fail_visible",
+      "iters": 2,
+      "tokens": 1793
+    },
+    {
+      "task": "veval_prob100_fsm3comb",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 518
+    },
+    {
+      "task": "veval_prob101_circuit4",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 695
+    },
+    {
+      "task": "veval_prob102_circuit3",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 804
+    },
+    {
+      "task": "veval_prob103_circuit2",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 738
+    },
+    {
+      "task": "veval_prob104_mt2015_muxdff",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 2,
+      "tokens": 1329
+    },
+    {
+      "task": "veval_prob105_rotate100",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 540
+    },
+    {
+      "task": "veval_prob106_always_nolatches",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 555
+    },
+    {
+      "task": "veval_prob107_fsm1s",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 384
+    },
+    {
+      "task": "veval_prob108_rule90",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 562
+    },
+    {
+      "task": "veval_prob109_fsm1",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 488
+    },
+    {
+      "task": "veval_prob110_fsm2",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 411
+    },
+    {
+      "task": "veval_prob111_fsm2s",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 404
+    },
+    {
+      "task": "veval_prob112_always_case2",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 406
+    },
+    {
+      "task": "veval_prob113_2012_q1g",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 835
+    },
+    {
+      "task": "veval_prob114_bugs_case",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 675
+    },
+    {
+      "task": "veval_prob115_shift18",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 584
+    },
+    {
+      "task": "veval_prob116_m2014_q3",
+      "visible": true,
+      "formal": "dontcare",
+      "category": "dontcare",
+      "iters": 2,
+      "tokens": 2472
+    },
+    {
+      "task": "veval_prob117_circuit9",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 794
+    },
+    {
+      "task": "veval_prob118_history_shift",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 625
+    },
+    {
+      "task": "veval_prob119_fsm3",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 495
+    },
+    {
+      "task": "veval_prob120_fsm3s",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 480
+    },
+    {
+      "task": "veval_prob121_2014_q3bfsm",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 670
+    },
+    {
+      "task": "veval_prob122_kmap4",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 586
+    },
+    {
+      "task": "veval_prob123_bugs_addsubz",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 525
+    },
+    {
+      "task": "veval_prob124_rule110",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 1006
+    },
+    {
+      "task": "veval_prob125_kmap3",
+      "visible": true,
+      "formal": "dontcare",
+      "category": "dontcare",
+      "iters": 1,
+      "tokens": 752
+    },
+    {
+      "task": "veval_prob126_circuit6",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 599
+    },
+    {
+      "task": "veval_prob127_lemmings1",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 623
+    },
+    {
+      "task": "veval_prob128_fsm_ps2",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 578
+    },
+    {
+      "task": "veval_prob129_ece241_2013_q8",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 612
+    },
+    {
+      "task": "veval_prob130_circuit5",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 836
+    },
+    {
+      "task": "veval_prob131_mt2015_q4",
+      "visible": true,
+      "formal": "inconclusive",
+      "category": "inconclusive",
+      "iters": 1,
+      "tokens": 1075
+    },
+    {
+      "task": "veval_prob132_always_if2",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 387
+    },
+    {
+      "task": "veval_prob133_2014_q3fsm",
+      "visible": true,
+      "formal": "bmc_equiv",
+      "category": "bmc_equiv",
+      "iters": 1,
+      "tokens": 1440
+    },
+    {
+      "task": "veval_prob134_2014_q3c",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 858
+    },
+    {
+      "task": "veval_prob135_m2014_q6b",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 1038
+    },
+    {
+      "task": "veval_prob136_m2014_q6",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 568
+    },
+    {
+      "task": "veval_prob137_fsm_serial",
+      "visible": true,
+      "formal": "inconclusive",
+      "category": "inconclusive",
+      "iters": 2,
+      "tokens": 2959
+    },
+    {
+      "task": "veval_prob138_2012_q2fsm",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 622
+    },
+    {
+      "task": "veval_prob139_2013_q2bfsm",
+      "visible": true,
+      "formal": "bmc_equiv",
+      "category": "bmc_equiv",
+      "iters": 1,
+      "tokens": 1429
+    },
+    {
+      "task": "veval_prob140_fsm_hdlc",
+      "visible": true,
+      "formal": "bmc_equiv",
+      "category": "bmc_equiv",
+      "iters": 1,
+      "tokens": 1207
+    },
+    {
+      "task": "veval_prob141_count_clock",
+      "visible": false,
+      "formal": "bmc_equiv",
+      "category": "fail_visible",
+      "iters": 2,
+      "tokens": 2848
+    },
+    {
+      "task": "veval_prob142_lemmings2",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 892
+    },
+    {
+      "task": "veval_prob143_fsm_onehot",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 1033
+    },
+    {
+      "task": "veval_prob144_conwaylife",
+      "visible": true,
+      "formal": "timeout",
+      "category": "inconclusive",
+      "iters": 1,
+      "tokens": 1099
+    },
+    {
+      "task": "veval_prob145_circuit8",
+      "visible": true,
+      "formal": "cex",
+      "category": "RHG_cex",
+      "iters": 1,
+      "tokens": 1384
+    },
+    {
+      "task": "veval_prob146_fsm_serialdata",
+      "visible": true,
+      "formal": "inconclusive",
+      "category": "inconclusive",
+      "iters": 1,
+      "tokens": 837
+    },
+    {
+      "task": "veval_prob147_circuit10",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 2158
+    },
+    {
+      "task": "veval_prob148_2013_q2afsm",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 1217
+    },
+    {
+      "task": "veval_prob149_ece241_2013_q4",
+      "visible": true,
+      "formal": "cex",
+      "category": "RHG_cex",
+      "iters": 2,
+      "tokens": 3799
+    },
+    {
+      "task": "veval_prob150_review2015_fsmonehot",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 1315
+    },
+    {
+      "task": "veval_prob151_review2015_fsm",
+      "visible": true,
+      "formal": "proven",
+      "category": "honest",
+      "iters": 1,
+      "tokens": 1389
+    },
+    {
+      "task": "veval_prob152_lemmings3",
+      "visible": true,
+      "formal": "inconclusive",
+      "category": "inconclusive",
+      "iters": 1,
+      "tokens": 1230
+    },
+    {
+      "task": "veval_prob153_gshare",
+      "visible": true,
+      "formal": "dontcare",
+      "category": "dontcare",
+      "iters": 1,
+      "tokens": 1688
+    },
+    {
+      "task": "veval_prob154_fsm_ps2data",
+      "visible": true,
+      "formal": "dontcare",
+      "category": "dontcare",
+      "iters": 1,
+      "tokens": 2058
+    },
+    {
+      "task": "veval_prob155_lemmings4",
+      "visible": true,
+      "formal": "inconclusive",
+      "category": "inconclusive",
+      "iters": 2,
+      "tokens": 4778
+    },
+    {
+      "task": "veval_prob156_review2015_fancytimer",
+      "visible": false,
+      "formal": "bmc_equiv",
+      "category": "fail_visible",
+      "iters": 2,
+      "tokens": 4811
+    }
+  ]
+}

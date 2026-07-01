@@ -68,15 +68,31 @@ class LLMClient:
                    or os.getenv("OPENAI_API_KEY") or "sk-noauth")
         self.client = OpenAI(base_url=base_url, api_key=api_key)
 
-    def complete(self, system: str, user: str, timeout: int = 180) -> LLMResponse:
-        resp = self.client.chat.completions.create(
-            model=self.model,
-            messages=[
-                {"role": "system", "content": system},
-                {"role": "user", "content": user},
-            ],
-            timeout=timeout,
-        )
+    def complete(self, system: str, user: str, timeout: int = 180,
+                 max_retries: int = 5) -> LLMResponse:
+        """One chat completion, with exponential-backoff retry on transient gateway
+        errors (rate-limit / dropped connection / 5xx). Some routed models — e.g. the
+        9router `cx/gpt-5.5` codex route — silently drop a fraction of calls under a
+        sustained sweep; without retry each drop turns into a spurious visible-fail
+        (empty candidate), corrupting the sweep. Backoff lets the rate window refill."""
+        import time
+
+        resp = None
+        for attempt in range(max_retries):
+            try:
+                resp = self.client.chat.completions.create(
+                    model=self.model,
+                    messages=[
+                        {"role": "system", "content": system},
+                        {"role": "user", "content": user},
+                    ],
+                    timeout=timeout,
+                )
+                break
+            except Exception:  # noqa: BLE001 — transient gateway error; back off and retry
+                if attempt == max_retries - 1:
+                    raise
+                time.sleep(min(2 ** attempt, 30))  # 1, 2, 4, 8, 16 s
         usage = resp.usage
         cached = 0
         details = getattr(usage, "prompt_tokens_details", None)

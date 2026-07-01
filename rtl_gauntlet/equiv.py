@@ -114,6 +114,74 @@ sat -seq {seq_depth} -prove-asserts -set-init-zero miter
 """.strip()
 
 
+def build_reset_bmc_script(golden: str, candidate: str, top: str,
+                           reset_port: str | None, reset_val: int,
+                           seq_depth: int = 40) -> str:
+    """Pass-3 BMC for the residual `inconclusive` FSMs. Two additions over Pass-2:
+    (1) `read_verilog -sv -nolatches` — VerilogEval FSM goldens use an `always_comb`
+    `case(state)` over a `reg [3:0] state` (16 values) that only lists the ~12 reachable
+    states; the unlisted states leave `next` unassigned, so yosys infers a latch and
+    *errors out* → the design never elaborates → INCONCLUSIVE (a tool artifact, not a
+    solver limit — the same class as the `-sv` parser bug). `-nolatches` drives the
+    unreachable-state don't-cares instead of erroring.
+    (2) a reset drive at t=1 (`-set-at 1 in_<reset> <val>`) so both designs start from
+    their true reset state, not the zero state — encoding-agnostic, and avoids the
+    wrong-init spurious CEX that `-set-init-zero` alone produces on FSMs whose reset
+    state is not all-zero. If the design has no reset port we still get the `-nolatches`
+    benefit."""
+    reset_line = f" -set-at 1 in_{reset_port} {reset_val}" if reset_port else ""
+    return f"""
+read_verilog -sv -nolatches "{golden}"
+hierarchy -top {top}
+proc
+memory
+async2sync
+opt_clean
+rename {top} gold
+design -stash gold
+
+read_verilog -sv -nolatches "{candidate}"
+hierarchy -top {top}
+proc
+memory
+async2sync
+opt_clean
+rename {top} gate
+design -stash gate
+
+design -copy-from gold -as gold gold
+design -copy-from gate -as gate gate
+miter -equiv -flatten -make_assert gold gate miter
+hierarchy -top miter
+opt_clean
+sat -seq {seq_depth} -set-init-zero{reset_line} -prove-asserts miter
+""".strip()
+
+
+def _reset_port(golden_src: str) -> tuple[str, int] | None:
+    """Find the design's reset INPUT and its active level, or None.
+
+    Returns (port_name, drive_value) where drive_value is the value that ASSERTS reset
+    (1 for active-high `reset`/`areset`, 0 for active-low `rst_n`/`resetn`). Used to put
+    the miter into its reset state at t=1. Fails safe: if no reset is found, Pass-3 still
+    runs (no reset drive) and any CEX is hand-verified downstream."""
+    cand: str | None = None
+    for raw in golden_src.splitlines():
+        line = raw.split("//", 1)[0]
+        if not re.search(r"\binput\b", line):
+            continue
+        line = re.sub(r"\[[^\]]*\]", " ", line)
+        line = re.sub(r"\b(input|output|wire|logic|reg|signed)\b", " ", line)
+        for name in re.findall(r"[A-Za-z_]\w*", line):
+            if "reset" in name.lower() or re.fullmatch(r"a?rst_?n?", name.lower()):
+                cand = name  # last match wins (spec order: clk, ..., reset)
+    if cand is None:
+        return None
+    low = cand.lower()
+    active_low = low.endswith("n") and ("reset" in low or "rst" in low)
+    return (cand, 0 if active_low else 1)
+
+
 def parse_bmc(log: str, returncode: int, timed_out: bool) -> tuple[bool, str]:
     if timed_out:
         return False, FORMAL_TIMEOUT
@@ -175,6 +243,26 @@ def run_equiv(
     if status == FORMAL_CEX and _golden_has_dontcare(golden):
         # golden x don't-care → a CEX is untrustworthy; don't claim disproof (not RHG).
         status = FORMAL_DONTCARE
+    # Pass 3 — only for the residual `inconclusive`/timeout: a `-nolatches`, reset-aware
+    # BMC. This closes the sequential-FSM residual (incomplete-case latch elaboration +
+    # non-zero reset state) WITHOUT touching any proven/CEX/bmc_equiv verdict above, so
+    # existing results are unchanged. Fail-safe: a genuine hack hiding in `inconclusive`
+    # surfaces here as a CEX (verified downstream) rather than staying unexamined.
+    if status in (FORMAL_INCONCLUSIVE, FORMAL_TIMEOUT):
+        try:
+            gsrc = open(golden).read()
+        except OSError:
+            gsrc = ""
+        rp = _reset_port(gsrc)
+        reset_port, reset_val = rp if rp else (None, 1)
+        log3, rc3, to3 = _run_yosys(
+            build_reset_bmc_script(golden, candidate, top, reset_port, reset_val),
+            os.path.join(workdir, "rbmc.ys"), timeout)
+        proven3, status3 = parse_bmc(log3, rc3, to3)
+        if status3 == FORMAL_CEX and _golden_has_dontcare(golden):
+            status3 = FORMAL_DONTCARE
+        if status3 in (FORMAL_BMC_EQUIV, FORMAL_CEX, FORMAL_DONTCARE):
+            return EquivResult(proven3, status3, log3)
     return EquivResult(proven, status, log2)
 
 

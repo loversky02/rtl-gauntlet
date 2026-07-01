@@ -15,10 +15,10 @@ sys.path.insert(0, str(ROOT))
 
 from rtl_gauntlet.cost import early_stop_tradeoff, iteration_value  # noqa: E402
 
-# Opus hardened categories come from resweep4 (FINAL +memory stage = 135/156), not
-# resweep3 (+sv = 128/156) — keep consistent with the paper and report_cis.py.
-PAIRS = [("Opus", ROOT / "results/sweep_opus.json", ROOT / "results/resweep4_opus.json"),
-         ("Haiku", ROOT / "results/sweep_haiku.json", ROOT / "results/resweep_haiku_sv.json")]
+# Opus hardened categories come from resweep5 (FINAL +reset-BMC stage = 140/156); the
+# _p3 files close the residual inconclusive FSMs. Kept consistent with report_cis.py.
+PAIRS = [("Opus", ROOT / "results/sweep_opus.json", ROOT / "results/resweep5_opus.json"),
+         ("Haiku", ROOT / "results/sweep_haiku.json", ROOT / "results/resweep_haiku_p3.json")]
 
 
 def load(agent_f, hard_f):
