@@ -347,12 +347,13 @@ rather than universal---a caveat the post-hoc number hides.
 \end{figure}
 
 \paragraph{Latency (C3).} A surrogate pipeline verified offline (mock $315$ designs $\to$ holdout
-Pearson $r=0.89/0.91/0.96$ for area/power/timing) and, via a containerized OpenLane flow (the
-OpenLane image as runtime $\to$ native \code{openlane}, no Docker-in-Docker), produced real Sky130
-metrics: \code{counter8} (seq) $495.5\,\mu m^2$ / $0.120$ mW / worst-slack $\approx\!-5.5$ ns;
-\code{popcount8} (comb) $247.7\,\mu m^2$ / $0.051$ mW / $-1.6$ ns (slacks \emph{negative}: the default
-clock is not met---C3 is a pre-signoff \emph{relative} prototype, not closed timing). (The deploy
-gotcha was a config file at the repo root, not OpenLane.)
+Pearson $r=0.89/0.91/0.96$), plus a real containerized OpenLane flow (the OpenLane 2 image as runtime
+$\to$ native \code{openlane}, no Docker-in-Docker) over a \textbf{size-graded} set---\code{counter8},
+\code{popcount8}, \code{spm}, and \code{picorv32} (a real RISC-V core)---under \textbf{two synthesis
+strategies} (\code{AREA} vs \code{DELAY}). Real Sky130 area spans $\sim\!500\,\mu m^2$ (counter8) to
+$\sim\!113{,}000\,\mu m^2$ (picorv32), and the design ranking is \textbf{fully stable across the two
+flows}: Kendall-$\tau=1.0$ for area, power, \emph{and} slack---so the latency comparison is not a
+synthesis-flow artifact. Slacks are pre-signoff \emph{relative} (open Sky130, not foundry signoff).
 
 \section{Findings}
 \begin{enumerate}[leftmargin=*,topsep=2pt,itemsep=1pt]
@@ -387,9 +388,9 @@ Sky130/OpenROAD is pre-signoff, not foundry signoff, and rankings can flip acros
 we therefore frame PPA as a \emph{relative} comparison under identical settings (per TuRTLe) and
 note larger designs $+$ a commercial flow as the path to signoff-grade claims. The open flow inflates
 area/power by ${\sim}1.2$--$1.5\times$ vs.\ a commercial signoff stack~\cite{edahep} and ranking
-inversions are real (RTL-OPT~\cite{rtlopt}); the planned mitigation is to check \emph{rank
-stability across $\ge\!2$ synthesis strategies} (Kendall-$\tau$) and to expand C3 from the two current
-toy designs to a size-graded set (\code{spm}, AES, picorv32, ibex). \emph{Nondeterminism}:
+inversions are a known risk (RTL-OPT~\cite{rtlopt}); we therefore check \emph{rank stability across two
+synthesis strategies} on the size-graded set (\S\ref{sec:exp})---Kendall-$\tau=1.0$ for area/power/slack,
+so the ranking does \emph{not} invert here. \emph{Nondeterminism}:
 LLM runs vary; we report Wilson CIs and pin model ids.
 
 \section{Limitations and Future Work}\label{sec:limits}
@@ -402,10 +403,10 @@ GRPO on a visible-test reward, audited each step by the hidden$+$formal oracle,
 $\rhg(t)=\mathrm{visible}(t)-\mathrm{formal}(t)$); the full Qwen3-4B run needs an SFT cold-start (else
 the sparse reward collapses to zero advantage~\cite{dapo}) $+$ vLLM rollouts, so it is a \emph{separate
 GPU study}. RTL is the one domain where this step-wise audit is \emph{exhaustive}.
-\item \textbf{PPA at toy scale.} C3 is a working prototype---real Sky130 PPA $+$ a surrogate
-($r=0.89/0.91/0.96$)---but only on \code{counter8}/\code{popcount8}. Scaling to larger IP
-(\code{spm}, AES, picorv32, ibex), with rank-stability (Kendall-$\tau$) across $\ge\!2$ synthesis flows
-to guard against the known ranking inversions~\cite{rtlopt,edahep}, is future work.
+\item \textbf{PPA is pre-signoff.} C3 now spans a size-graded set (\code{counter8}$\to$\code{popcount8}
+$\to$\code{spm}$\to$\code{picorv32}) with real Sky130 PPA and Kendall-$\tau=1.0$ rank stability across
+two synthesis strategies. The remaining gap is a \emph{commercial signoff} stack (open Sky130 inflates
+PPA ${\sim}1.2$--$1.5\times$~\cite{edahep}) and a full agent-loop under the trained surrogate.
 \item \textbf{Contamination probe not yet exhaustive.} We mitigate at identifier and semantic level
 (\S\ref{sec:exp}) with a $\le\!7.2\%$ upper bound, but a full meaning-preserving re-mutation of all
 $156$ tasks plus membership inference (Min-K\%~\cite{minkprob}; NLL$\leftrightarrow$degradation
