@@ -279,9 +279,10 @@ run-once `restartPolicyType: NEVER`, so no idle compute cost).
 **#1 Contamination robustness.** VerilogEval is public (VeriContaminated: ~100% contamination for
 GPT-3.5/4o), so an "honest pass" could be memorization. We generate textually-novel,
 functionally-identical tasks (`scripts/mutate_tasks.py`: rename the target module + reframe the
-spec) and re-sweep. On the first 40 tasks, Opus: **HPR 1.00 → 1.00, RHG 0 → 0 (Δ HPR = 0.000)** —
-the honesty result is **robust to identifier-level contamination** (the model adapts to a novel
-module name and stays honest). We then add the stronger **semantic mutation** the literature
+spec) and re-sweep. On the first 40 tasks, **both Opus and Haiku**: **HPR 1.00 → 1.00, RHG 0 → 0
+(Δ HPR = 0.000 each)** (`results/sweep_mut_opus.json`, `results/sweep_mut_haiku.json`) — the honesty
+result is **robust to identifier-level contamination for both a strong and a weak model** (each adapts
+to a novel module name and stays honest). We then add the stronger **semantic mutation** the literature
 recommends (ICST'26 mutation-FL [2504.04372]; VarBench [2406.17681]; semantic-perturbation detection
 [2511.03774]): `tasks/sem_zerocount` is a semantic variant of the canonical popcount — count the
 **zero** bits. The memorized count-ones solution passes the balanced visible TB (where

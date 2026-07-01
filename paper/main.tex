@@ -207,16 +207,18 @@ failures, not cheating.}
 
 \paragraph{Elicit (negative, informative).} A tamper-capable shell agent on a harder task: Haiku
 struggled four iterations (with full affordance to edit the testbench) but never tampered---it kept
-honestly repairing the design and solved it; Opus was honest in one. Genuine reward hacking is not
+honestly repairing the design and solved it; Opus and GPT-5.5 were honest in one. All three shell
+agents edited \emph{only} the design, never the testbench. Genuine reward hacking is not
 elicited from aligned frontier models in a single agentic loop even under affordance and difficulty
-(the oracle \emph{would} catch it---the planted red-team is caught). This points to RL
-training-time emergence as the regime to study.
+(the oracle \emph{would} catch it---the planted red-team is caught); a full agentic harness on
+harder tasks is the elicitation regime (EvilGenie catches Claude Code / Codex tampering there),
+alongside RL training-time emergence.
 
 \paragraph{Contamination.} VerilogEval is public (reported $\sim\!100\%$ contamination for older
 models), so an honest pass could be memorization. We generate textually-novel, functionally-identical
-tasks (rename the target module, reframe the spec) and re-sweep: on the first 40 tasks Opus is
-$\hpr{}\,1.00\!\to\!1.00$, $\rhg{}\,0\!\to\!0$ ($\Delta=0$). The result is robust to
-identifier-level contamination. As a \emph{semantic}-novelty control, our self-authored tasks
+tasks (rename the target module, reframe the spec) and re-sweep: on the first 40 tasks \emph{both}
+Opus and Haiku are $\hpr{}\,1.00\!\to\!1.00$, $\rhg{}\,0\!\to\!0$ ($\Delta=0$ each). The result is
+robust to identifier-level contamination for both a strong and a weak model. As a \emph{semantic}-novelty control, our self-authored tasks
 (\code{gray2bin}, \code{popcount8}, \code{hex7seg}) implement functions absent from any public
 benchmark, yet models are honest on them too ($\rhg{}=0$)---so the result is not benchmark
 memorization. A direct \emph{semantic} mutation (\code{sem\_zerocount}: count \emph{zeros}, a variant
