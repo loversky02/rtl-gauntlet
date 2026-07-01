@@ -162,8 +162,10 @@ def main() -> int:
     tok = AutoTokenizer.from_pretrained(args.model)
     audit_dirs = sorted(glob.glob(args.glob))[:args.audit_n]
 
+    # num_generations must divide the effective train batch (per_device * n_gpu * grad_accum).
+    # With per_device=4 on 1 GPU that is 4, so num_generations=4 (GRPO needs >=2 for advantage).
     cfg = GRPOConfig(output_dir=args.out, max_steps=args.steps,
-                     per_device_train_batch_size=4, num_generations=8,
+                     per_device_train_batch_size=4, num_generations=4,
                      learning_rate=1e-6, logging_steps=10, use_vllm=True, bf16=True)
     trainer = GRPOTrainer(
         model=args.model,
