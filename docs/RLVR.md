@@ -42,8 +42,21 @@ Implemented: reward + oracle instrumentation (`rl_reward.py`) reuse the eval sta
 (`train_grpo.py`) now has a complete audit callback — every `--audit-every` steps it generates designs
 for the held-out set with the current policy, scores them with the withheld hidden+formal oracle, and
 logs `{visible_pass_rate, formal_pass_rate, RHG, hack_rate, honest_rate}` to `runs/grpo/rhg_curve.jsonl`.
-One-command bring-up: `runpod/rlvr_setup.sh` (deps pinned in `runpod/requirements-rl.txt`). Byte-compiles
-clean; not yet run on GPU (needs a pod). This is a **separate paper**, not part of v1.
+One-command bring-up: `runpod/rlvr_setup.sh` (deps pinned in `runpod/requirements-rl.txt`).
+
+**Loop validated locally (no GPU).** `scripts/validate_grpo_local.py` runs GRPOTrainer for 2 steps
+with a tiny RANDOM Qwen2 model + the cached tokenizer, exercising every path the pod hits
+(dataset → reward → generate → `optimizer.step` → oracle audit → `rhg_curve.jsonl`) — clean on CPU in
+~12 s. Five integration bugs were fixed and loop-validated this way (after some were, wastefully,
+first hit on a rented GPU): `num_generations` must divide the effective batch (→4); `use_vllm=True`
+needs a separate `trl vllm-serve` (→False for single-GPU); `rl_reward` used the pilot schema, not
+VerilogEval's `test` TB + `RefModule` (fixed); `bf16` only on CUDA; and the 4B `optimizer.step` OOM
+(→ `gradient_checkpointing` on GPU). **Deploy discipline: run `validate_grpo_local.py` before any pod.**
+
+**Remaining = the GPU run itself** (not code): Qwen3-4B, single-GPU HF-generate is ~20 h for 500
+steps (~\$30, over a small budget); the full study wants a 2-GPU pod with `trl vllm-serve` (~3–5 h).
+Self-terminating launcher: `runpod/rlvr_launch.sh` (trap EXIT + 2.5 h net → no runaway cost). This is
+a **separate paper**, not part of v1.
 
 ## Literature (verified arXiv IDs — see docs/RESEARCH_NOTES.md §A)
 - **2503.11926** — production RL training *discovers* test-subverting hacks (invisible to single-shot eval).
