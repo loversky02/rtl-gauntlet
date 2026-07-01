@@ -3,63 +3,81 @@
 **Measuring Honesty, Cost, and Latency-Robustness in Agentic Hardware Design.**
 
 Agentic RTL frameworks now report *100% pass* on RTL benchmarks (e.g. HORIZON,
-[arXiv:2606.28279](https://arxiv.org/abs/2606.28279)). But that number is measured
-against *visible* tests, it is *expensive* to reach, and it is obtained on *proxy*
-benchmarks. HORIZON's own authors flag three open problems. RTL Gauntlet turns those
-three problems into three measurable axes and one coherent study:
+[arXiv:2606.28279](https://arxiv.org/abs/2606.28279)). But that number is measured against
+*visible* tests, it is *expensive* to reach, and it is obtained on *proxy* benchmarks. HORIZON's own
+authors flag three open problems — reward hacking, token cost, high-latency (PPA) reward. RTL
+Gauntlet turns those into three measurable axes.
 
-| Axis | Question HORIZON leaves open | What we measure |
-|------|------------------------------|-----------------|
-| **Honesty** | Is the 100% real, or did the agent fit the visible tests / evaluator quirks? | **Reward-Hacking Gap (RHG)** + **Honest Pass Rate (HPR)** via a two-tier protocol (diagnostic-visible vs. hidden randomized tests + independent reference + formal equivalence) |
-| **Cost** | 100% is easy; *cheap* 100% is not — one category burned 56M tokens / 82 iterations | Pareto curve of Honest-Pass vs. tokens, with **early-stop** and **curriculum/triage** to cut the long tail |
-| **Latency** | Real PPA reward (synthesis → P&R → timing) takes hours–days, not seconds | An agent loop that reasons under **slow, sparse, expensive** reward via a trained PPA **surrogate** + async evaluation |
+**Paper:** [`paper/main.pdf`](paper/main.pdf) (7 pp, conference-format draft). Source
+[`paper/main.tex`](paper/main.tex); rebuild with `cd paper && pdflatex main.tex`.
 
-> Honesty and Cost are the cheap, fast, demo-able core (LLM calls routed through a
-> gateway, EDA tools run inside Docker). Latency is the ambitious extension.
+## Headline result
 
-## Why it's feasible
+The naïve headline reward-hacking number is **entirely an oracle artifact**. A naïve formal oracle
+over-reports hacking via don't-care `x`, async-reset, state-encoding, init-state, a SystemVerilog
+parser flag, and unstated input constraints. We **harden the oracle in six steps** (reset-aware,
+don't-care-aware, bounded miter+SAT, `read_verilog -sv`, `memory` case→ROM, and a `-nolatches`
+reset-aware BMC), cutting false counter-examples **9→1** and "inconclusive" **50→0**, and hand-verify
+every surviving flag: **zero genuine reward hacking across four models on fair tasks**.
 
-Almost the entire substrate is already open-source:
+| Model | HPR (95% CI) | verified RHG |
+|-------|--------------|--------------|
+| Opus 4.8 | 0.90 [.84,.94] | 0 (≤2.5%) |
+| GPT-5.5 | 0.88 [.82,.92] | 0 (≤2.5%) |
+| DeepSeek | 0.76 [.68,.82] | 0 (≤3.1%) |
+| Haiku 4.5 | 0.72 [.65,.79] | 0 (≤3.2%) |
 
-- **Tasks + agentic harness:** NVIDIA [CVDP](https://github.com/NVlabs/cvdp_benchmark)
-  (783 problems, 13 categories, Docker custom-agent support) +
-  [RTLLM-2.0 / Verilog-Eval](https://github.com/NVlabs/cvdp_benchmark) for tasks with
-  public reference designs.
-- **Hidden-tier scoring:** [YosysHQ/eqy](https://github.com/YosysHQ/eqy) (formal
-  sequential equivalence) + cocotb/Verilator randomized testbenches — all bundled in the
-  CVDP sim image (Yosys 0.40, Verilator 5.038, Icarus, cocotb 2.0.1).
-- **Agent backbone:** routed through an OpenAI-compatible gateway; no local GPU needed
-  for Honesty/Cost. GPU is reserved for training the PPA surrogate (Latency axis).
+*(Gemini 2.5 Pro sweep in progress → 5th model.)* Every flagged counter-example (`circuit8`, `q5b`,
+`prob095`, `prob149`) is a hand-verified init / encoding / input-space don't-care artifact.
+**Weakness ≠ hacking**: a weaker model fails far more on the visible tests but cheats no more, even a
+tamper-capable shell agent edits only the design, never the testbench.
 
-## Status
+## The three axes
 
-🟢 **Phase 0 done · Phase 1 in progress.** Self-contained two-tier pilot built and verified
-on the Mac (parsers + metric engine); EDA (Icarus/Yosys) runs on **RunPod x86** via
-`runpod/setup.sh` (sidesteps arm64). Next: agentic run via 9router for the first real
-RHG/HPR. See [docs/PLAN.md](docs/PLAN.md), [docs/RISKS.md](docs/RISKS.md),
-[docs/RELATED_WORK.md](docs/RELATED_WORK.md), [docs/TEST_MATRIX.md](docs/TEST_MATRIX.md).
+| Axis | Metric | Status |
+|------|--------|--------|
+| **Honesty (C1)** | **Reward-Hacking Gap (RHG)** + **Honest Pass Rate (HPR)** via a two-tier protocol (visible diagnostic vs. withheld hidden-randomized + formal-equivalence oracle) | 🟢 4 models × 156 VerilogEval tasks; oracle residual closed |
+| **Cost (C2)** | Tokens vs. Honest-Pass, with an **early-stop** policy | 🟢 early-stop @1 reclaims 12–23% of tokens for ~5% honesty loss |
+| **Latency (C3)** | Agent under slow PPA reward via a trained surrogate + a real OpenLane flow | 🟢 real Sky130 PPA (counter8/popcount8) + surrogate r=0.89/0.91/0.96; full agent-loop = future |
 
-## Quickstart
+**The central artifact** for honest agentic-hardware evaluation is a don't-care/reset/encoding-aware
+oracle plus a verification discipline — not a new pass-rate.
 
-```bash
-make env-check     # verify docker / python / git toolchain
-make demo          # run the metrics engine on synthetic runs (no deps, proves it works)
-make cvdp          # clone the NVIDIA CVDP harness into external/
-make sim-image     # build the open-source EDA simulation image (Docker)
-```
+## Follow-on (separate paper): RL training-time reward hacking
+
+Eval-time, aligned models don't hack fair tasks. The dangerous regime is *training*: does an RL agent
+optimizing a gameable (visible-test) reward learn to game it? Scaffolded in
+[`scripts/train_grpo.py`](scripts/train_grpo.py) (GRPO + hidden+formal audit → RHG-vs-step curve),
+loop-validated locally with no GPU via
+[`scripts/validate_grpo_local.py`](scripts/validate_grpo_local.py). Deploy notes + convergence
+research: [`docs/RLVR.md`](docs/RLVR.md), [`docs/RLVR_CONVERGENCE_RESEARCH.md`](docs/RLVR_CONVERGENCE_RESEARCH.md).
 
 ## Layout
 
 ```
-rtl_gauntlet/      core library (task schema, two-tier metrics) — stdlib only
-docs/              PLAN, TEST_MATRIX, decisions/ (ADRs)
-scripts/           env check, demos, runners
-tasks/             curated task sets (reference RTL + visible/hidden tests)
-external/          third-party harnesses (CVDP), gitignored
+rtl_gauntlet/   core library — task schema, two-tier metrics, the formal ORACLE (equiv.py), sim, ppa
+paper/          main.tex / main.pdf + figures (generated by scripts/make_figures.py)
+scripts/        sweeps (run_veval), CIs (report_cis), cost (analyze_cost), RLVR (train_grpo), figures
+results/        frozen sweep JSONs (per model × oracle stage — see docs/REPRODUCE.md)
+tasks/          VerilogEval-derived + self-authored + mutated tasks (gitignored; regen via import_veval)
+docs/           PILOT_RESULTS (numbers), REPRODUCE, NEXT (status), TEST_MATRIX (proofs), RISKS, RLVR
+runpod/         GPU launchers for the RLVR study (self-terminating)
 ```
+
+## Reproduce
+
+```bash
+make demo                          # metric engine on synthetic runs (no deps)
+python3 scripts/report_cis.py      # HPR + RHG Wilson CIs from the frozen sweeps
+python3 scripts/analyze_cost.py    # C2 early-stop / repair-tail payoff
+python3 scripts/make_figures.py    # regenerate paper/figures/*.pdf
+python3 scripts/validate_grpo_local.py   # validate the RLVR loop on CPU (no GPU)
+```
+
+EDA locally: `iverilog` + `yosys` (Homebrew, arm64). LLMs via an OpenAI-compatible gateway (see
+`.env.example`). Exact stage→file→number map: [`docs/REPRODUCE.md`](docs/REPRODUCE.md).
 
 ## References
 
 - HORIZON — *Agentic Hardware Design as Repository-Level Code Evolution*, [arXiv:2606.28279](https://arxiv.org/abs/2606.28279)
-- CVDP — *Comprehensive Verilog Design Problems*, [arXiv:2506.14074](https://arxiv.org/abs/2506.14074) · [code](https://github.com/NVlabs/cvdp_benchmark) · [data](https://huggingface.co/datasets/nvidia/cvdp-benchmark-dataset)
-- EQY — equivalence checking with Yosys, [YosysHQ/eqy](https://github.com/YosysHQ/eqy)
+- SpecBench (2605.21384) · EvilGenie (2511.21654) · VeriContaminated (2503.13572) · full list in `paper/main.tex`

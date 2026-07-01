@@ -34,3 +34,4 @@ tasks/mut_*/
 
 # OS
 .DS_Store
+.env.gemini

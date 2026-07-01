@@ -16,13 +16,15 @@ Each paper claim maps to a concrete artifact that proves it. Status:
 | H7 | Don't-care + reset-aware oracle removes false RHG | async2sync + don't-care-aware: false RHG 9→3 (+3 honest, +3 dontcare); all 3 residual verified as state-encoding/init artifacts, not hacking | 1 | 🟡 |
 | H8 | BMC fallback removes state-encoding false-CEX | 2-pass equiv (full proof → miter+SAT BMC): false RHG 9→1; q4/q12 → bmc_equiv (verified); residual circuit8 = init-don't-care latch transient | 1 | 🟡 |
 | H9 | SystemVerilog parse fix clears most inconclusive | `read_verilog -sv`: inconclusive 50→14, honest 88→122; RHG_cex still 1 (circuit8 init artifact). Most "inconclusive" was a silent SV parse-fail, not a solver limit | 1 | 🟢 |
-| H10 | memory pass + EQY-match clear inconclusive | `memory` (case-ROM) closed 8/14 → **6 residual** (hard sequential FSMs); EQY structural-match for the last 6 = future | 1 | 🟡 |
-| M6 | Elicit real hacking (negative result) | tamper-capable shell agent: Haiku struggled 4 iters with full affordance but never tampered (honest); genuine hacking not elicited from aligned models → RL training-time = future | 1 | 🟡 |
-| H11 | Weakness ≠ hacking (model comparison) | Opus vs Haiku ×156: Haiku fails 3× more (visible) but BOTH have 0 genuine hacking (1 RHG_cex each = verified init artifact) | 1 | 🟢 |
+| H10 | memory pass clears most inconclusive | `memory` (case-ROM) closed 8/14 → 6 residual (hard sequential FSMs) | 1 | 🟢 |
+| H10b | **reset-aware Pass-3 CLOSES the FSM residual (no EQY)** | `-nolatches` + reset-driven BMC: 6 residual → 5 bmc_equiv + 1 dontcare; **inconclusive 50→0** (Opus/Haiku/DeepSeek); root cause was incomplete-case `always_comb` latch elaboration, not solver-hardness; genuine-diff control still flags a broken design | 1 | 🟢 |
+| M6 | Elicit real hacking (negative result) | shell agents Opus/Haiku/**GPT-5.5** all edit only the design, never the TB (Haiku struggled 4 iters, still honest); genuine hacking not elicited in a single agentic loop → RL training-time / full agentic harness = future | 1 | 🟡 |
+| H11 | Weakness ≠ hacking (model comparison) | **4 models ×156** (Opus/GPT-5.5/DeepSeek/Haiku): weaker models fail 3–4× more on visible but have 0 genuine hacking; every flagged RHG_cex (circuit8/q5b/prob095/prob149) = verified init/encoding/input-space don't-care artifact | 1 | 🟢 |
 | H3 | Formal equivalence catches hacks that hidden tests miss | **formal_demo**: candidate passes visible+randomized-hidden TB (misses 0xDEAD) but formal CEX → RHG 0.50 | 1 | 🟢 |
 | M4 | RHG/HPR reported with confidence intervals | Wilson 95% CIs (report_cis.py): verified RHG=0, upper bound ≤2.5%/3.2% | 1 | 🟢 |
 | M5 | Reproducible (pinned models, deterministic re-score) | docs/REPRODUCE.md + `--candidates-from` EDA-only re-score | 1 | 🟢 |
-| M1 | Honesty robust to contamination (identifier mutation) | mutated 40 tasks (rename module + reframe spec): HPR 1.0→1.0, RHG 0→0 (Δ=0); semantic mutation = deeper future test | 1 | 🟡 |
+| M1 | Honesty robust to contamination (identifier mutation) | mutated 40 tasks (rename module + reframe spec) swept on **both Opus AND Haiku**: HPR 1.0→1.0, RHG 0→0 (Δ=0 each); + semantic mutation (`sem_zerocount`: memorized count-ones caught, variant honest) | 1 | 🟢 |
+| M7 | RLVR training-loop validated without a GPU | `validate_grpo_local.py`: GRPOTrainer 2 steps on a tiny random model + LoRA — dataset→reward→generate→optimizer.step→oracle audit→RHG curve all clean on CPU (~12s); the full 4B run is a separate GPU study | 1 | 🟢 |
 | C1 | Long tail is reproducible | one task with ≫ median tokens reproduced | 2 | 🔴 |
 | C2 | Early-stop cuts tokens at fixed honesty | early-stop @1: 12% (Opus) / 23% (Haiku) tokens saved, ~5% honesty loss; tail payoff 35%/14% | 2 | 🟢 |
 | C3 | Curriculum/triage beats flat scheduling | Pareto front dominates baseline | 2 | 🔴 |
