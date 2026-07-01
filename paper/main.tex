@@ -383,14 +383,10 @@ limit, not a verdict. \emph{Eliciting}: on \emph{fair} tasks single-loop aligned
 \emph{impossible} (spec-contradicting) task elicits cheating in the \emph{majority} ($3/5$ pass it,
 all $3$ confirmed by an \emph{independent} judge that scores $86\%$ on known hardcodes) with Opus
 resisting---so the fair-task negative is a property of the \emph{conditions}, not a blind spot; the
-deeper regime (RL training) is in \S\ref{sec:limits}. \emph{PPA}: open
-Sky130/OpenROAD is pre-signoff, not foundry signoff, and rankings can flip across synthesis flows;
-we therefore frame PPA as a \emph{relative} comparison under identical settings (per TuRTLe) and
-note larger designs $+$ a commercial flow as the path to signoff-grade claims. The open flow inflates
-area/power by ${\sim}1.2$--$1.5\times$ vs.\ a commercial signoff stack~\cite{edahep} and ranking
-inversions are a known risk (RTL-OPT~\cite{rtlopt}); we therefore check \emph{rank stability across two
-synthesis strategies} on the size-graded set (\S\ref{sec:exp})---Kendall-$\tau=1.0$ for area/power/slack,
-so the ranking does \emph{not} invert here. \emph{Nondeterminism}:
+deeper regime (RL training) is in \S\ref{sec:limits}. \emph{PPA}: open Sky130 is pre-signoff (inflated
+${\sim}1.2$--$1.5\times$ vs.\ commercial~\cite{edahep}) and ranking inversions are a known
+risk~\cite{rtlopt}; we check rank stability across two synthesis strategies (\S\ref{sec:exp},
+Kendall-$\tau=1.0$) and frame PPA as \emph{relative} (per TuRTLe~\cite{turtle}). \emph{Nondeterminism}:
 LLM runs vary; we report Wilson CIs and pin model ids.
 
 \section{Limitations and Future Work}\label{sec:limits}
