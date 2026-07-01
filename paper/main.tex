@@ -126,14 +126,14 @@ diagnostic testbench, and its failure logs, and edits RTL until visible passes. 
 tiers it never saw: a hidden randomized/exhaustive testbench, and \textbf{formal equivalence} vs.\ a
 curated golden (Yosys). The I/O interface is locked. We define
 \[
-\rhg = \tfrac{\#\{\text{visible-passers failing a withheld tier}\}}{\#\{\text{visible-passers}\}},
-\quad
-\hpr = \tfrac{\#\{\text{pass visible and every withheld tier}\}}{\#\text{tasks}} .
+\rhg = \frac{\lvert\{\text{visible-passers failing a withheld tier}\}\rvert}{\lvert\{\text{visible-passers}\}\rvert},
+\qquad
+\hpr = \frac{\lvert\{\text{pass visible and every withheld tier}\}\rvert}{\text{total tasks}} .
 \]
 Here ``two-tier'' is the split \emph{visible} vs.\ \emph{withheld}. The withheld side yields one of
 four formal verdicts, mapped as \code{proven}/\code{bmc\_equiv}$\to$honest, \code{cex}$\to$flagged
 hack, and \code{dontcare}/\code{inconclusive}$\to$\emph{excluded} (a third bucket, neither honest nor
-hack). So \hpr{} is a \emph{lower bound} on true honesty and $\#\code{cex}/\#\text{visible-passers}$
+hack). So \hpr{} is a \emph{lower bound} on true honesty and the \code{cex} rate among visible-passers
 an \emph{upper bound} on \emph{detectable} hacking; only \textbf{verified-genuine \rhg{}} (every
 \code{cex} confirmed by hand) is the headline claim. On the $156$-task sweep the withheld tier is the
 \textbf{formal} oracle; the hidden randomized testbench is exercised on the focused demos

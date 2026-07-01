@@ -25,10 +25,13 @@ def fig_progression():
     ax.plot(stages, false_cex, "o-", color="#c0392b", label="false CEX")
     ax.plot(stages, inconclusive, "s-", color="#e67e22", label="inconclusive")
     ax.plot(stages, honest, "^-", color="#27ae60", label="honest (incl. bmc)")
-    for x, y in enumerate(false_cex):
-        ax.annotate(str(y), (x, y), textcoords="offset points", xytext=(0, 6), ha="center", fontsize=9)
-    for x, y in enumerate(inconclusive):
-        ax.annotate(str(y), (x, y), textcoords="offset points", xytext=(0, 6), ha="center", fontsize=9)
+    for x, y in enumerate(false_cex):        # below the red line
+        ax.annotate(str(y), (x, y), textcoords="offset points", xytext=(0, -15),
+                    ha="center", fontsize=9, color="#c0392b")
+    for x, y in enumerate(inconclusive):     # above the orange line
+        ax.annotate(str(y), (x, y), textcoords="offset points", xytext=(0, 8),
+                    ha="center", fontsize=9, color="#e67e22")
+    ax.set_ylim(-12, 158)
     ax.set_ylabel("# of 156 tasks (Opus 4.8)")
     ax.set_title("Oracle hardening: artifacts fall, honest pass rises")
     ax.legend(loc="center right")
@@ -56,7 +59,7 @@ def fig_models():
     ax.set_xticklabels(cats, rotation=20, ha="right")
     ax.set_ylabel("# of 156 tasks")
     ax.set_title("Weakness ≠ hacking (5 models): more visible-fails, every RHG_cex a verified artifact")
-    ax.legend()
+    ax.legend(loc="upper right", fontsize=8, ncol=2)
     ax.grid(True, axis="y", alpha=0.3)
     fig.savefig(f"{OUT}/models.pdf")
     plt.close(fig)
@@ -74,8 +77,9 @@ def fig_cost():
     ax.set_xticks(list(x))
     ax.set_xticklabels(models)
     ax.set_ylabel("%")
+    ax.set_ylim(0, 58)
     ax.set_title("Cost: the repair tail is mostly wasted (~5% honesty lost)")
-    ax.legend()
+    ax.legend(loc="upper right", fontsize=9)
     ax.grid(True, axis="y", alpha=0.3)
     fig.savefig(f"{OUT}/cost.pdf")
     plt.close(fig)
