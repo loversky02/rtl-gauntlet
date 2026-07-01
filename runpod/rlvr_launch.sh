@@ -41,32 +41,33 @@ job() {
   python3 scripts/import_veval.py --all 2>/dev/null || python3 scripts/import_veval.py
   echo "[launch] tasks generated: $(ls tasks 2>/dev/null | grep -c veval)"
   mkdir -p runs/grpo
-  # --num-gen 2 keeps 4B GRPO within a 24 GB GPU (LoRA + gradient-checkpointing already on);
-  # --num-gen 8 OOMs a 3090/4090. GRPO needs >=2 generations for an advantage.
-  python3 scripts/train_grpo.py --model Qwen/Qwen3-4B --glob "tasks/veval_*" --smoke --num-gen 2
+  # --num-gen 2 keeps 4B GRPO within a 24 GB GPU (LoRA + gradient-checkpointing already on).
+  # --sft-first: SFT cold-start on (spec -> golden) so the sparse GRPO reward has a non-zero
+  # advantage (else it collapses, DAPO arXiv:2503.14476). GRPO needs >=2 generations.
+  python3 scripts/train_grpo.py --model Qwen/Qwen3-4B --glob "tasks/veval_*" --smoke --num-gen 2 --sft-first
 }
 
 echo "=== RLVR_SMOKE_START ==="
-if job; then echo "=== RLVR_SMOKE_DONE ok ==="; else echo "=== RLVR_SMOKE_FAILED rc=$? ==="; fi
-echo "RLVR_CURVE_BEGIN"
-cat "$(find / -name rhg_curve.jsonl 2>/dev/null | head -1)" 2>/dev/null || echo "NO_CURVE"
-echo "RLVR_CURVE_END"
+job > /tmp/rlvr-log.txt 2>&1; RC=$?
+echo "=== RLVR_SMOKE $([ "$RC" = 0 ] && echo DONE_ok || echo FAILED_rc=$RC) ==="
+tail -60 /tmp/rlvr-log.txt
 
-# Push the curve back to a per-pod branch so it is retrievable WITHOUT pod-log access
-# (this runpodctl build has no `pod logs`). Needs a repo-scoped GH_TOKEN via --env.
+# Push the LOG (ALWAYS — so failures are diagnosable without pod-log access) + the curve (if any)
+# to a per-pod branch. Needs a repo-scoped GH_TOKEN via --env.
 if [ -n "${GH_TOKEN:-}" ]; then
-  cd /workspace/rtl-gauntlet 2>/dev/null || cd /root/rtl-gauntlet 2>/dev/null || true
+  cd /workspace/rtl-gauntlet 2>/dev/null || cd /root/rtl-gauntlet 2>/dev/null || \
+    { cd /tmp && git clone --depth 1 -b careset-oracle-revision \
+      https://github.com/loversky02/rtl-gauntlet.git rgpush && cd rgpush; }
+  mkdir -p results/runpod
+  cp /tmp/rlvr-log.txt "results/runpod/rlvr_log_${RUNPOD_POD_ID:-pod}.txt" 2>/dev/null || true
   CURVE=$(find / -name rhg_curve.jsonl 2>/dev/null | head -1)
-  if [ -n "$CURVE" ]; then
-    mkdir -p results/runpod && cp "$CURVE" "results/runpod/rhg_curve_${RUNPOD_POD_ID:-pod}.jsonl"
-    git config user.email pod@runpod && git config user.name runpod
-    git add results/runpod/*.jsonl
-    git commit -m "runpod: RLVR rhg_curve from ${RUNPOD_POD_ID:-pod}" || true
-    git push "https://x-access-token:${GH_TOKEN}@github.com/loversky02/rtl-gauntlet.git" \
-      "HEAD:runpod-results-${RUNPOD_POD_ID:-pod}" 2>&1 | tail -3
-    echo "[push] results on branch runpod-results-${RUNPOD_POD_ID:-pod}"
-  fi
+  [ -n "$CURVE" ] && cp "$CURVE" "results/runpod/rhg_curve_${RUNPOD_POD_ID:-pod}.jsonl"
+  git config user.email pod@runpod && git config user.name runpod
+  git add results/runpod/* 2>/dev/null
+  git commit -m "runpod: RLVR log+curve from ${RUNPOD_POD_ID:-pod} (rc=$RC)" || true
+  git push "https://x-access-token:${GH_TOKEN}@github.com/loversky02/rtl-gauntlet.git" \
+    "HEAD:runpod-results-${RUNPOD_POD_ID:-pod}" 2>&1 | tail -3
+  echo "[push] results+log on branch runpod-results-${RUNPOD_POD_ID:-pod}"
 fi
 
-# Keep the pod alive briefly so the log is retrievable, then the EXIT trap terminates it.
-sleep 300
+sleep 120   # brief keepalive, then the EXIT trap terminates the pod
