@@ -41,9 +41,9 @@ Status: `open` · `must-test` (resolve with a small probe before scaling) · `mi
 
 > If R2 comes back ≈0 on fair, non-trap tasks, or R12 shows the gaps are all innocent over-fitting with no trajectory evidence → the honesty story weakens; reconsider before investing in the full sweep.
 
-## D. Status upgrades after the GPT brainstorm (sources verified 2026-06-30)
+## D. Status upgrades after research verification (sources verified 2026-06-30)
 
-The brief in `deep-research-report.md` was source-checked: VeriContaminated, EvilGenie,
+The brief in `research-report.md` was source-checked: VeriContaminated, EvilGenie,
 SpecBench, Trace2Skill all exist and are described accurately. Upgrades adopted:
 
 | ID | New status | Enforcement (with evidence) |

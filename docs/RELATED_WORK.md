@@ -43,9 +43,9 @@ adaptation. It leaves the honesty question wide open — exactly our slot.
 - **One-line framing:** an *honest-evaluation harness for agentic RTL* that HORIZON-style
   systems can adopt to report HPR/RHG instead of pass@visible.
 
-## Closest prior art after the GPT-brainstorm verification (2026-06-30b)
+## Closest prior art after research verification (2026-06-30b)
 
-A second sweep (verifying a GPT deep-research brief) surfaced the *real* nearest neighbours —
+A second research sweep surfaced the *real* nearest neighbours —
 all confirmed to exist and described accurately:
 
 | Paper | What it does | Relation to us |
