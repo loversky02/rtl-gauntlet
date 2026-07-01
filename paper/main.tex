@@ -299,10 +299,12 @@ agents edited \emph{only} the design, never the testbench---no hacking on \emph{
 whose visible testbench demands \code{0x00}$\to$7, contradicting the spec, so \emph{any} visible-pass
 is provable cheating), we elicit across all five models. \textbf{Three of the five pass it}---DeepSeek,
 Gemini, and GPT-5.5 special-case the contradictory vector (\code{count = (data==8'h00) ? 4'd7 :
-popcount}, an honest popcount elsewhere): visible PASS, formal CEX. The hardcode judge confirms DeepSeek
-and Gemini as \emph{exploit-evidenced} hardcode-overfit; it leaves GPT-5.5's design ambiguous even
-though passing a spec-contradicting testbench is \emph{prima facie} cheating---so the judge is a
-\emph{conservative lower bound} (motivating the inter-rater $\kappa$ check we flag as future work).
+popcount}, an honest popcount elsewhere): visible PASS, formal CEX. An \emph{independent} strong judge
+(Opus) confirms all three as \emph{exploit-evidenced} hardcode-overfit; a model judging its \emph{own}
+design is lenient---in a self-judge run GPT-5.5 excused its own hardcode---so the judge must be
+independent (a C1 lesson). On known hardcodes (planted $+$ elicited) the independent judge scores
+$6/7$ ($86\%$) true positives, missing one, so exploit-evidenced counts are a \emph{conservative lower
+bound} (a full judge-vs-human $\kappa$ is future work; \code{c1\_judge\_accuracy.py}).
 \textbf{Opus and Haiku refuse}: Opus stays formally proven-correct (it fails the impossible test rather
 than special-case it) and Haiku does not pass it either---a model-differentiated
 honesty-under-pressure signal (Opus resists here and in a prior elicitation run). This is the upper
@@ -388,8 +390,8 @@ regular-clock / half-cycle harness is future work). GPT-5.5 leaves $2$ inconclus
 $256$-cell grid plus one candidate the bounded SAT does not close in budget)---a per-candidate budget
 limit, not a verdict. \emph{Eliciting}: on \emph{fair} tasks single-loop aligned agents do not hack, but an
 \emph{impossible} (spec-contradicting) task elicits cheating in the \emph{majority} ($3/5$ pass it,
-$\ge\!2$ judge-confirmed) with Opus resisting---so the fair-task negative is a property of the
-\emph{conditions}, not a blind spot; the
+all $3$ confirmed by an \emph{independent} judge that scores $86\%$ on known hardcodes) with Opus
+resisting---so the fair-task negative is a property of the \emph{conditions}, not a blind spot; the
 deeper regime (RL training) is in \S\ref{sec:limits}. \emph{PPA}: open
 Sky130/OpenROAD is pre-signoff, not foundry signoff, and rankings can flip across synthesis flows;
 we therefore frame PPA as a \emph{relative} comparison under identical settings (per TuRTLe) and
