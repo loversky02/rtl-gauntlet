@@ -39,7 +39,8 @@ def main() -> int:
     gcfg = GRPOConfig(output_dir=out, max_steps=2, per_device_train_batch_size=2,
                       num_generations=2, learning_rate=1e-4, logging_steps=1,
                       use_vllm=False, bf16=False, fp16=False, max_completion_length=32,
-                      max_prompt_length=256, report_to=[])
+                      max_prompt_length=256, report_to=[],
+                      beta=0.0, scale_rewards=False)   # exercise the --dynamic-sampling knobs
     lora = LoraConfig(r=8, lora_alpha=16, task_type="CAUSAL_LM",
                       target_modules=["q_proj", "k_proj", "v_proj", "o_proj"])
     trainer = GRPOTrainer(

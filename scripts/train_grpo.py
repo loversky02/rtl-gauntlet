@@ -137,6 +137,44 @@ def oracle_callback(eval_dirs, workroot, tokenizer=None, audit_every=50,
     return _Audit()
 
 
+def sft_cold_start(model_name: str, tok, glob_pat: str, out: str, lora, use_cuda: bool,
+                   steps: int = 60) -> str:
+    """SFT cold-start on golden RTL before GRPO. Every successful RTL-RL pipeline
+    (CodeV-R1, VeriReason, EARL, VeriRL) SFTs first so the policy already passes some tasks;
+    without it, GRPO's per-prompt groups are almost all-zero reward -> zero advantage ->
+    gradient death (DAPO, arXiv:2503.14476). Trains LoRA on (spec -> ```verilog golden```)
+    pairs, merges the adapters into the base, saves, and returns the merged-model path that
+    GRPO then continues from with fresh adapters. Verify on GPU (`--sft-first`)."""
+    from datasets import Dataset
+    from trl import SFTConfig, SFTTrainer
+
+    rows = []
+    for d in sorted(glob.glob(glob_pat)):
+        try:
+            t = load_task(d)
+            spec = open(os.path.join(d, t["files"]["spec"])).read()
+            golden = open(os.path.join(d, t["files"]["golden"])).read()
+        except Exception:  # noqa: BLE001
+            continue
+        rows.append({"messages": [
+            {"role": "system", "content": SYS},
+            {"role": "user", "content": spec},
+            {"role": "assistant", "content": f"```verilog\n{golden}\n```"}]})
+    ds = Dataset.from_list(rows)
+    print(f"[sft] cold-start: {len(ds)} golden pairs x {steps} steps")
+    cfg = SFTConfig(output_dir=f"{out}/sft", max_steps=steps, per_device_train_batch_size=1,
+                    gradient_accumulation_steps=4, learning_rate=1e-4, logging_steps=10,
+                    bf16=use_cuda, report_to=[])
+    tr = SFTTrainer(model=model_name, args=cfg, train_dataset=ds, processing_class=tok,
+                    peft_config=lora)
+    tr.train()
+    path = f"{out}/sft-merged"
+    tr.model.merge_and_unload().save_pretrained(path)
+    tok.save_pretrained(path)
+    print(f"[sft] merged SFT model -> {path}")
+    return path
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default="Qwen/Qwen3-4B")
@@ -147,6 +185,21 @@ def main() -> int:
     ap.add_argument("--out", default="runs/grpo")
     ap.add_argument("--smoke", action="store_true",
                     help="quick signal run: 50 steps, audit every 25, 12 held-out tasks")
+    # --- research-backed knobs (docs/RLVR_CONVERGENCE_RESEARCH.md) ---
+    ap.add_argument("--num-gen", type=int, default=8,
+                    help="GRPO generations per prompt (>=2). 8 gives a better advantage estimate "
+                         "than 4; effective batch is set to match so it stays divisible.")
+    ap.add_argument("--sft-first", action="store_true",
+                    help="SFT cold-start on golden RTL before GRPO — every successful RTL-RL "
+                         "pipeline (CodeV-R1/VeriReason/EARL/VeriRL) does this; skips the "
+                         "gradient-death regime where a base model never passes.")
+    ap.add_argument("--dynamic-sampling", action="store_true",
+                    help="DAPO-style anti-collapse: drop the KL anchor (beta=0) and reward-std "
+                         "scaling that make all-same-reward groups yield zero advantage. Full "
+                         "group resampling needs trl>=0.18.")
+    ap.add_argument("--vllm", action="store_true",
+                    help="vLLM rollouts (~5-10x faster). Needs a `trl vllm-serve` process or "
+                         "trl>=0.18 colocate; the pinned trl 0.17 is server-mode only.")
     args = ap.parse_args()
 
     if args.smoke:
@@ -180,18 +233,24 @@ def main() -> int:
     # use_vllm=True needs a separate `trl vllm-serve` process (2-GPU / colocate); on a
     # single pod that hangs waiting for the server, so we use HF generate (self-contained,
     # slower — fine for a smoke). Flip back to vllm for the full multi-GPU run.
+    base_model = args.model
+    if args.sft_first:
+        base_model = sft_cold_start(args.model, tok, args.glob, args.out, lora, use_cuda)
+
     cfg = GRPOConfig(output_dir=args.out, max_steps=args.steps,
-                     per_device_train_batch_size=4, num_generations=4,
-                     learning_rate=1e-6, logging_steps=10, use_vllm=False,
+                     per_device_train_batch_size=args.num_gen, num_generations=args.num_gen,
+                     learning_rate=1e-6, logging_steps=10, use_vllm=args.vllm,
+                     beta=0.0 if args.dynamic_sampling else 0.04,          # DAPO: drop KL anchor
+                     scale_rewards=not args.dynamic_sampling,              # DAPO: no std-normalization
                      bf16=use_cuda, fp16=False, max_completion_length=256,
                      gradient_checkpointing=use_cuda,
                      gradient_checkpointing_kwargs={"use_reentrant": False})
     trainer = GRPOTrainer(
-        model=args.model,
+        model=base_model,
         reward_funcs=[make_reward(args.out)],
         args=cfg,
         train_dataset=ds,
-        peft_config=lora,
+        peft_config=lora,   # SFT (if any) is merged into base_model; GRPO trains fresh adapters
         callbacks=[oracle_callback(audit_dirs, args.out, tokenizer=tok,
                                    audit_every=args.audit_every)],
     )
