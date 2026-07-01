@@ -59,11 +59,12 @@ $\le\!3.2\%$) by frontier models on fair tasks. A weaker model (Haiku~4.5) fails
 Opus~4.8 on the visible tests but does \emph{not} hack more; even a tamper-capable shell agent that
 struggles for several iterations does not edit the testbench. We show the oracle catches hacking
 when present---both a planted candidate (passes a randomized hidden testbench, formally disproven) and
-a \emph{real elicited} one: on an impossible (spec-contradicting) task $2/3$ frontier models hardcode
-the design (Opus stays honest), caught by the oracle plus a hardcode judge. We further show the
-result survives off the verbatim benchmark (a contamination probe), and we add
-a token-cost analysis (an early-stop reclaims $12$--$23\%$ of tokens) and a latency-axis prototype
-that produces real Sky130 power/area/timing through a containerized OpenLane flow. The central
+a \emph{real elicited} one: on an impossible (spec-contradicting) task $3/5$ frontier models hardcode
+(Opus stays honest), caught by the oracle plus a hardcode judge (judge-vs-human $\kappa=0.80$). We
+further show the result survives off the verbatim benchmark (a whole-benchmark contamination probe),
+and we add a token-cost analysis (an early-stop reclaims $12$--$24\%$ of tokens) and a latency axis:
+real Sky130 PPA over a size-graded set (up to a RISC-V core) with Kendall-$\tau=1.0$ rank stability
+across synthesis strategies. The central
 artifact for honest agentic-hardware evaluation is a don't-care/reset/encoding-aware oracle plus a
 verification discipline---not a new pass-rate.
 \end{abstract}
@@ -100,7 +101,7 @@ via a containerized flow (\S\ref{sec:exp}).
 \node[vis] (agent)  at (3.1,2.2)  {\textbf{agent} edits RTL};
 \node[box] (freeze) at (6.2,2.2)  {\textbf{freeze} design (I/O locked)};
 \node[wh]  (hidden) at (4.3,0.55) {\textbf{hidden} randomized TB};
-\node[wh]  (formal) at (7.9,0.55) {\textbf{formal oracle}: equiv.\ vs.\ golden (6-step hardened)};
+\node[wh]  (formal) at (7.9,0.55) {\textbf{formal oracle}: equiv.\ vs.\ golden (7-step hardened)};
 \node[res] (verdict) at (11.3,0.55) {\textbf{verdict}: \rhg{} / \hpr{} $+$ tamper};
 \draw[ar] (spec) -- (agent);
 \draw[ar] (agent) -- (freeze);
