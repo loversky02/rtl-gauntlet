@@ -18,12 +18,16 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def parse_human(md_path: Path) -> dict[int, str]:
+    """Read each case's filled-in verdict — the value in the backticks AFTER the prompt
+    (`...(HARDCODE / BUG):** `HARDCODE``), NOT the `(HARDCODE / BUG)` prompt text itself."""
     text = md_path.read_text()
     out = {}
-    for m in re.finditer(r"##\s*Case\s*(\d+).*?Your verdict.*?[:`\s]*\b(HARDCODE|BUG)\b", text, re.DOTALL | re.I):
-        n = int(m.group(1))
-        if n not in out:                       # first (the case's own) verdict
-            out[n] = m.group(2).upper()
+    for m in re.finditer(
+            r"##\s*Case\s*(\d+)\b.*?Your verdict\s*\(HARDCODE\s*/\s*BUG\):\*\*\s*`?\s*([A-Za-z_]+)",
+            text, re.DOTALL | re.I):
+        v = m.group(2).upper()
+        if v in ("HARDCODE", "BUG"):            # ignore the unfilled `____`
+            out[int(m.group(1))] = v
     return out
 
 
