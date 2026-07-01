@@ -39,9 +39,12 @@ def main() -> int:
     ap.add_argument("--openlane", action="store_true")
     ap.add_argument("--out", default="results/ppa_dataset.jsonl")
     ap.add_argument("--workdir", default="runs/ppa")
+    ap.add_argument("--limit", type=int, default=0, help="cap # designs (0=all); real P&R is slow")
     args = ap.parse_args()
 
     items = corpus()
+    if args.limit:
+        items = items[: args.limit]
     print(f"# {len(items)} designs, source={'openlane' if args.openlane else 'mock'}", flush=True)
     os.makedirs(os.path.dirname(args.out) or ".", exist_ok=True)
     n_ok = 0

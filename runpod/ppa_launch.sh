@@ -40,7 +40,7 @@ job() {
   # Real Sky130 PPA over the corpus (goldens + candidates). --openlane calls native `openlane`.
   # NOTE: gen_ppa_data globs the whole corpus; for the size-graded set (spm/AES/picorv32/ibex)
   # add those designs under tasks/ first and scope corpus() — see docs/C3_PLAN.md.
-  python3 scripts/gen_ppa_data.py --openlane --out results/ppa_real.jsonl
+  python3 scripts/gen_ppa_data.py --openlane --out results/ppa_real.jsonl --limit "${PPA_LIMIT:-12}"
   echo "[ppa] rows: $(wc -l < results/ppa_real.jsonl 2>/dev/null || echo 0)"
 }
 
