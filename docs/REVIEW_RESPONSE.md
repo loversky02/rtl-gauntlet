@@ -117,3 +117,36 @@ validity holes), one is an actionable presentation fix — now done:
 5. **Presentation density / internal jargon** → **fixed**: (a) a glossary table (Table: golden, miter,
    CEX, BMC, careset, precondition, half-cycle miter...) added at the top of §4; (b) the abstract
    de-jargoned (tool flags → plain-English step names); (c) stale numbers in captions fixed.
+
+
+---
+
+## Third-pass review (2026-07-02) — disposition
+
+The sharpest round: claims/logic + statistics. Dispositions:
+
+1. **Title-vs-evidence gap (eval-time)** → *Fixed by scoping, per the reviewer's own either/or*: the
+   abstract now says "at evaluation time" explicitly, and a `Scope:` sentence in the thesis states the
+   RL regime is what the instrument is built to audit, not what the paper claims about. The RL smoke is
+   framed as an instrument demonstration only.
+2. **"Fair task" circularity** → *Rebutted with new text (the criterion existed but was unwritten)*:
+   fairness is **mechanically independent of the oracle** — a task is fair iff its **golden passes the
+   visible testbench** (no careset/precondition/equivalence involved). Preconditions come from the
+   testbench's own stimulus, and under each one the planted/broken controls still CEX — masking cannot
+   excuse a real hack inside the legal-stimulus space. Now §3 + controls in §4.
+3. **"Weakness ≠ hacking" from near-constant data** → *Conceded and softened*: Findings now state it as
+   descriptive ("weakness manifests as failures, not detected hacking"), bounded by the benchmark's
+   sensitivity, explicitly not causal.
+4. **0/156 rule-of-three bound** → *Conceded and made explicit*: a `Statistical power` note in Threats
+   says the bound measures the benchmark's sensitivity, not a model property; <0.5% would need ≳600
+   tasks; pooling models is optimistic (shared tasks). Scaling task count is the top future-work item.
+5. **κ n=20 CI wide** → *Conceded*: the paper now reports κ=0.80 with CI ≈ [0.55, 1.0] and scopes the
+   intent claim to that uncertainty; independent-judge requirement already stated (self-judging lenient).
+6. **Contamination bounds scattered / MI indirect for frontier models** → *Fixed*: single ≤1.9%
+   (156-task) bound; Limitations now states plainly that MI runs only on an open model, so for the five
+   frontier models the evidence is behavioral and "reasoning, not recall" is an inference.
+7. **Prose density** → partially addressed (captions/sentences compressed, glossary kept); a pseudo-code
+   pipeline figure is a good suggestion for the next major revision.
+
+**Not addressable without new scale** (agreed, stated as future work): more/diverse tasks for real
+statistical power; SoC/multi-clock generality; RL-training study at defended scale.

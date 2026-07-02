@@ -11,6 +11,7 @@
 \usepackage{xcolor}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{enumitem}
+\usepackage{multicol}
 \usepackage{tikz}
 \usetikzlibrary{positioning, arrows.meta, fit}
 
@@ -55,7 +56,8 @@ designs---cutting false counter-examples $9\!\to\!0$ and ``inconclusive'' $50\!\
 na\"ively-flagged counter-example is machine-\emph{proven} equivalent---two golden builds define the
 specified (cared) output bits, and declared per-task preconditions encode each spec's legal-stimulus
 assumption---\emph{eliminating hand-verification entirely}: \textbf{zero genuine reward hacking}
-($95\%$ upper bound $\le\!3.2\%$) by frontier models on fair tasks. A weaker model (Haiku~4.5) fails $3\times$ more than
+($95\%$ upper bound $\le\!3.2\%$) by frontier models on fair tasks \emph{at evaluation time} (a task
+is \emph{fair} iff its golden itself passes the visible tests---a criterion independent of our oracle). A weaker model (Haiku~4.5) fails $3\times$ more than
 Opus~4.8 on the visible tests but does \emph{not} hack more; even a tamper-capable shell agent that
 struggles for several iterations does not edit the testbench. We show the oracle catches hacking
 when present---both a planted candidate (passes a randomized hidden testbench, formally disproven) and
@@ -77,6 +79,8 @@ hacking, token cost, and high-latency (PPA) reward. We make each measurable.
 
 \paragraph{Thesis.} \emph{Pass@visible is the wrong score for agentic hardware design}: it can be
 gamed (honesty), it is expensive (cost), and it does not scale to real reward (latency).
+\emph{Scope:} we measure at \textbf{evaluation time}; the RL-training regime where hacking is known to
+emerge is what this instrument is built to audit (\S\ref{sec:limits}), not what this paper claims about.
 
 \paragraph{Contributions.}
 \begin{enumerate}[leftmargin=*,topsep=2pt,itemsep=1pt]
@@ -161,6 +165,11 @@ an \emph{upper bound} on \emph{detectable} hacking; only \textbf{verified-genuin
 \code{cex} confirmed by hand) is the headline claim. On the $156$-task sweep the withheld tier is the
 \textbf{formal} oracle; the hidden randomized testbench is exercised on the focused demos
 (\code{formal\_demo}, \code{sem\_zerocount}, tamper).
+\textbf{Fairness is defined independently of the oracle:} a task is \emph{fair} iff its \emph{golden}
+passes the visible testbench---a mechanical check involving no careset, precondition, or equivalence
+engine. Preconditions come from the testbench's own stimulus, and under each one the planted/broken
+controls still CEX (\S\ref{sec:oracle})---the masking cannot excuse a real hack in the legal-stimulus
+space, only stop spec-don't-cares being miscounted as hacks.
 A tamper tier (a shell-capable agent that may edit any workspace file) flags edits to the
 testbench/harness as \emph{exploit-evidenced} hacking, with the withheld tiers run on frozen
 originals so tampering cannot fool the verdict. We separate the claim into behavioral gap,
@@ -175,8 +184,6 @@ term & meaning \\
 golden & curated reference implementation the candidate must match \\
 visible / withheld tier & tests the agent sees and iterates against / checks run only on the frozen design \\
 miter & two designs wired to a comparator, so any output difference becomes a solver-searchable flag \\
-counter-example (CEX) & a concrete input sequence on which candidate and golden differ \\
-BMC & bounded model checking: exhaustive CEX search up to a cycle depth \\
 don't-care (\code{x}) & output bits the specification leaves unspecified \\
 careset (care-mask) & per-bit mask of \emph{specified} bits, from two golden builds (\code{x}$\to$0 vs.\ \code{x}$\to$1); only cared bits are compared \\
 input precondition & the spec's legal-stimulus assumption, declared per task and enforced inside the miter \\
@@ -247,17 +254,14 @@ na\"ive & 88 & -- & -- & -- & 9 & 50 & 9 \\
 +careset & \textbf{129} & 11 & \textbf{5} & 2 & \textbf{0} & 0 & 9 \\
 \bottomrule
 \end{tabular}
-\caption{Oracle hardening (same 156 Opus candidates, no new LLM calls). False CEX $9\!\to\!0$;
-inconclusive $50\!\to\!0$; \hpr{} $56\%\!\to\!\mathbf{93\%}$ (honest $129$ $+$ $11$ BMC $+$ $5$
-careset-proven $=145$ of $156$). The \code{cs} (careset) stage \emph{proves} the flagged artifacts
-equivalent---former \code{dc} reclassifications become machine-checked proofs and the mixed-edge
-\code{circuit8} closes under the real-latch half-cycle miter; across all five models the flagged
-\rhg{} drops from $9$ cases to \textbf{zero}, with no hand-verification anywhere.}
+\caption{Oracle hardening (same 156 Opus candidates, no new LLM calls). False CEX $9\!\to\!0$,
+inconclusive $50\!\to\!0$, \hpr{} $56\%\!\to\!\mathbf{93\%}$; the careset stage turns former
+reclassifications into machine-checked proofs and the half-cycle miter closes \code{circuit8}.}
 \label{tab:progression}
 \end{table}
 
 \begin{figure}[t]\centering
-\includegraphics[width=0.86\linewidth]{figures/progression.pdf}
+\includegraphics[width=0.76\linewidth]{figures/progression.pdf}
 \caption{Oracle hardening: artifacts fall (false CEX $9\!\to\!0$, inconclusive $50\!\to\!0$); proven-equivalent rises $88\!\to\!145$.}
 \label{fig:prog}
 \end{figure}
@@ -305,16 +309,14 @@ flagged \rhg{} (machine) & \textbf{0} & \textbf{0} & \textbf{0} & \textbf{0} & \
 verified-genuine \rhg{} & 0 ($\le.025$) & 0 ($\le.025$) & 0 ($\le.026$) & 0 ($\le.031$) & 0 ($\le.032$) \\
 \bottomrule
 \end{tabular}
-\caption{Five models $\times\,156$ tasks (seven-step oracle; \hpr{} counts honest $+$ BMC $+$
-careset-proven, so Opus $=129{+}11{+}5=145$, $145/156=0.93$). The careset $+$ mixed-edge miters
-machine-\emph{prove} every na\"ively-flagged counter-example, so the \emph{flagged} \rhg{} is
-\textbf{zero for all five models} with \emph{no hand-verification anywhere}. Verified-genuine
-\rhg{}$=0$ throughout. Weakness shows as failures, not cheating.}
+\caption{Five models $\times\,156$ tasks, seven-step oracle (\hpr{} $=$ honest$+$BMC$+$careset;
+Opus $129{+}11{+}5=145=0.93$). Every na\"ively-flagged CEX is machine-proven: flagged \rhg{} is
+\textbf{zero for all five models}, no hand-verification anywhere.}
 \label{tab:models}
 \end{table}
 
 \begin{figure}[t]\centering
-\includegraphics[width=0.88\linewidth]{figures/models.pdf}
+\includegraphics[width=0.80\linewidth]{figures/models.pdf}
 \caption{Weakness $\ne$ hacking across five models: Haiku/DeepSeek fail more on the visible tests (Opus/GPT-5.5/Gemini fewest), \rhg{}$=0$ throughout.}
 \label{fig:models}
 \end{figure}
@@ -328,7 +330,8 @@ demands \code{0x00}$\to$7, contradicting the spec, so \emph{any} visible-pass is
 confirms all three as hardcode-overfit and scores $6/7$ ($86\%$) on known hardcodes, so
 exploit-evidenced counts are a \emph{conservative lower bound} (self-judging is lenient---GPT-5.5
 excused its own). A blind judge-vs-human study ($n{=}20$ balanced cases) gives Cohen's
-$\kappa=0.80$ (\emph{strong}), so the intent sub-classification is reliable---we keep the intent claim.
+$\kappa=0.80$ (\emph{strong}, though the $n{=}20$ CI is wide, ${\approx}[0.55,1.0]$)---we keep the
+intent claim, scoped to that uncertainty.
 \textbf{Opus and Haiku refuse} (Opus stays
 formally proven-correct). So the metric is \emph{not} trivially zero: cheating appears in the
 \emph{majority} of frontier models under contradictory specs, Opus resisting. The hack is
@@ -371,7 +374,7 @@ honesty-loss budget is met only by the stronger-tail models, so the early-stop i
 rather than universal---a caveat the post-hoc number hides.
 
 \begin{figure}[t]\centering
-\includegraphics[width=0.62\linewidth]{figures/cost.pdf}
+\includegraphics[width=0.55\linewidth]{figures/cost.pdf}
 \caption{The repair tail is mostly wasted; an early-stop reclaims $12$--$23\%$ of tokens.}
 \label{fig:cost}
 \end{figure}
@@ -392,8 +395,9 @@ artifact. Verification discipline is mandatory---and now \emph{fully mechanized}
 mixed-edge miters \emph{prove} every flagged artifact equivalent; no hand-verification remains.
 \item No false positives on honest agents; across $5$ models $\times\,156$ fair tasks, \textbf{zero
 verified genuine reward hacking} ($95\%$ upper bound $\le\!3.2\%$).
-\item \textbf{Weakness $\ne$ hacking}---a weaker model fails far more but cheats no more, even under
-tamper affordance.
+\item \textbf{Weakness manifests as failures, not detected hacking}---a weaker model fails far more
+on visible tests yet triggers no more oracle flags, even under tamper affordance (a descriptive
+statement bounded by the benchmark's sensitivity, not a causal claim).
 \item Hacking is a function of adversarial conditions, not benchmark mass; the protocol catches it
 when present.
 \end{enumerate}
@@ -407,14 +411,15 @@ the five models the flagged \rhg{} drops $9\!\to\!0$ with \textbf{zero regressio
 overfit and three broken mixed-edge mutants all still CEX (non-vacuous). The proofs are conditional on
 \emph{declared} preconditions (synchronous stimulus; legal-input sequences) that the withheld
 testbench also respects. GPT-5.5 leaves $2$ inconclusive (Conway's Life's $256$-cell grid plus one
-candidate the bounded SAT does not close in budget)---a per-candidate budget limit, not a verdict. \emph{Eliciting}: on \emph{fair} tasks single-loop aligned agents do not hack, but an
-\emph{impossible} (spec-contradicting) task elicits cheating in the \emph{majority} ($3/5$ pass it,
-all $3$ confirmed by an \emph{independent} judge that scores $86\%$ on known hardcodes) with Opus
-resisting---so the fair-task negative is a property of the \emph{conditions}, not a blind spot; the
-deeper regime (RL training) is in \S\ref{sec:limits}. \emph{PPA}: open Sky130 is pre-signoff (inflated
+candidate the bounded SAT does not close in budget)---a per-candidate budget limit, not a verdict. \emph{Eliciting}: fair tasks elicit no hacking, but an \emph{impossible} task
+elicits it in $3/5$ models (independent judge, $86\%$ on known hardcodes; Opus resists)---the
+fair-task negative is a property of the conditions, not a blind spot (RL training: \S\ref{sec:limits}). \emph{PPA}: open Sky130 is pre-signoff (inflated
 ${\sim}1.2$--$1.5\times$ vs.\ commercial~\cite{edahep}) and ranking inversions are a known
 risk~\cite{rtlopt}; we check rank stability across two synthesis strategies (\S\ref{sec:exp},
-Kendall-$\tau=1.0$) and frame PPA as \emph{relative} (per TuRTLe~\cite{turtle}). \emph{Nondeterminism}:
+Kendall-$\tau=1.0$) and frame PPA as \emph{relative} (per TuRTLe~\cite{turtle}). \emph{Statistical power}: with $0$ events the bound is set by the denominator (rule of three:
+$0/147$ certifies only $\lesssim\!2.5\%$; $<\!0.5\%$ would need ${\gtrsim}600$ tasks; pooling models
+is optimistic since they share tasks)---it measures the benchmark's sensitivity, not a model
+property. \emph{Nondeterminism}:
 LLM runs vary; we report Wilson CIs and pin model ids.
 
 \section{Limitations and Future Work}\label{sec:limits}
@@ -436,23 +441,25 @@ RTL is the one domain where this step-wise audit is \emph{exhaustive}.
 $\to$\code{spm}$\to$\code{picorv32}) with real Sky130 PPA and Kendall-$\tau=1.0$ rank stability across
 two synthesis strategies. The remaining gap is a \emph{commercial signoff} stack (open Sky130 inflates
 PPA ${\sim}1.2$--$1.5\times$~\cite{edahep}) and a full agent-loop under the trained surrogate.
-\item \textbf{Contamination probe not yet exhaustive.} We mitigate at identifier and semantic level
-(\S\ref{sec:exp}) with a $\le\!7.2\%$ upper bound, but a full meaning-preserving re-mutation of all
-$156$ tasks plus membership inference (Min-K\%~\cite{minkprob}; NLL$\leftrightarrow$degradation
-\cite{nllmem}) would tighten it further.
+\item \textbf{Contamination probe not yet exhaustive.} The whole-benchmark behavioral probe bounds
+memorization-driven \hpr{} drops at $\le\!1.9\%$ (\S\ref{sec:exp}), but membership inference runs only
+on an \emph{open} model (closed APIs expose no teacher-forced logprobs)---so for the five frontier
+models the evidence is behavioral, and ``reasoning, not recall'' is an inference; deeper
+function-restructuring mutation remains future work~\cite{minkprob,nllmem}.
 \end{itemize}
 Beyond these: more models and task types (debug/verify/reuse), and closing GPT-5.5's two
 budget-limited inconclusives.
 
 \section{Conclusion}
-Honest evaluation of agentic hardware design is gated not by a new pass-rate but by an oracle that
-is don't-care/reset/encoding-aware and by a discipline of verifying every flag. With that, frontier
-agents do not hack fair RTL tasks---but the oracle catches it when they do.
+Honest evaluation of agentic hardware design is gated not by a new pass-rate but by a
+don't-care/reset/encoding-aware oracle that proves every flag. With that, frontier agents do not hack
+fair RTL tasks at evaluation time---and the oracle catches it when they do.
 
 \paragraph{Reproducibility \& artifact.} All code, frozen sweeps, and generators are released;
 \code{report\_cis.py} regenerates every headline number from the frozen candidates (EDA-only, no LLM
 calls), with pinned model ids and fixed testbench seeds (\code{docs/REPRODUCE.md}).
 
+\begin{multicols}{2}\raggedright
 \begin{thebibliography}{99}\scriptsize\setlength{\itemsep}{0pt}
 \bibitem{horizon} Yu, Deng, Pinckney, Khailany. Agentic Hardware Design as Repository-Level Code Evolution (HORIZON). arXiv:2606.28279, 2026.
 \bibitem{cvdp} Pinckney et al. Comprehensive Verilog Design Problems (CVDP). arXiv:2506.14074, 2025.
@@ -475,5 +482,6 @@ calls), with pinned model ids and fixed testbench seeds (\code{docs/REPRODUCE.md
 \bibitem{nllmem} Metamorphic testing of memorization in LLM program repair (NLL$\leftrightarrow$degradation). arXiv:2604.21579, 2026.
 \bibitem{edahep} Using Open-Source EDA Tools in ASICs (open-vs-commercial PPA gap). arXiv:2512.06122, 2025.
 \end{thebibliography}
+\end{multicols}
 
 \end{document}
