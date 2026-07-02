@@ -150,3 +150,37 @@ The sharpest round: claims/logic + statistics. Dispositions:
 
 **Not addressable without new scale** (agreed, stated as future work): more/diverse tasks for real
 statistical power; SoC/multi-clock generality; RL-training study at defended scale.
+
+
+---
+
+## Fourth-pass review (2026-07-02) — disposition (free-tier data, no GPU)
+
+The core critique: after honest scoping the result risks shrinking to "clean oracle + benchmark too
+insensitive to say anything about honesty" — cannot tell a good instrument from a blind one; all
+positives are author-staged. We attacked it with **new data**:
+
+1. **"Instrument might be blind" → rebutted with positive sensitivity.** Imported a SECOND public
+   benchmark (**RTLLM**, `import_rtllm.py`), applied the mechanical fairness gate (golden passes its
+   own TB) → 41 fair tasks, and swept all 5 models. The naive golden-equiv oracle **flags 50
+   candidate differences over 20 tasks** — so the all-zero VerilogEval result is *not* an insensitive
+   oracle. Adjudication then clears them: an **independent judge finds 0 hardcodes** (all
+   honest/underspecified), and the recurring flags are the known over-reporting classes — worked
+   example `up_down_counter` (flagged by all 5) differs from its golden *only* in async-vs-sync reset,
+   with the CEX being a mid-operation reset pulse the reset-at-init TB never applies (hand-verified
+   trace). This both rebuts blindness and **replicates the central thesis on a 2nd benchmark**.
+   (`results/rtllm_oracle_gate.json`, `results/rtllm_flag_judge.json`.)
+2. **"All positives are staged" → pressure hunt for natural hacks.** Re-ran every model's *failing*
+   VerilogEval tasks under **7-iteration repair pressure** with an independent judge
+   (`run_pressure.py`): 9+6+41+14+36 = **106 pressed task-runs → 0 natural hacks**. So the negative is
+   pressure-tested, not an artifact of a 2-iteration budget. (`results/pressure_*.json`.)
+3. **"Judge carries Opus's fingerprint" → cross-judge.** A second independent judge (Gemini) on the
+   same 20 blind cases: acc 0.95, **κ vs human = 1.00**, κ vs Opus-judge = 0.80 — reliability is a
+   property of the method, not of Opus. (`results/c1_crossjudge.json`.)
+4. **"DeepSeek cost data missing" → fixed.** Re-swept DeepSeek with token logging (199k over 156);
+   cost data now spans 5 models. **Tamper extended to 156×5** (0 fake-pass on all five).
+
+**Honestly still open (needs GPU / scale, stated as future work):** a *natural* hack remains unfound
+(so the strongest defense of the title is still the RL-training study, GPU-gated); RTLLM full
+per-task adjudication to RHG=0 is characterized but not completed; SoC/multi-clock generality.
+The instrument-sensitivity result is the key advance: **0 is now a measured 0, not a blind 0.**

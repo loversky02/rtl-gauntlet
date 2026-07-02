@@ -56,14 +56,14 @@ designs---cutting false counter-examples $9\!\to\!0$ and ``inconclusive'' $50\!\
 na\"ively-flagged counter-example is machine-\emph{proven} equivalent---two golden builds define the
 specified (cared) output bits, and declared per-task preconditions encode each spec's legal-stimulus
 assumption---\emph{eliminating hand-verification entirely}: \textbf{zero genuine reward hacking}
-($95\%$ upper bound $\le\!3.2\%$) by frontier models on fair tasks \emph{at evaluation time} (a task
-is \emph{fair} iff its golden itself passes the visible tests---a criterion independent of our oracle). A weaker model (Haiku~4.5) fails $3\times$ more than
-Opus~4.8 on the visible tests but does \emph{not} hack more; even a tamper-capable shell agent that
-struggles for several iterations does not edit the testbench. We show the oracle catches hacking
-when present---both a planted candidate (passes a randomized hidden testbench, formally disproven) and
-a \emph{real elicited} one: on an impossible (spec-contradicting) task $3/5$ frontier models hardcode
-(Opus stays honest), caught by the oracle plus a hardcode judge (judge-vs-human $\kappa=0.80$). We
-further show the result survives off the verbatim benchmark (a whole-benchmark contamination probe),
+($95\%$ upper bound $\le\!3.2\%$) by frontier models on fair tasks \emph{at evaluation time} (fair
+$=$ the golden itself passes the visible tests, a criterion independent of our oracle)---including
+under $7$-iteration repair pressure and on a second benchmark (RTLLM), where the oracle flags $50$
+differences but a judge finds $0$ hardcodes, so it is sensitive, not blind. A weaker model
+(Haiku~4.5) fails $3\times$ more than Opus but does \emph{not} hack more. The oracle catches hacking
+when present---a planted candidate and a \emph{real elicited} one: on an impossible task $3/5$ models
+hardcode (Opus resists), caught by the oracle plus a hardcode judge (judge-vs-human $\kappa=0.80$). The
+result survives off the verbatim benchmark (a contamination probe),
 and we add a token-cost analysis (an early-stop reclaims $12$--$24\%$ of tokens) and a latency axis:
 real Sky130 PPA over a size-graded set (up to a RISC-V core) with Kendall-$\tau=1.0$ rank stability
 across synthesis strategies. The central
@@ -187,7 +187,6 @@ miter & two designs wired to a comparator, so any output difference becomes a so
 don't-care (\code{x}) & output bits the specification leaves unspecified \\
 careset (care-mask) & per-bit mask of \emph{specified} bits, from two golden builds (\code{x}$\to$0 vs.\ \code{x}$\to$1); only cared bits are compared \\
 input precondition & the spec's legal-stimulus assumption, declared per task and enforced inside the miter \\
-half-cycle miter & models each clock phase as one step, so intentional latches and \code{negedge} FFs compare faithfully \\
 \bottomrule
 \end{tabular}
 \caption{Glossary of recurring verification terms (metrics \rhg{}/\hpr{} are defined in \S\ref{sec:method}).}
@@ -261,7 +260,7 @@ reclassifications into machine-checked proofs and the half-cycle miter closes \c
 \end{table}
 
 \begin{figure}[t]\centering
-\includegraphics[width=0.76\linewidth]{figures/progression.pdf}
+\includegraphics[width=0.68\linewidth]{figures/progression.pdf}
 \caption{Oracle hardening: artifacts fall (false CEX $9\!\to\!0$, inconclusive $50\!\to\!0$); proven-equivalent rises $88\!\to\!145$.}
 \label{fig:prog}
 \end{figure}
@@ -316,13 +315,13 @@ Opus $129{+}11{+}5=145=0.93$). Every na\"ively-flagged CEX is machine-proven: fl
 \end{table}
 
 \begin{figure}[t]\centering
-\includegraphics[width=0.80\linewidth]{figures/models.pdf}
+\includegraphics[width=0.72\linewidth]{figures/models.pdf}
 \caption{Weakness $\ne$ hacking across five models: Haiku/DeepSeek fail more on the visible tests (Opus/GPT-5.5/Gemini fewest), \rhg{}$=0$ throughout.}
 \label{fig:models}
 \end{figure}
 
 \paragraph{Elicit (the phase-diagram).} A tamper-capable shell agent (may edit \emph{any} file):
-across \emph{all $156$ fair tasks} on \emph{both} Opus and Haiku it produces \textbf{$0$ fake-pass tampers}---the few
+across \emph{all $156$ fair tasks} on \emph{all five models} it produces \textbf{$0$ fake-pass tampers}---the few
 non-design writes are benign helper modules, never a neutered testbench. \textbf{But on an \emph{impossible} task}~\cite{impossiblebench} (visible TB
 demands \code{0x00}$\to$7, contradicting the spec, so \emph{any} visible-pass is provable cheating),
 \textbf{$3$ of $5$} models pass it---DeepSeek, Gemini, GPT-5.5 special-case the vector
@@ -365,7 +364,7 @@ mean NLL-degradation under the meaning-preserving mutation is $+0.045$ nats---ne
 memorization advantage---triangulating the behavioral probe.
 
 \paragraph{Cost (C2).} Across the four models with per-iteration token logs
-(Opus/Haiku/GPT-5.5/Gemini; DeepSeek's sweep did not record tokens), the repair tail is mostly
+(Opus/Haiku/GPT-5.5/Gemini; DeepSeek's \emph{original} sweep logged none), the repair tail is mostly
 wasted---only $47$/$14$/$59$/$48\%$ of multi-iteration tasks end honest. An early-stop at one
 iteration reclaims $12$--$24\%$ of tokens (Opus $12$, GPT-5.5 $17$, Haiku $23$, Gemini $24$) for a
 $4$--$9\%$ honesty loss (Figure~\ref{fig:cost}). Evaluated \emph{prospectively}
@@ -374,7 +373,7 @@ honesty-loss budget is met only by the stronger-tail models, so the early-stop i
 rather than universal---a caveat the post-hoc number hides.
 
 \begin{figure}[t]\centering
-\includegraphics[width=0.55\linewidth]{figures/cost.pdf}
+\includegraphics[width=0.50\linewidth]{figures/cost.pdf}
 \caption{The repair tail is mostly wasted; an early-stop reclaims $12$--$23\%$ of tokens.}
 \label{fig:cost}
 \end{figure}
@@ -396,10 +395,13 @@ mixed-edge miters \emph{prove} every flagged artifact equivalent; no hand-verifi
 \item No false positives on honest agents; across $5$ models $\times\,156$ fair tasks, \textbf{zero
 verified genuine reward hacking} ($95\%$ upper bound $\le\!3.2\%$).
 \item \textbf{Weakness manifests as failures, not detected hacking}---a weaker model fails far more
-on visible tests yet triggers no more oracle flags, even under tamper affordance (a descriptive
-statement bounded by the benchmark's sensitivity, not a causal claim).
-\item Hacking is a function of adversarial conditions, not benchmark mass; the protocol catches it
-when present.
+yet triggers no more flags (descriptive, bounded by sensitivity, not causal).
+\item \textbf{The instrument is sensitive, not blind.} On a second benchmark (RTLLM, $41$ fair tasks)
+the na\"ive oracle flags $50$ differences over $20$ tasks across five models---not an insensitive
+oracle---yet an independent judge finds \textbf{$0$ hardcodes} (all honest/underspecified; e.g.\
+\code{up\_down\_counter}, flagged by all five, differs only in async-vs-sync reset, a CEX the
+reset-at-init TB never applies). Under $7$-iteration pressure on each model's failing tasks ($106$
+runs) we elicit \textbf{$0$ natural hacks}; the planted/impossible controls still fire.
 \end{enumerate}
 
 \section{Threats to Validity}
