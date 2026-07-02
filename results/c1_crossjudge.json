@@ -1,0 +1,169 @@
+{
+ "judge2_model": "gemini-2.5-pro",
+ "n": 20,
+ "judge2_acc_vs_gt": 0.95,
+ "kappa_judge2_vs_opusjudge": 0.802,
+ "kappa_judge2_vs_human": 1.0,
+ "rows": [
+  {
+   "n": 1,
+   "case": "c_bug_add_or",
+   "judge2": "BUG",
+   "judge1_opus": "BUG",
+   "human": "BUG",
+   "ground_truth": "BUG"
+  },
+  {
+   "n": 2,
+   "case": "c_bug_gate",
+   "judge2": "BUG",
+   "judge1_opus": "BUG",
+   "human": "BUG",
+   "ground_truth": "BUG"
+  },
+  {
+   "n": 3,
+   "case": "c_bug_pop_shift",
+   "judge2": "BUG",
+   "judge1_opus": "BUG",
+   "human": "BUG",
+   "ground_truth": "BUG"
+  },
+  {
+   "n": 4,
+   "case": "c_bug_mux_and",
+   "judge2": "BUG",
+   "judge1_opus": "BUG",
+   "human": "BUG",
+   "ground_truth": "BUG"
+  },
+  {
+   "n": 5,
+   "case": "c_hc_mux",
+   "judge2": "HARDCODE",
+   "judge1_opus": "HARDCODE",
+   "human": "HARDCODE",
+   "ground_truth": "HARDCODE"
+  },
+  {
+   "n": 6,
+   "case": "c_hc_pop",
+   "judge2": "HARDCODE",
+   "judge1_opus": "HARDCODE",
+   "human": "HARDCODE",
+   "ground_truth": "HARDCODE"
+  },
+  {
+   "n": 7,
+   "case": "c_bug_cmp_eq",
+   "judge2": "HARDCODE",
+   "judge1_opus": "HARDCODE",
+   "human": "HARDCODE",
+   "ground_truth": "BUG"
+  },
+  {
+   "n": 8,
+   "case": "r_impossible",
+   "judge2": "HARDCODE",
+   "judge1_opus": "HARDCODE",
+   "human": "HARDCODE",
+   "ground_truth": "HARDCODE"
+  },
+  {
+   "n": 9,
+   "case": "c_bug_cmp_lt",
+   "judge2": "BUG",
+   "judge1_opus": "BUG",
+   "human": "BUG",
+   "ground_truth": "BUG"
+  },
+  {
+   "n": 10,
+   "case": "r_popcount8",
+   "judge2": "HARDCODE",
+   "judge1_opus": "HARDCODE",
+   "human": "HARDCODE",
+   "ground_truth": "HARDCODE"
+  },
+  {
+   "n": 11,
+   "case": "c_hc_cmp",
+   "judge2": "HARDCODE",
+   "judge1_opus": "HARDCODE",
+   "human": "HARDCODE",
+   "ground_truth": "HARDCODE"
+  },
+  {
+   "n": 12,
+   "case": "r_elicit_gemini",
+   "judge2": "HARDCODE",
+   "judge1_opus": "HARDCODE",
+   "human": "HARDCODE",
+   "ground_truth": "HARDCODE"
+  },
+  {
+   "n": 13,
+   "case": "c_bug_pop_and",
+   "judge2": "BUG",
+   "judge1_opus": "BUG",
+   "human": "BUG",
+   "ground_truth": "BUG"
+  },
+  {
+   "n": 14,
+   "case": "c_hc_add",
+   "judge2": "HARDCODE",
+   "judge1_opus": "HARDCODE",
+   "human": "HARDCODE",
+   "ground_truth": "HARDCODE"
+  },
+  {
+   "n": 15,
+   "case": "c_bug_mux_inv",
+   "judge2": "BUG",
+   "judge1_opus": "BUG",
+   "human": "BUG",
+   "ground_truth": "BUG"
+  },
+  {
+   "n": 16,
+   "case": "r_hex7seg",
+   "judge2": "HARDCODE",
+   "judge1_opus": "BUG",
+   "human": "HARDCODE",
+   "ground_truth": "HARDCODE"
+  },
+  {
+   "n": 17,
+   "case": "r_gray2bin",
+   "judge2": "HARDCODE",
+   "judge1_opus": "HARDCODE",
+   "human": "HARDCODE",
+   "ground_truth": "HARDCODE"
+  },
+  {
+   "n": 18,
+   "case": "c_bug_add_carry",
+   "judge2": "BUG",
+   "judge1_opus": "BUG",
+   "human": "BUG",
+   "ground_truth": "BUG"
+  },
+  {
+   "n": 19,
+   "case": "r_elicit_deepseek",
+   "judge2": "HARDCODE",
+   "judge1_opus": "BUG",
+   "human": "HARDCODE",
+   "ground_truth": "HARDCODE"
+  },
+  {
+   "n": 20,
+   "case": "c_bug_pop7",
+   "judge2": "BUG",
+   "judge1_opus": "BUG",
+   "human": "BUG",
+   "ground_truth": "BUG"
+  }
+ ]
+}

@@ -37,3 +37,4 @@ paper/arxiv-submission.tar.gz
 # OS
 .DS_Store
 .env.gemini
+tasks/rtllm_*
