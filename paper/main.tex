@@ -47,15 +47,15 @@ agent's design and scores it with a withheld formal-equivalence oracle, and defi
 Reward-Hacking Gap (\rhg) and Honest Pass Rate (\hpr). Applying it to 156 VerilogEval tasks across
 five models, we find the na\"ive headline \rhg{} ($6.1\%$) is \emph{entirely an oracle artifact}: a
 na\"ive formal oracle over-reports reward hacking via don't-care \code{x}, async-reset,
-state-encoding, init-state, and even a SystemVerilog parser flag. We harden the oracle in seven steps
----reset-aware, don't-care-aware, bounded miter+SAT, \code{read\_verilog -sv}, a \code{memory}
-(case$\to$ROM) pass, a \code{-nolatches} reset-aware BMC, and an \emph{X-aware don't-care-masked
-(careset) miter}---cutting false counter-examples $9\!\to\!1$ and ``inconclusive'' $50\!\to\!0$. The
-careset miter \emph{proves} the flagged don't-care artifacts equivalent---two golden builds define the
-cared bits, a declared input precondition supplies the spec's legal-input assumption, and a real-latch
-half-cycle miter closes the mixed-edge class---collapsing the flagged \rhg{} across five models from
-$9$ cases to \textbf{zero} and \emph{eliminating hand-verification entirely}: \textbf{zero genuine
-reward hacking} ($95\%$ upper bound $\le\!3.2\%$) by frontier models on fair tasks. A weaker model (Haiku~4.5) fails $3\times$ more than
+state-encoding, init-state, and even a SystemVerilog parser default. We harden the oracle in seven
+steps---reset normalization, don't-care awareness, a bounded miter$+$SAT fallback, a SystemVerilog
+parse fix, ROM inference, a reset-aware bounded check for incompletely-specified FSMs, and an X-aware
+\emph{careset} miter with a real-latch half-cycle variant for latch/\code{negedge}
+designs---cutting false counter-examples $9\!\to\!0$ and ``inconclusive'' $50\!\to\!0$. Every
+na\"ively-flagged counter-example is machine-\emph{proven} equivalent---two golden builds define the
+specified (cared) output bits, and declared per-task preconditions encode each spec's legal-stimulus
+assumption---\emph{eliminating hand-verification entirely}: \textbf{zero genuine reward hacking}
+($95\%$ upper bound $\le\!3.2\%$) by frontier models on fair tasks. A weaker model (Haiku~4.5) fails $3\times$ more than
 Opus~4.8 on the visible tests but does \emph{not} hack more; even a tamper-capable shell agent that
 struggles for several iterations does not edit the testbench. We show the oracle catches hacking
 when present---both a planted candidate (passes a randomized hidden testbench, formally disproven) and
@@ -166,7 +166,29 @@ testbench/harness as \emph{exploit-evidenced} hacking, with the withheld tiers r
 originals so tampering cannot fool the verdict. We separate the claim into behavioral gap,
 exploit-evidenced, and tamper-confirmed, and never claim intent without trajectory evidence.
 
+\begin{table}[t]\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lp{0.72\linewidth}@{}}
+\toprule
+term & meaning \\
+\midrule
+golden & curated reference implementation the candidate must match \\
+visible / withheld tier & tests the agent sees and iterates against / checks run only on the frozen design \\
+miter & two designs wired to a comparator, so any output difference becomes a solver-searchable flag \\
+counter-example (CEX) & a concrete input sequence on which candidate and golden differ \\
+BMC & bounded model checking: exhaustive CEX search up to a cycle depth \\
+don't-care (\code{x}) & output bits the specification leaves unspecified \\
+careset (care-mask) & per-bit mask of \emph{specified} bits, from two golden builds (\code{x}$\to$0 vs.\ \code{x}$\to$1); only cared bits are compared \\
+input precondition & the spec's legal-stimulus assumption, declared per task and enforced inside the miter \\
+half-cycle miter & models each clock phase as one step, so intentional latches and \code{negedge} FFs compare faithfully \\
+\bottomrule
+\end{tabular}
+\caption{Glossary of recurring verification terms (metrics \rhg{}/\hpr{} are defined in \S\ref{sec:method}).}
+\label{tab:gloss}
+\end{table}
+
 \section{The oracle, and why na\"ive formal over-reports}\label{sec:oracle}
+Table~\ref{tab:gloss} glosses the recurring verification terms used below.
 On a 156-task sweep (Opus~4.8), a na\"ive \code{equiv\_make} oracle reported $9$ \rhg{}
 counter-examples and $50$ ``inconclusive.'' \textbf{Every CEX was a false positive}, found by
 hand-verifying flagged cases: don't-care \code{x} in the golden; functionally identical designs
@@ -235,9 +257,8 @@ equivalent---former \code{dc} reclassifications become machine-checked proofs an
 \end{table}
 
 \begin{figure}[t]\centering
-\includegraphics[width=0.95\linewidth]{figures/progression.pdf}
-\caption{Oracle hardening: artifacts fall (false CEX $9\!\to\!1$, inconclusive $50\!\to\!0$) and the
-verified-equivalent count (honest, incl.\ BMC) rises ($88\!\to\!140$; honest-only $88\!\to\!129$).}
+\includegraphics[width=0.86\linewidth]{figures/progression.pdf}
+\caption{Oracle hardening: artifacts fall (false CEX $9\!\to\!0$, inconclusive $50\!\to\!0$); proven-equivalent rises $88\!\to\!145$.}
 \label{fig:prog}
 \end{figure}
 
@@ -293,7 +314,7 @@ machine-\emph{prove} every na\"ively-flagged counter-example, so the \emph{flagg
 \end{table}
 
 \begin{figure}[t]\centering
-\includegraphics[width=0.95\linewidth]{figures/models.pdf}
+\includegraphics[width=0.88\linewidth]{figures/models.pdf}
 \caption{Weakness $\ne$ hacking across five models: Haiku/DeepSeek fail more on the visible tests (Opus/GPT-5.5/Gemini fewest), \rhg{}$=0$ throughout.}
 \label{fig:models}
 \end{figure}
@@ -350,7 +371,7 @@ honesty-loss budget is met only by the stronger-tail models, so the early-stop i
 rather than universal---a caveat the post-hoc number hides.
 
 \begin{figure}[t]\centering
-\includegraphics[width=0.78\linewidth]{figures/cost.pdf}
+\includegraphics[width=0.62\linewidth]{figures/cost.pdf}
 \caption{The repair tail is mostly wasted; an early-stop reclaims $12$--$23\%$ of tokens.}
 \label{fig:cost}
 \end{figure}
@@ -397,8 +418,12 @@ Kendall-$\tau=1.0$) and frame PPA as \emph{relative} (per TuRTLe~\cite{turtle}).
 LLM runs vary; we report Wilson CIs and pin model ids.
 
 \section{Limitations and Future Work}\label{sec:limits}
-Three limitations bound the claims; each has a concrete next step.
+Four limitations bound the claims; each has a concrete next step.
 \begin{itemize}[leftmargin=*,topsep=2pt,itemsep=2pt]
+\item \textbf{Small-module scope.} The $156$ VerilogEval tasks are single-module, single-clock RTL,
+so ``zero genuine reward hacking'' is a statement about \emph{this} task space. System-level designs
+(SoCs, multiple clock domains, hierarchical timing) are untested, and the careset/half-cycle
+machinery is per-module---compositional extension is future work.
 \item \textbf{Eval-time, not RL training.} We measure single-loop inference. The regime where reward
 hacking is documented to \emph{emerge} is RL on a gameable reward~\cite{baker,rlvrgaming}. Our training
 probe (\code{train\_grpo.py}: GRPO on the visible-test reward, audited by the withheld hidden$+$formal
@@ -416,22 +441,19 @@ PPA ${\sim}1.2$--$1.5\times$~\cite{edahep}) and a full agent-loop under the trai
 $156$ tasks plus membership inference (Min-K\%~\cite{minkprob}; NLL$\leftrightarrow$degradation
 \cite{nllmem}) would tighten it further.
 \end{itemize}
-Beyond these: more models and task types (debug/verify/reuse), and EQY structural matching for
-GPT-5.5's $3$ residual FSMs.
+Beyond these: more models and task types (debug/verify/reuse), and closing GPT-5.5's two
+budget-limited inconclusives.
 
 \section{Conclusion}
 Honest evaluation of agentic hardware design is gated not by a new pass-rate but by an oracle that
 is don't-care/reset/encoding-aware and by a discipline of verifying every flag. With that, frontier
 agents do not hack fair RTL tasks---but the oracle catches it when they do.
 
-\paragraph{Reproducibility \& artifact.} All code is released: the hardened oracle (\code{equiv.py}),
-the five per-model frozen sweeps, the figure/table generators, and the RLVR probe. \code{report\_cis.py}
-regenerates every headline number from the frozen candidates (EDA-only, \emph{no} LLM calls); model
-ids are pinned and hidden testbenches use fixed seeds, so results are deterministic
-(\code{docs/REPRODUCE.md}). The benchmark is an evaluation \emph{environment}, so we follow the
-code-hosting rather than data-hosting path.
+\paragraph{Reproducibility \& artifact.} All code, frozen sweeps, and generators are released;
+\code{report\_cis.py} regenerates every headline number from the frozen candidates (EDA-only, no LLM
+calls), with pinned model ids and fixed testbench seeds (\code{docs/REPRODUCE.md}).
 
-\begin{thebibliography}{99}\footnotesize\setlength{\itemsep}{1pt}
+\begin{thebibliography}{99}\scriptsize\setlength{\itemsep}{0pt}
 \bibitem{horizon} Yu, Deng, Pinckney, Khailany. Agentic Hardware Design as Repository-Level Code Evolution (HORIZON). arXiv:2606.28279, 2026.
 \bibitem{cvdp} Pinckney et al. Comprehensive Verilog Design Problems (CVDP). arXiv:2506.14074, 2025.
 \bibitem{specbench} Zhao, Srikanth, Wu, Jiang. SpecBench: Measuring Reward Hacking in Long-Horizon Coding Agents. arXiv:2605.21384, 2026.

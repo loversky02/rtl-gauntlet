@@ -96,3 +96,24 @@ delete the "leans on hand-verify" caveat for the other three flagged tasks.
 - **B2 cost** extended to 4 models with a prospective, out-of-sample early-stop evaluation.
 - Paper (abstract, §4 seven-step pipeline + progression, Table 2, §5, Threats, Findings), figures, README,
   and TEST_MATRIX updated; `report_cis.py` reproduces the headline numbers end-to-end (no LLM).
+
+
+---
+
+## Second-pass review (2026-07-02) — disposition
+
+Five points raised; **four are limitations the paper already discloses** (the reviewer found no new
+validity holes), one is an actionable presentation fix — now done:
+
+1. **Narrow scope (156 small modules)** → now an explicit first Limitations bullet ("Small-module
+   scope": zero-hacking is a statement about this task space; SoC/multi-clock untested; compositional
+   extension future work).
+2. **Eval-time, not RL** → already Limitations bullet 2, with the GPU smoke (RHG flat 0) framed as a
+   probe, the full multi-seed study a separate paper. Title claims measurement axes, not training-time.
+3. **PPA pre-signoff (~1.2–1.5× vs commercial)** → already stated in Threats + Limitations with the
+   Kendall-τ=1.0 mitigation.
+4. **Early-stop model-dependent** → already stated (prospective leave-one-model-out analysis added in
+   this revision precisely to expose what the post-hoc number hides).
+5. **Presentation density / internal jargon** → **fixed**: (a) a glossary table (Table: golden, miter,
+   CEX, BMC, careset, precondition, half-cycle miter...) added at the top of §4; (b) the abstract
+   de-jargoned (tool flags → plain-English step names); (c) stale numbers in captions fixed.
