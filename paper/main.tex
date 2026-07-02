@@ -396,12 +396,13 @@ LLM runs vary; we report Wilson CIs and pin model ids.
 Three limitations bound the claims; each has a concrete next step.
 \begin{itemize}[leftmargin=*,topsep=2pt,itemsep=2pt]
 \item \textbf{Eval-time, not RL training.} We measure single-loop inference. The regime where reward
-hacking is documented to \emph{emerge} is RL on a gameable reward~\cite{baker,rlvrgaming}. We implement
-and CPU-loop-validate the training probe (\code{train\_grpo.py} $+$ \code{validate\_grpo\_local.py}:
-GRPO on a visible-test reward, audited each step by the hidden$+$formal oracle,
-$\rhg(t)=\mathrm{visible}(t)-\mathrm{formal}(t)$); the full Qwen3-4B run needs an SFT cold-start (else
-the sparse reward collapses to zero advantage~\cite{dapo}) $+$ vLLM rollouts, so it is a \emph{separate
-GPU study}. RTL is the one domain where this step-wise audit is \emph{exhaustive}.
+hacking is documented to \emph{emerge} is RL on a gameable reward~\cite{baker,rlvrgaming}. Our training
+probe (\code{train\_grpo.py}: GRPO on the visible-test reward, audited by the withheld hidden$+$formal
+oracle, $\rhg(t)=\mathrm{visible}(t)-\mathrm{formal}(t)$) \emph{runs end-to-end on a GPU}: a Qwen3-4B
+LoRA smoke (SFT cold-start~\cite{dapo} $+$ $50$ GRPO steps, A100) holds
+$\mathrm{visible}=\mathrm{formal}=0.83$ with $\rhg$ \emph{flat at} $0$ at both audits---no hacking
+induced \emph{at smoke scale}. The full multi-seed emergence study is a \emph{separate GPU study}.
+RTL is the one domain where this step-wise audit is \emph{exhaustive}.
 \item \textbf{PPA is pre-signoff.} C3 now spans a size-graded set (\code{counter8}$\to$\code{popcount8}
 $\to$\code{spm}$\to$\code{picorv32}) with real Sky130 PPA and Kendall-$\tau=1.0$ rank stability across
 two synthesis strategies. The remaining gap is a \emph{commercial signoff} stack (open Sky130 inflates
