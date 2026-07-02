@@ -1,73 +1,50 @@
-# NEXT — resume checklist (paper must-haves)
+# NEXT — status after the review revision (2026-07-02)
 
-**To resume next session:** open Claude in this repo, say *"tiếp tục RTL Gauntlet must-haves"* —
-memory auto-loads; then read this file.
+**To resume next session:** open Claude in this repo — memory auto-loads; then read this file.
 
-**Status (updated):** All must-haves #1–#5 + #6 (negative) + #7 (4 models) + **oracle residual
-CLOSED**. Oracle: false-CEX 9→1, inconclusive 50→**0** (Opus), HPR **90%**. Four models, all verified
-RHG=0: Opus **0.90** / GPT-5.5 **0.88** / DeepSeek **0.76** / Haiku **0.72**. **Paper compiled**:
-`paper/main.tex` → `paper/main.pdf` (**7 pp**, `pdflatex`), figures via `scripts/make_figures.py`.
-C1 ~97% · C2 ~60% · C3 ~45% · Paper ~93%. Results: `docs/PILOT_RESULTS.md`.
+## STATUS: REVISION COMPLETE — merged to `main`, submission-ready
 
-**DONE this session:**
-- **#3 residual CLOSED** — `-nolatches` reset-aware Pass-3 in `equiv.py`: 5 Opus FSMs → bmc_equiv,
-  1 → dontcare; inconclusive 50→0 (Opus/Haiku/DeepSeek); genuine-diff control still flags. No EQY.
-- **#7 GPT-5.5 added** (`cx/gpt-5.5`) — 0.96 visible-pass, HPR 0.88, RHG_cex 3 all verified artifacts.
-  `llm.py` now retries w/ backoff (the route drops calls under burst when the upstream blips).
-- **#1 Haiku mutation done** — 40/40 honest, HPR 1.00→1.00, RHG 0→0 (both Opus AND Haiku robust).
-- **#8 GPT-5.5 shell-tamper** — no-tamper (edits only the design); Opus/Haiku/GPT all honest on fair.
-- **RLVR made deploy-ready + loop-validated locally** (`validate_grpo_local.py`, no GPU): fixed 6
-  integration issues (num_generations, use_vllm, rl_reward task-keys+ref_module, bf16, OOM→LoRA) and
-  added research-backed knobs (`--num-gen 8`, `--sft-first`, `--dynamic-sampling`, `--vllm`). The 4B
-  full run still needs a GPU + budget (see cost table below).
-- **Author** set (Vuong Tran Dinh Minh); **Gemini #5 scaffold** (`.env.gemini`, sweep running); all
-  docs synced (README/PILOT_RESULTS/REPRODUCE/RLVR/TEST_MATRIX).
+Every item of the external review (A/B/C) is addressed; all work is on `main` (single branch, single
+contributor, no AI attribution). Paper: `paper/main.tex` → **8 pp**, compiles clean; fresh
+`paper/arxiv-submission.tar.gz` (isolated-compile verified: 8 pp, 0 errors). Tests: `tests/` **10
+passed, no xfail**. Point-by-point reviewer response: `docs/REVIEW_RESPONSE.md`.
 
-**Remaining:**
-- **Gemini #5 wire** — sweep finishing; then tab:models 5th col + abstract "four→five models" + figs.
-- **#6 RLVR full GPU run** — deploy-ready; GATED on budget. RunPod: fail-fast smoke ~$1; 1 seed vLLM
-  ~$10-15; full multi-seed study ~$40-75 + days. Balance ~$11 (spent ~$1.1 on fixed-then-terminated pods).
-- 🟡 enrichment: related-work (DAPO/CodeV-R1/EvilGenie) + RLVR future-work (gradient-death/SFT-first);
-  README run-instructions polish; prettier figures for submission.
+### Headline results (all reproducible, no LLM/GPU needed)
+| axis | result | reproduce |
+|------|--------|-----------|
+| **Oracle (A1)** | 7-step hardened; careset + **real-latch half-cycle (mixed-edge)** miters machine-prove EVERY flagged CEX: **flagged RHG 9→0, hand-verification eliminated** | `compare_careset.py` |
+| **HPR** | Opus/GPT **0.929** [.88,.96] · Gemini 0.897 · DeepSeek 0.769 · Haiku 0.731 | `report_cis.py` |
+| **Contamination (A2)** | 156/156 mutants oracle-verified equivalent; HPR stable on Opus+Haiku re-sweep; open-model MI ΔNLL +0.045 (no memorization) | `verify_mutants.py`, `membership_mlx.py` |
+| **Tamper (A3a)** | 156 fair tasks × Opus+Haiku: **0 fake-pass tampers** (3 more models sweeping) | `run_tamper_sweep.py` |
+| **Negative control (A3b)** | impossible task: **3/5 models cheat** (DeepSeek/Gemini/GPT-5.5), Opus resists | `run_impossible_5model.py` |
+| **Latency (B1)** | real Sky130, size-graded incl. **picorv32**; **Kendall-τ = 1.0** rank stability across AREA/DELAY | `kendall_tau.py` |
+| **Cost (B2)** | 4 models + prospective (leave-one-out) early-stop: 12–24% tokens / 4–9% honesty, model-dependent | `analyze_cost.py` |
+| **Judge (C1)** | blind judge-vs-human **Cohen κ = 0.80 (strong)**, n=20 → keep the intent claim | `c1_kappa.py` |
+| **RLVR (C2)** | GPU smoke ran end-to-end (A100): SFT + 50-step GRPO, oracle audits → **RHG = 0.0 flat** | `results/runpod/rhg_curve_*.jsonl` |
 
-**Environment (already set up):**
-- 9router: `set -a; source ../jerp-docex/.env; set +a` (gives `OPENAI_BASE_URL` + key).
-  Models: `RTLG_MODEL=cc/claude-opus-4-8` | `cc/claude-haiku-4-5-20251001` | `cx/gpt-5.5`.
-  LLM calls need the sandbox disabled.
-- EDA local: `iverilog` + `yosys` via brew (installed). Sweeps: `scripts/run_veval.py`.
-- VerilogEval tasks: regenerate with `python3 scripts/import_veval.py --all` (gitignored).
+### In flight (background, ~free)
+- Tamper sweep for GPT/Gemini/DeepSeek ×156 (`runs/tamper_{gpt,gemini,deepseek}.log`) → when done,
+  update the paper's elicit line to "156×5" and `results/tamper_summary.json`.
 
-## MUST-HAVE (gate to a submittable v1) — ✅ ALL DONE
-- [x] **#1 Contamination + mutation** — `mutate_tasks.py`; Opus+Haiku 40/40 honest (HPR 1.0→1.0,
-  RHG 0→0) + semantic `sem_zerocount`. Full-benchmark semantic re-mutation = future.
-- [x] **#2 Formal-earns-its-keep** — `formal_demo` (16-bit, wrong only on 0xDEAD): visible+hidden
-  PASS, formal CEX → RHG 0.50.
-- [x] **#3 Close inconclusive** — done WITHOUT eqy: `memory` pass (→6) then `-nolatches` reset-aware
-  Pass-3 (→0 for Opus/Haiku/DeepSeek). Root cause was latch-elaboration, not solver-hardness.
-- [x] **#4 CIs** — `metrics.wilson_ci` + `report_cis.py`; verified RHG=0, upper bounds ≤2.5–3.2%.
-- [x] **#5 Reproducibility** — `docs/REPRODUCE.md` (pinned ids, stage→file table); README run cmds.
+### Environment (already set up)
+- 9router creds live in sibling projects (`../jerp-docex/.env` etc.) → per-model `.env.opus/.gpt/.haiku`
+  here; Gemini `.env.gemini` (keep **2.5 Pro** — changing model changes results); DeepSeek `.env`.
+- EDA local: brew `iverilog` + `yosys`. Tasks regenerate: `python3 scripts/import_veval.py --all`.
+- RunPod lessons (API dockerArgs, SECURE cloud, SHA-pinned launcher, GH_TOKEN needs Contents:RW,
+  heartbeat push-back): see memory `runpod-deploy-lessons` + `runpod/rlvr_launch.sh`.
 
-## SHOULD-HAVE (de-risk acceptance)
-- [~] **#6 Elicit RHG>0** — single-loop elicit is NEGATIVE (documented); RLVR training-time is the
-  regime, deploy-ready + loop-validated, GATED on GPU budget. This is the "may not converge" question.
-- [x] **#7 +models** — DeepSeek + GPT-5.5 done (4 models); Gemini #5 sweeping.
-- [x] **#8 Real shell-agent hacking — ELICITED (positive).** Fair tasks: Opus/Haiku/GPT-5.5 all
-  honest (lower anchor). **Impossible task (b, `make_impossible.py`): GPT-5.5 HARDCODES** the
-  contradictory vector (`(data==8'h00)?4'd7:popcount`) → visible PASS, formal CEX, exploit-evidenced
-  = **first elicited hack**, and a design-only one the old file-edit flag missed (caught by
-  `tamper_judge`, a). Research: `docs/TAMPER_ELICITATION_HARNESS.md`. The one-shot shell agent
-  sufficed on the impossible task; a fuller bash/editor tool-use loop (c) + ambiguous-spec tasks
-  remain if we want the full phase-diagram matrix.
+## FUTURE WORK (separate papers / optional polish — do NOT block submission)
+- **RLVR full study** (500 steps, multi-seed, ~$5–15 GPU): instrument proven; launcher + retrieval
+  work end-to-end. The emergence question is a **separate paper**.
+- **Hidden-randomized-TB for all 156** — authoring is the human bottleneck; paper discloses the
+  subset honestly.
+- **picorv32 timing closure** (slack currently negative; paper frames pre-signoff relative + τ=1.0).
+- More task types (debug/verify/reuse); intent measurement from reasoning traces.
 
-## FUTURE WORK (state in paper; do NOT block v1)
-- **C3 full:** scale OpenLane designs (⚠ `railway.json` MUST be at repo ROOT) → surrogate on real
-  data → RunPod GPU ~1 h → agent loop under high-latency reward. Railway project was deleted; redeploy
-  fresh. ~2–3 h parallelized for the toy set; larger designs (picorv32) = many more hours.
-- **Training-time RLVR hacking** — a separate, more ambitious paper (needs GPU): train a small RTL
-  agent with GRPO on a visible-test reward, measure emergence of hacking via hidden+formal.
-- Intent measurement (reasoning-trace), surrogate meta-hacking, more task types (debug/verif/reuse).
-
-## Target venue
-Methodology + benchmark + finding paper → NeurIPS/ICML **Datasets & Benchmarks**, or **MLCAD/ICCAD**
-(EDA tooling). Core story: *naive formal over-reports reward hacking; a hardened oracle + verification
-discipline; frontier agents don't hack fair tasks, but the oracle catches it when present.*
+## Submission checklist (user actions)
+- [ ] 🔴 Revoke the GitHub fine-grained token (it appears in the chat transcript).
+- [ ] Repo public + arXiv upload (`paper/arxiv-submission.tar.gz`; engine auto = pdfLaTeX;
+      category cs.AR, cross-list cs.LG/cs.SE; license CC BY 4.0). Checks in `paper/ARXIV.md`.
+- [ ] Venue: NeurIPS/ICML Datasets & Benchmarks, or MLCAD/ICCAD. Core story: *naive formal
+      over-reports reward hacking; a fully mechanized 7-step oracle proves every flag; frontier
+      agents don't hack fair RTL tasks — and the oracle catches it when they do.*

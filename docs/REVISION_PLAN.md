@@ -244,25 +244,28 @@ surface. Everything after is score-raising, not paper-saving.
 
 ---
 
-## Status log (non-GPU execution)
+## Status log — FINAL (2026-07-02): ALL WAVES COMPLETE, merged to `main`
 
-- ✅ **R-A1 (keystone)** — sound careset oracle built, integrated into `equiv.py`, 156×5 re-scored:
-  flagged RHG **9→2**, HPR up on all 5, **0 regressions**, hand-verify 4 tasks→1 (circuit8). Paper +
-  figures + README + TEST_MATRIX updated; `report_cis.py` reproduces Table 2. Tests green.
-- ✅ **R-B2 (cost)** — extended to 4 models + threshold ablation + **prospective** (leave-one-model-out)
-  early-stop; early-stop@1 saves 12–24% for 4–9% honesty loss, model-dependent under a 5% budget.
-  Paper §5 + Fig + `cost.py`/`analyze_cost.py`.
-- ✅ **R-F4 (reviewer memo)** — [`docs/REVIEW_RESPONSE.md`](REVIEW_RESPONSE.md), point-by-point A/B/C.
-- 🟡 **R-A2a (contamination)** — verification harness done: `scripts/verify_mutants.py` proves the 40
-  probe mutants **function-preserving via A1 (40/40)**; paper contamination bullet updated. *Remaining
-  (router):* full-156 semantic re-mutation + 5-model re-sweep; membership inference (open models).
-- ✅ **R-A3b (negative control ×5)** — `scripts/run_impossible_5model.py`: on the impossible task **3/5
-  pass** (DeepSeek/Gemini/GPT-5.5), 2 judge-confirmed hardcode, Opus+Haiku refuse. Metric not trivially
-  zero. Bonus C1 signal: judge under-called GPT-5.5 (conservative lower bound). Paper §5/Threats/M6 +
-  `results/phase_diagram_impossible_5model.json`.
-- ⏳ **Router set up (9router=GPT/Claude via `.env.opus/.gpt/.haiku`; DeepSeek=`.env`; Gemini=`.env.gemini`
-  Pro).** Remaining router work: A2a full re-sweep, R-C1 human-annotation half. **GPU (runpodctl ready):**
-  R-C2 RLVR — clones from GitHub, so **needs the careset work pushed first**; R-B1-full surrogate train.
+- ✅ **R-A1 (keystone)** — careset oracle + **`run_mixededge_equiv`** (real-latch half-cycle miter closes
+  circuit8: `-nolatches` was destroying its intentional latch). 156×5 re-scored: **flagged RHG 9→0,
+  hand-verification ELIMINATED**, HPR Opus/GPT **0.929**, 0 regressions; broken-mutant controls still cex.
+  Tests 10✓ no xfail. `report_cis.py`/`compare_careset.py` reproduce everything.
+- ✅ **R-A2a (contamination, full scale)** — ALL 156 mutants generated + **oracle-verified
+  function-preserving (156/156)**; re-swept Opus (HPR 0.923→0.923) + Haiku (0.731→0.763), RHG≈0 →
+  not memorization. ✅ **R-A2b** — open-model MI via local MLX (Qwen2.5-3B teacher-forced): ΔNLL +0.045
+  ≈ 0, no memorization advantage; closed APIs can't do MI (documented).
+- ✅ **R-A3a (tamper)** — 156 × Opus+Haiku: **0 fake-pass tampers**; GPT/Gemini/DeepSeek sweeping in
+  background (→ 156×5). ✅ **R-A3b** — impossible task ×5: 3/5 cheat, Opus resists, judge = conservative
+  lower bound.
+- ✅ **R-B1-full (latency)** — Railway OpenLane: real Sky130 over size-graded set incl. **picorv32**,
+  **Kendall-τ = 1.0** across AREA/DELAY strategies. ✅ **R-B2 (cost)** — 4 models + prospective
+  early-stop (12–24% / 4–9%, model-dependent).
+- ✅ **R-C1 (judge κ)** — blind 20-case study: judge-vs-human **Cohen κ = 0.802 (strong)** → intent
+  claim kept. ✅ **R-C2 (RLVR)** — GPU smoke end-to-end on A100 (SFT + 50-step GRPO, oracle audits):
+  **RHG = 0.0 flat**; full multi-seed study = separate paper.
+- ✅ **R-F1..F4** — anchor committed, C3 promoted (τ=1.0), honest Limitations, reviewer memo
+  (`docs/REVIEW_RESPONSE.md`). Paper **8 pp**; fresh `arxiv-submission.tar.gz` (isolated-compile
+  verified). Repo: single `main`, single contributor, no AI attribution.
 
 ## Decision log
 
