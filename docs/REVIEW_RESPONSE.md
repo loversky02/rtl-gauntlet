@@ -178,7 +178,7 @@ positives are author-staged. We attacked it with **new data**:
    same 20 blind cases: acc 0.95, **κ vs human = 1.00**, κ vs Opus-judge = 0.80 — reliability is a
    property of the method, not of Opus. (`results/c1_crossjudge.json`.)
 4. **"DeepSeek cost data missing" → fixed.** Re-swept DeepSeek with token logging (199k over 156);
-   cost data now spans 5 models. **Tamper extended to 156×5** (0 fake-pass on all five).
+   cost data now spans 5 models. **Tamper extended to 156×4** (0 fake-pass; Opus/Haiku/GPT/DeepSeek full, Gemini partial 56/156 also 0 — stopped on quota).
 
 **Honestly still open (needs GPU / scale, stated as future work):** a *natural* hack remains unfound
 (so the strongest defense of the title is still the RL-training study, GPU-gated); RTLLM full

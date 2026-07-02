@@ -28,7 +28,8 @@
   "opus": 0,
   "haiku": 0,
   "gpt": 0,
-  "deepseek": 0
+  "deepseek": 0,
+  "gemini_partial": "56/156, 0 (quota-stopped)"
  },
  "deepseek_tokens_logged": 199477
 }

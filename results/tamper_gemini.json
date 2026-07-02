@@ -1,0 +1,231 @@
+{
+  "model": "gemini-2.5-pro",
+  "tampered": 0,
+  "n": 56,
+  "rows": [
+    {
+      "task": "veval_prob001_zero",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob002_m2014_q4i",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob003_step_one",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob004_vector2",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob005_notgate",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob006_vectorr",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob007_wire",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob008_m2014_q4h",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob009_popcount3",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob010_mt2015_q4a",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob011_norgate",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob012_xnorgate",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob013_m2014_q4e",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob014_andgate",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob015_vector1",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob016_m2014_q4j",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob017_mux2to1v",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob018_mux256to1",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob019_m2014_q4f",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob020_mt2015_eq2",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob021_mux256to1v",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob022_mux2to1",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob023_vector100r",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob024_hadd",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob025_reduction",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob026_alwaysblock1",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob027_fadd",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob028_m2014_q4a",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob029_m2014_q4g",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob030_popcount255",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob031_dff",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob032_vector0",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob033_ece241_2014_q1c",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob034_dff8",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob035_count1to10",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob036_ringer",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob037_review2015_count1k",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob038_count15",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob039_always_if",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob040_count10",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob041_dff8r",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob042_vector4",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob043_vector5",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob044_vectorgates",
+      "error": "APIConnectionError: Connection error."
+    },
+    {
+      "task": "veval_prob045_edgedetect2",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob046_dff8p",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob047_dff8ar",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob048_m2014_q4c",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob049_m2014_q4b",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob050_kmap1",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob051_gates4",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob052_gates100",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob053_m2014_q4d",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob054_edgedetect",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob055_conditional",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    },
+    {
+      "task": "veval_prob056_ece241_2013_q7",
+      "error": "RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}]"
+    }
+  ]
+}
