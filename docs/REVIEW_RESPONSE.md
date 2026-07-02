@@ -92,7 +92,7 @@ delete the "leans on hand-verify" caveat for the other three flagged tasks.
 ---
 
 ## Summary of what changed since the reviewed draft
-- **A1 sound oracle** integrated + 156×5 re-scored: flagged RHG 9→2, HPR up, 0 regressions, hand-verify 4→1.
+- **A1 sound oracle** integrated + 156×5 re-scored: flagged RHG **9→0**, HPR up (Opus/GPT 0.929), 0 regressions, **hand-verification eliminated** (careset + real-latch half-cycle miters).
 - **B2 cost** extended to 4 models with a prospective, out-of-sample early-stop evaluation.
 - Paper (abstract, §4 seven-step pipeline + progression, Table 2, §5, Threats, Findings), figures, README,
   and TEST_MATRIX updated; `report_cis.py` reproduces the headline numbers end-to-end (no LLM).
