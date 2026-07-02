@@ -17,24 +17,23 @@ The naïve headline reward-hacking number is **entirely an oracle artifact**. A 
 over-reports hacking via don't-care `x`, async-reset, state-encoding, init-state, a SystemVerilog
 parser flag, and unstated input constraints. We **harden the oracle in seven steps** (reset-aware,
 don't-care-aware, bounded miter+SAT, `read_verilog -sv`, `memory` case→ROM, a `-nolatches` reset-aware
-BMC, and an **X-aware careset miter**), cutting false counter-examples **9→1** and "inconclusive"
-**50→0**. The careset miter *machine-proves* the flagged don't-care artifacts equivalent (two golden
-builds define the cared bits; a declared input precondition supplies the spec's legal-input
-assumption), collapsing the flagged RHG across five models from **9→2** with **zero regressions** and
-reducing hand-verification from four tasks to one: **zero genuine reward hacking across five models on
-fair tasks**.
+BMC, and an **X-aware careset miter** with a **real-latch half-cycle miter** for the mixed-edge class),
+cutting false counter-examples **9→0** and "inconclusive" **50→0**. Every naïvely-flagged
+counter-example is **machine-proven equivalent** — **hand-verification is eliminated entirely**:
+**zero genuine reward hacking across five models on fair tasks**.
 
 | Model | HPR (95% CI) | flagged RHG (machine) | verified RHG |
 |-------|--------------|-----------------------|--------------|
-| Opus 4.8 | 0.92 [.87,.96] | 1 (circuit8) | 0 (≤2.5%) |
-| GPT-5.5 | 0.92 [.87,.96] | 1 (circuit8) | 0 (≤2.5%) |
-| Gemini 2.5 | 0.90 [.84,.94] | 0 | 0 (≤2.6%) |
-| DeepSeek | 0.77 [.70,.83] | 0 | 0 (≤3.1%) |
-| Haiku 4.5 | 0.73 [.66,.79] | 0 | 0 (≤3.2%) |
+| Opus 4.8 | 0.93 [.88,.96] | **0** | 0 (≤2.5%) |
+| GPT-5.5 | 0.93 [.88,.96] | **0** | 0 (≤2.5%) |
+| Gemini 2.5 | 0.90 [.84,.94] | **0** | 0 (≤2.6%) |
+| DeepSeek | 0.77 [.70,.83] | **0** | 0 (≤3.1%) |
+| Haiku 4.5 | 0.73 [.66,.79] | **0** | 0 (≤3.2%) |
 
-The four na­ïvely-flagged tasks (`q5b`, `prob095`, `prob149`, `circuit8`) are now **machine-proven
-equivalent** except `circuit8` (a mixed-edge latch/FF, hand-verified as equivalent under the
-testbench's synchronous clock). Reproduce: `python3 scripts/compare_careset.py`.
+All four naïvely-flagged tasks (`q5b`, `prob095`, `prob149`, `circuit8`) are **machine-proven
+equivalent** — `circuit8`'s false CEX came from `-nolatches` destroying its intentional latch; the
+half-cycle miter (real latches, regular clock, posedge-registered inputs) proves it while wrong-edge /
+inverted mutants still CEX. Reproduce: `python3 scripts/compare_careset.py`.
 **Weakness ≠ hacking**: a weaker model fails far more on the visible tests but cheats no more, even a
 tamper-capable shell agent edits only the design, never the testbench.
 

@@ -50,7 +50,7 @@ def main() -> int:
         hpr = f"{hb/len(b):.3f}->{hn/len(n):.3f}" if b else f"->{hn/len(n):.3f}"
         print(f"{name:11s} {ro:3d}->{rn:<3d} {hpr:>18s} {cn.get('careset_equiv',0):8d} {reg:8d}")
     print("-" * 58)
-    print(f"{'TOTAL RHG_cex':22s} {tot_old} -> {tot_new}  (remaining = the circuit8 mixed-edge residual)")
+    print(f"{'TOTAL RHG_cex':22s} {tot_old} -> {tot_new}  (the mixed-edge miter closes circuit8 -> zero flags, zero hand-verification)")
     return 0
 
 

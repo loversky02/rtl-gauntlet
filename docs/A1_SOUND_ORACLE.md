@@ -39,7 +39,7 @@ For golden `G` and candidate `C` with locked I/O:
 | `prob095` | init/reset transient (sync reset) | **proven** | care-mask + settle — *automatic* |
 | `q5b`      | one-hot init (async reset)        | **proven** | care-mask + settle — *automatic* |
 | `prob149`  | input **sequence** precondition (gradual level) | **proven** | + declared precondition |
-| `circuit8` | mixed-edge negedge-FF **+** latch | **cex** (residual) | needs regular-clock modeling |
+| `circuit8` | mixed-edge negedge-FF **+** latch | **proven** | real-latch half-cycle miter (see below) |
 | *broken dfr*, *broken fr* (controls) | — | **cex** | non-vacuity: real bugs still caught |
 
 `q5b` also cross-checks: Gemini's `q5b` (independently written, genuinely equivalent) is `proven`,
@@ -105,3 +105,18 @@ Abstract/§4 currently say "verify every surviving flag **by hand**." After inte
 the don't-care-aware miter **proves** equivalence for the artifact cases (output-`x`, init-transient,
 declared input-precondition), reducing hand-verification from 4 flagged tasks to 1 characterized
 mixed-edge residual — with the input preconditions published as machine-checkable task annotations.
+
+
+## UPDATE — circuit8 CLOSED (hand-verification eliminated)
+
+The circuit8 "residual" was an **artifact of our own elaboration**: `-nolatches` + `setundef` DESTROY the
+intentional transparent latch (turn "hold" into a driven constant), so the standard careset build compared a
+mangled design. `run_mixededge_equiv` (equiv.py) keeps the REAL latches (no `-nolatches`, no `async2sync`),
+converts to half-cycle logic with `clk2fflogic`, drives a REGULAR alternating clock (one SAT step per
+half-cycle), registers all non-clock inputs at posedge (the testbench's synchronous-stimulus precondition,
+declared), and keeps the two-build care-mask for init-x. Result: **Opus, GPT-5.5, and Gemini circuit8
+candidates all PROVEN; inverted-FF / transparent-low-latch / wrong-edge mutants all still CEX** (non-vacuous).
+
+Final 156×5 tally: **flagged RHG 9 → 0** — every naively-flagged counter-example is machine-proven
+equivalent; **no hand-verification remains anywhere**. HPR: Opus/GPT 145/156 = 0.929, Gemini 0.897.
+Tests: `tests/test_sound_oracle.py` (10 passed, no xfail).

@@ -16,10 +16,10 @@ We replaced the heuristic don't-care handling (`_golden_has_dontcare` reclassify
 **declared per-task input precondition** ([`rtl_gauntlet/preconds/`](../rtl_gauntlet/preconds/)) supplies
 the spec's legal-input assumption. Re-scoring all **156×5** through it (`compare_careset.py`, no LLM):
 
-- flagged **RHG_cex 9 → 2** across five models (both remaining are `circuit8`); **3/5 models now 0**;
+- flagged **RHG_cex 9 → 0** across five models — every flag machine-proven; 
 - **HPR up on every model** (Opus/GPT 0.92, Gemini 0.90, DeepSeek 0.77, Haiku 0.73);
 - **zero regressions**; the planted impossible-task overfit stays a CEX (non-vacuous);
-- hand-verification drops from **4 tasks to 1** (`circuit8`).
+- **hand-verification eliminated entirely** (the last case, `circuit8`, closes under a real-latch half-cycle miter — the old `-nolatches` build was destroying its intentional latch).
 
 **Nuance we add (and the reviewer's one-line recipe misses):** `setundef + careset` alone is *necessary but
 not sufficient*. What the hand-verification was actually encoding splits into four don't-care classes —
@@ -27,9 +27,7 @@ output-`x`, init/reset-transient (both now automatic), input-*sequence* precondi
 the testbench, e.g. prob149's gradual thermometer change), and mixed-edge/latch timing (`circuit8`). So A1
 converts an *opaque per-case verdict* into a *machine-checkable, re-runnable proof + a declared precondition*
 — a genuine rigor upgrade. Full write-up: [`docs/A1_SOUND_ORACLE.md`](A1_SOUND_ORACLE.md); regression tests
-`tests/test_sound_oracle.py` (8 passed, 1 xfail). **One honest residual:** `circuit8`, a `negedge`-FF + latch
-equivalent only under the testbench's synchronous clock; our bounded free-clock miter cannot discharge the
-timing race (a regular-clock harness is future work), so it stays hand-verified.
+`tests/test_sound_oracle.py` (10 passed, no xfail). **No residual:** `circuit8` closes under the real-latch half-cycle miter (regular clock, posedge-registered inputs — a declared synchronous-stimulus precondition); broken mutants still CEX.
 
 ### A2 — close contamination — **Behavioral probe DONE at full scale; MI is API-limited**
 *Clarify (under-credited):* the earlier draft already ran a 40-task identifier mutation. **Now extended
@@ -88,7 +86,7 @@ separate GPU study (convergence on a 4B model is the risk — we agree it is "sh
 
 ### C3 — honest Limitations — **Done (and kept honest)**
 The paper's Limitations/Threats already scope: eval-time (not RL), pre-signoff relative PPA, hidden-TB on a
-subset, contamination probe not yet exhaustive, and now the single `circuit8` oracle residual. A1 lets us
+subset, contamination probe not yet exhaustive, and now **zero oracle residuals**. A1 lets us
 delete the "leans on hand-verify" caveat for the other three flagged tasks.
 
 ---

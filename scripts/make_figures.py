@@ -18,9 +18,9 @@ plt.rcParams.update({"font.size": 11, "figure.dpi": 150, "savefig.bbox": "tight"
 
 def fig_progression():
     stages = ["naïve", "+reset\n+don't-care", "+BMC", "+SV", "+memory", "+reset\n-BMC", "+careset"]
-    false_cex = [9, 3, 1, 1, 1, 1, 1]          # Opus residual = circuit8 (mixed-edge, hand-verified)
+    false_cex = [9, 3, 1, 1, 1, 1, 0]          # careset+mixed-edge closes circuit8 -> ZERO flagged
     inconclusive = [50, 50, 50, 14, 6, 0, 0]
-    honest = [88, 91, 94, 128, 135, 140, 144]  # honest + bmc_equiv + careset_equiv (Opus 129+11+4)
+    honest = [88, 91, 94, 128, 135, 140, 145]  # honest + bmc_equiv + careset_equiv (Opus 129+11+5)
     fig, ax = plt.subplots(figsize=(6.2, 3.4))
     ax.plot(stages, false_cex, "o-", color="#c0392b", label="false CEX")
     ax.plot(stages, inconclusive, "s-", color="#e67e22", label="inconclusive")
@@ -42,8 +42,8 @@ def fig_progression():
 
 def fig_models():
     cats = ["honest", "bmc", "careset", "dontcare", "RHG_cex", "inconcl", "fail", "no-cand"]
-    opus = [129, 11, 4, 2, 1, 0, 9, 0]         # resweep_opus_careset
-    gpt = [126, 12, 6, 3, 1, 2, 6, 0]          # resweep_gpt_careset
+    opus = [129, 11, 5, 2, 0, 0, 9, 0]         # resweep_opus_careset (mixed-edge closes circuit8)
+    gpt = [126, 12, 7, 3, 0, 2, 6, 0]          # resweep_gpt_careset
     gemini = [123, 11, 6, 1, 0, 1, 14, 0]      # resweep_gemini_careset
     deepseek = [113, 5, 2, 0, 0, 0, 36, 0]     # resweep_deepseek_careset
     haiku = [109, 4, 1, 1, 0, 0, 30, 11]       # resweep_haiku_careset
@@ -58,7 +58,7 @@ def fig_models():
     ax.set_xticks(list(x))
     ax.set_xticklabels(cats, rotation=20, ha="right")
     ax.set_ylabel("# of 156 tasks")
-    ax.set_title("Weakness ≠ hacking (5 models): flagged RHG_cex 9→2 (careset-proven; circuit8 residual)")
+    ax.set_title("Weakness ≠ hacking (5 models): flagged RHG_cex 9→0 — every flag machine-proven")
     ax.legend(loc="upper right", fontsize=8, ncol=2)
     ax.grid(True, axis="y", alpha=0.3)
     fig.savefig(f"{OUT}/models.pdf")

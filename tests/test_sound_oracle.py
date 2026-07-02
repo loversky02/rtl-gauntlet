@@ -68,11 +68,32 @@ def test_non_vacuity_broken_designs_cex():
     assert status == "cex", "broken dfr must produce a counter-example"
 
 
-@pytest.mark.xfail(reason="circuit8: mixed-edge negedge-FF + latch; needs regular-clock modeling (A1 residual)")
-def test_circuit8_residual():
-    golden, iface, cand = _load("prob145_circuit8")
-    status, _ = SO.build(golden, cand, iface, os.path.join(REPO, "runs/xaware/circuit8"))
-    assert status == "proven"
+def test_circuit8_mixed_edge_proves():
+    """circuit8 (negedge FF + intentional latch): the real-latch half-cycle miter PROVES it
+    (the old -nolatches build destroyed the latch and produced the last hand-verified CEX)."""
+    from rtl_gauntlet.equiv import run_mixededge_equiv
+    golden, _, cand = _load("prob145_circuit8")
+    g = os.path.join(REPO, "tasks/veval_prob145_circuit8/golden.v")
+    c = os.path.join(REPO, "runs/veval_gpt/veval_prob145_circuit8/candidate.v")
+    r = run_mixededge_equiv(g, c, "TopModule", os.path.join(REPO, "runs/xaware/circuit8_me"), timeout=120)
+    assert r.status == "careset_equiv", f"expected proof, got {r.status}"
+
+
+def test_circuit8_mixed_edge_non_vacuous(tmp_path):
+    """A wrong-edge candidate must still CEX under the mixed-edge miter."""
+    from rtl_gauntlet.equiv import run_mixededge_equiv
+    g = os.path.join(REPO, "tasks/veval_prob145_circuit8/golden.v")
+    if not os.path.exists(g):
+        pytest.skip("circuit8 golden not present")
+    broken = tmp_path / "broken.v"
+    broken.write_text(
+        "module TopModule(input clock, input a, output reg p, output reg q);\n"
+        "  always @(*) if (clock) p = a;\n"
+        "  always @(posedge clock) q <= a;   // wrong edge\n"
+        "endmodule\n")
+    r = run_mixededge_equiv(g, str(broken), "TopModule",
+                            os.path.join(REPO, "runs/xaware/circuit8_broken"), timeout=120)
+    assert r.status == "cex", f"broken design must CEX, got {r.status}"
 
 
 # --- Integration through the production oracle entry point (rtl_gauntlet.equiv.run_equiv) ---
@@ -88,7 +109,7 @@ def _paths(task, model="veval_gpt", cand="candidate.v"):
 @pytest.mark.parametrize("task,expected", [
     ("prob088_ece241_2014_q5b", "careset_equiv"),   # one-hot init — was hand-verified RHG_cex
     ("prob149_ece241_2013_q4", "careset_equiv"),     # gradual-change precond (from rtl_gauntlet/preconds/)
-    ("prob145_circuit8", "cex"),                     # mixed-edge residual — stays flagged
+    ("prob145_circuit8", "careset_equiv"),           # mixed-edge — closed by the real-latch half-cycle miter
 ])
 def test_run_equiv_resolves_flagged_artifacts(task, expected):
     from rtl_gauntlet.equiv import run_equiv

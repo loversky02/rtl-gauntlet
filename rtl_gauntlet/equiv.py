@@ -266,6 +266,77 @@ def _load_precond(golden: str) -> str:
     return ""
 
 
+def run_mixededge_equiv(golden: str, candidate: str, top: str, workdir: str,
+                        settle: int = 3, halfcycles: int = 28,
+                        timeout: int = 300) -> EquivResult:
+    """Mixed-edge (latch + negedge-FF) careset miter — closes the circuit8 class.
+
+    The standard careset path elaborates with `-nolatches`, which DESTROYS an intentional
+    transparent latch (turns "hold" into a driven don't-care), producing a false CEX on designs
+    like circuit8 (`always @* if (clock) p = a;` + `always @(negedge clock) q <= a;`). Here we keep
+    the REAL latches (no -nolatches, no async2sync), convert everything to half-cycle logic with
+    `clk2fflogic`, drive the clock as a REGULAR alternating waveform (one SAT step per half-cycle),
+    and register every non-clock input at posedge — the spec's synchronous-stimulus precondition
+    (the VerilogEval TB drives inputs at clock edges). The two-build care-mask still masks init-x.
+    Non-vacuous: inverted-FF / transparent-low-latch / wrong-edge variants all still CEX."""
+    os.makedirs(workdir, exist_ok=True)
+    try:
+        gsrc = open(golden).read()
+    except OSError:
+        return EquivResult(False, FORMAL_INCONCLUSIVE, "golden unreadable")
+    ins, outs = _iface_ports(gsrc, top)
+    clk = _clk_name(ins)
+    if not outs or not clk:
+        return EquivResult(False, FORMAL_INCONCLUSIVE, "mixededge: needs a clock + outputs")
+    data_ins = [(n, w) for n, w in ins if n != clk]
+
+    def elab(src: str, mod: str, undef: str) -> str:
+        # NO -nolatches (keep the latch), NO async2sync (clk2fflogic models both edges).
+        return (f'read_verilog -sv "{src}"\nhierarchy -top {top}\nproc\n'
+                f'setundef -{undef} -init\nopt -purge\nrename {top} {mod}\n'
+                f'write_verilog -noattr "{workdir}/{mod}.v"\ndesign -reset\n')
+    mk = elab(golden, "gold0", "zero") + elab(golden, "gold1", "one") + elab(candidate, "gate", "zero")
+    log0, rc0, _ = _run_yosys(mk, os.path.join(workdir, "me_mk.ys"), timeout)
+    if rc0 != 0:
+        return EquivResult(False, FORMAL_INCONCLUSIVE, "mixededge elaboration failed:\n" + log0[-800:])
+
+    def conns(suf: str) -> str:
+        parts = [f".{clk}({clk})"]
+        parts += [f".{n}({n}_s)" for n, _ in data_ins]          # DUTs see the REGISTERED inputs
+        parts += [f".{n}({n}_{suf})" for n, _ in outs]
+        return ", ".join(parts)
+    inports = ", ".join([f"input {clk}"] +
+                        [(f"input [{w-1}:0] {n}" if w > 1 else f"input {n}") for n, w in data_ins])
+    sync = "".join(f"  reg [{w-1}:0] {n}_s;\n  always @(posedge {clk}) {n}_s <= {n};\n"
+                   for n, w in data_ins)
+    decls = "".join(f"  wire [{w-1}:0] {n}_0,{n}_1,{n}_g;\n" for n, w in outs)
+    cat = lambda suf: "{" + ",".join(f"{n}_{suf}" for n, _ in outs) + "}"  # noqa: E731
+    width = sum(w for _, w in outs)
+    miter = (f"module miter({inports});\n{sync}{decls}"
+             f"  gold0 u0({conns('0')});\n  gold1 u1({conns('1')});\n  gate ug({conns('g')});\n"
+             f"  wire [{width-1}:0] o0 = {cat('0')};\n  wire [{width-1}:0] o1 = {cat('1')};\n"
+             f"  wire [{width-1}:0] og = {cat('g')};\n"
+             f"  wire [{width-1}:0] care = ~(o0 ^ o1);\n  wire bad = |((o0 ^ og) & care);\n"
+             f"  reg [4:0] cyc;\n  always @(posedge {clk}) cyc <= (cyc==5'd31) ? 5'd31 : cyc+5'd1;\n"
+             f"  wire active = (cyc >= 5'd{settle});\n"
+             f"  always @* if (active) assert(!bad);\nendmodule\n")
+    with open(os.path.join(workdir, "me_miter.v"), "w") as f:
+        f.write(miter)
+    clkdrive = " ".join(f"-set-at {k} {clk} {k % 2}" for k in range(1, halfcycles + 1))
+    run = (f'read_verilog "{workdir}/gold0.v" "{workdir}/gold1.v" "{workdir}/gate.v"\n'
+           f'read_verilog -sv "{workdir}/me_miter.v"\nhierarchy -top miter\nproc\nflatten\nclk2fflogic\n'
+           f'setundef -zero -init\nopt\nsat -seq {halfcycles} {clkdrive} -prove-asserts\n')
+    log, _, to = _run_yosys(run, os.path.join(workdir, "me_run.ys"), timeout)
+    if to:
+        return EquivResult(False, FORMAL_INCONCLUSIVE, "mixededge sat timeout")
+    low = log.lower()
+    if "no model found" in low:
+        return EquivResult(True, FORMAL_CARESET_EQUIV, log)
+    if "model found" in low:
+        return EquivResult(False, FORMAL_CEX, log)
+    return EquivResult(False, FORMAL_INCONCLUSIVE, log[-800:])
+
+
 def run_careset_equiv(golden: str, candidate: str, top: str, workdir: str,
                       precond_v: str = "", settle: int = 2, seq: int = 24,
                       timeout: int = 300) -> EquivResult:
@@ -334,6 +405,14 @@ def run_careset_equiv(golden: str, candidate: str, top: str, workdir: str,
     if "no model found" in low:
         return EquivResult(True, FORMAL_CARESET_EQUIV, log)
     if "model found" in low:
+        # Mixed-edge class (a negedge FF and/or an intentional latch): the -nolatches elaboration
+        # above DESTROYS the latch, so this CEX may be an artifact of the build, not the design.
+        # Retry with the real-latch half-cycle miter before concluding cex.
+        if "negedge" in gsrc:
+            me = run_mixededge_equiv(golden, candidate, top, os.path.join(workdir, "mixededge"),
+                                     timeout=timeout)
+            if me.status == FORMAL_CARESET_EQUIV:
+                return me
         return EquivResult(False, FORMAL_CEX, log)
     return EquivResult(False, FORMAL_INCONCLUSIVE, log[-800:])
 
